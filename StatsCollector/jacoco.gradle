@@ -1,0 +1,27 @@
+apply plugin: 'jacoco'
+apply plugin: 'checkstyle'
+
+checkstyle {
+	configFile = new File(rootDir, "../../ojputil/OjpUtil/config/checkstyle/checkstyle.xml")
+ }
+
+jacoco {
+	toolVersion = "0.6.3.201306030806"
+	reportsDir = file("$buildDir/codeCoverage")
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled false
+		csv.enabled false
+		html.destination "${buildDir}/jacocoHtml"
+	}
+}
+
+test {
+	jacoco {
+		append = true
+		destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+		classDumpFile = file("$buildDir/jacoco/classpathdumps")
+	}
+}

@@ -1,0 +1,22 @@
+apply from: 'versions.gradle'
+
+dependencies {
+	compile(group:'org.springframework.boot', name:'spring-boot-starter-web', version:springBootVersion)
+	compile(group:'com.google.code.gson', name:'gson', version:gsonVersion)
+	compile(group:'org.apache.httpcomponents', name:'httpclient', version:httpClientVersion)
+	compile group:'joda-time', name:'joda-time', version:jodatimeVersion
+	compile group:'com.google.guava', name:'guava', version:guavaVersion
+	/* Test Compile dependencies */
+	testCompile group:'junit', name:'junit', version:junitVersion
+	testCompile group:'org.mockito', name:'mockito-core', version:mockitoVersion
+
+    testCompile (group:'org.powermock', name:'powermock-module-junit4', version:powermockVersion){
+        exclude group:'org.mockito', module:'mockito-core'
+        exclude group:'org.mockito', module:'mockito-all'
+    }
+    testCompile (group:'org.powermock', name:'powermock-api-mockito', version:powermockVersion){
+        exclude group:'org.mockito', module:'mockito-core'
+        exclude group:'org.mockito', module:'mockito-all'
+    }
+}
+

@@ -1,0 +1,11 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
+repositories {
+	maven {
+		url 'http://artifactory.ojp:8081/artifactory/repo'
+        credentials {
+            username = "publisher"
+            password = "ojppassword"
+        }
+	}
+}

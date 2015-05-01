@@ -1,0 +1,10 @@
+ext {
+	httpClientVersion='4.3.5'
+	gsonVersion='2.3.1'
+	springBootVersion='1.2.3.RELEASE'
+	junitVersion='4.11'
+	mockitoVersion='1.9.5'
+	powermockVersion='1.5.4'
+	jodatimeVersion='2.1'
+	guavaVersion='18.0'
+}
