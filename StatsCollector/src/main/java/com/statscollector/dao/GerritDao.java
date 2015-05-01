@@ -15,6 +15,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Repository;
 
 import com.statscollector.enums.StatusEnum;
+import com.statscollector.model.GerritChangeDetails;
 
 /**
  * I'm a DAO (actually more of a http client) that accesses Gerrit data using
@@ -30,6 +31,7 @@ public class GerritDao {
 	private static final String ALL_CHANGES_REST_URL = "/a/changes/";
 	private static final String HOST = "nreojp.git:8080";
 	private final static String QUERY = "q";
+	private static final String DETAIL_URL_END = "/detail";
 
 	/**
 	 * I Return a String containing all changes for all projects, that have the
@@ -83,6 +85,29 @@ public class GerritDao {
 	private URIBuilder setupBaseURI(final String requestUrl) throws URISyntaxException {
 		return new URIBuilder().setScheme(HTTP_SCHEME).setHost(HOST).setPath(requestUrl);
 
+	}
+
+	public String getDetails(final CredentialsProvider credsProvider, final String changeId) throws IOException,
+	URISyntaxException {
+		String resultString;
+
+		try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build()) {
+			URIBuilder baseURIBuilder = setupBaseURI(ALL_CHANGES_REST_URL+changeId+DETAIL_URL_END);
+			URI uri = baseURIBuilder.build();
+			HttpGet httpGet = new HttpGet(uri);
+			try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+				HttpEntity httpEntity = response.getEntity();
+				resultString = EntityUtils.toString(httpEntity);
+				EntityUtils.consume(httpEntity);
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				throw e;
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			throw e;
+		}
+		return resultString;
 	}
 
 }

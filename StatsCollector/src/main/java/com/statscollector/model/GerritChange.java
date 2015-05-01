@@ -1,7 +1,7 @@
 package com.statscollector.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.joda.time.DateTime;
 
@@ -14,7 +14,7 @@ import org.joda.time.DateTime;
 public class GerritChange {
 	private final String id, changeId, project, owner;
 	private final DateTime created, updated;
-	private final List<String> reviewers;
+	private Map<String, Integer> reviewers;
 	private final boolean haveCheckedForReviewers = false;
 
 	public GerritChange(final String id, final String changeId, final String project, final String owner,
@@ -26,7 +26,7 @@ public class GerritChange {
 		this.owner = owner;
 		this.created = created;
 		this.updated = updated;
-		this.reviewers = new ArrayList<>();
+		this.reviewers = new HashMap<>();
 	}
 
 	public String getId() {
@@ -53,8 +53,12 @@ public class GerritChange {
 		return updated;
 	}
 
-	public List<String> getReviewers() {
+	public Map<String, Integer> getReviewers() {
 		return reviewers;
+	}
+	
+	public void setReviewers(Map<String, Integer> reviewers) {
+		this.reviewers = reviewers;
 	}
 
 	public boolean haveReviewers() {

@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import com.statscollector.enums.StatusEnum;
 
-public class StatisticsDaoTest {
+public class GerritDaoTest {
 
 	private final GerritDao statisticsDao = new GerritDao();
 	private CredentialsProvider credsProvider;

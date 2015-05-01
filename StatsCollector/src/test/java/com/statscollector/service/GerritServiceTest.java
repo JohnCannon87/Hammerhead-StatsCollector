@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,8 +13,9 @@ import org.junit.Test;
 import com.statscollector.authentication.AuthenticationHelper;
 import com.statscollector.dao.GerritDao;
 import com.statscollector.model.GerritChange;
+import com.statscollector.model.GerritChangeDetails;
 
-public class StatisticsServiceTest {
+public class GerritServiceTest {
 
 	private GerritService statisticsService;
 
@@ -28,13 +30,16 @@ public class StatisticsServiceTest {
 
 	@Test
 	public void testGetAllChanges() throws IOException, URISyntaxException {
-		List<GerritChange> allChanges = statisticsService.getAllChanges();
+		List<GerritChange> allChanges = statisticsService.getAllMergedChanges();
 		System.out.println(allChanges);
 	}
 
 	@Test
-	public void testGetReviewStats() {
-		fail("Not yet implemented");
+	public void testGetGerritChangeDetails() throws IOException, URISyntaxException {
+		List<GerritChange> allChanges = statisticsService.getAllMergedChanges();
+		System.out.println(allChanges);
+		Map<String, GerritChangeDetails> gerritChangeDetails = statisticsService.getGerritChangeDetails(allChanges);
 	}
+	
 
 }

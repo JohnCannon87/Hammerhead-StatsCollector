@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
+import com.statscollector.config.GerritConfig;
 import com.statscollector.model.GerritChange;
+import com.statscollector.model.ReviewStats;
 import com.statscollector.service.filter.FilterDateUpdatedPredicate;
 import com.statscollector.service.filter.FilterProjectNamePredicate;
 import com.statscollector.service.filter.GerritChangeFilter;
@@ -30,6 +35,11 @@ public class GerritStatisticsService {
 	@Autowired
 	private GerritStatisticsHelper gerritStatisticsHelper;
 
+	@Autowired
+	private GerritConfig gerritConfig;
+	
+	final static Logger LOGGER = Logger.getLogger(GerritStatisticsService.class);
+	
 	/**
 	 * I return a list of changes with unwanted changes filtered out based on
 	 * the provided parameters.
@@ -43,7 +53,7 @@ public class GerritStatisticsService {
 	 */
 	public List<GerritChange> getChangesBasedOnParameters(final String projectFilterRegex, final DateTime startDate,
 			final DateTime endDate) throws IOException, URISyntaxException {
-		List<GerritChange> allChanges = gerritService.getAllChanges();
+		List<GerritChange> allChanges = gerritService.getAllMergedChanges();
 		return filterChanges(allChanges, getFilters(projectFilterRegex, startDate, endDate));
 	}
 
@@ -80,6 +90,56 @@ public class GerritStatisticsService {
 		results.add(new FilterDateUpdatedPredicate(startDate, endDate));
 		results.add(new FilterProjectNamePredicate(projectFilterRegex));
 		return results;
+	}
+
+	public ReviewStats getReviewStatistics(String projectFilterString,
+			DateTime startDate, DateTime endDate) throws IOException, URISyntaxException {
+		int noPeerReviewCount = 0, onePeerReviewCount = 0, twoPlusPeerReviewCount = 0, collabrativeDevelopmentCount = 0;
+		List<GerritChange> changes = getChangesBasedOnParameters(projectFilterString, startDate, endDate);
+		gerritService.populateChangeReviewers(changes);
+		for (GerritChange gerritChange : changes) {
+			int numberOfReviewers = numberOfReviewers(gerritChange);
+			LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
+			switch(numberOfReviewers){
+				case -1:
+					collabrativeDevelopmentCount++;
+				break;
+				case 0:
+					noPeerReviewCount++;
+				break;
+				case 1:
+					onePeerReviewCount++;
+				break;
+				default:
+					twoPlusPeerReviewCount++;
+				break;
+			}
+		}
+		
+		return new ReviewStats(noPeerReviewCount, onePeerReviewCount, twoPlusPeerReviewCount, collabrativeDevelopmentCount);
+	}
+
+	/**
+	 * I return the number of reviewers for the provided change, if the change has been collaboratively developed I return -1
+	 * @param gerritChange
+	 * @return
+	 */
+	private int numberOfReviewers(GerritChange gerritChange) {
+		LOGGER.info("Calculating changes for change: " + gerritChange);
+		String owner = gerritChange.getOwner();
+		Map<String, Integer> reviewers = gerritChange.getReviewers();
+		Set<String> reviewersUsernames = reviewers.keySet();
+		List<String> reviewersList = new ArrayList<>();
+		for (String username : reviewersUsernames) {
+			Integer reviewValue = reviewers.get(username);
+			if(reviewValue > 0){
+				reviewersList.add(username);
+			}
+		}
+		List<String> reviewersToIgnore = gerritConfig.getReviewersToIgnore();
+		reviewersList.removeAll(reviewersToIgnore);//Get rid of all automated reviewers etc.
+		reviewersList.remove(owner);//Remove the owner from the review list
+		return reviewersList.size();
 	}
 
 }

@@ -3,8 +3,11 @@ package com.statscollector.service;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -17,10 +20,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.MalformedJsonException;
 import com.statscollector.authentication.AuthenticationHelper;
 import com.statscollector.dao.GerritDao;
 import com.statscollector.enums.StatusEnum;
 import com.statscollector.model.GerritChange;
+import com.statscollector.model.GerritChangeDetails;
 
 /**
  * I'm a service that performs some business logic to access the information
@@ -48,16 +54,28 @@ public class GerritService {
 
 	private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
+	private static final String LABELS_REF = "labels";
+
+	private static final String CODE_REVIEW_REF = "Code-Review";
+
+	private static final String ALL_REF = "all";
+
+	private static final String USERNAME_REF = "username";
+
+	private static final String VALUE_REF = "value";
+
 	@Autowired
-	private GerritDao statisticsDao;
+	private GerritDao gerritDao;
 
 	@Autowired
 	private AuthenticationHelper authenticationHelper;
+	
+	final static Logger LOGGER = Logger.getLogger(GerritService.class);
 
-	public List<GerritChange> getAllChanges() throws IOException, URISyntaxException {
+	public List<GerritChange> getAllMergedChanges() throws IOException, URISyntaxException {
 		JsonParser jsonParser = new JsonParser();
-		String allOpenChangesUnparsed = statisticsDao.getAllChanges(
-				authenticationHelper.createAuthenticationCredentials(), StatusEnum.OPEN);
+		String allOpenChangesUnparsed = gerritDao.getAllChanges(
+				authenticationHelper.createAuthenticationCredentials(), StatusEnum.MERGED);
 		JsonElement allOpenChanges = jsonParser.parse(allOpenChangesUnparsed);
 		return translateToChanges(allOpenChanges);
 	}
@@ -95,11 +113,51 @@ public class GerritService {
 	}
 
 	public void setStatisticsDao(final GerritDao statisticsDao) {
-		this.statisticsDao = statisticsDao;
+		this.gerritDao = statisticsDao;
 	}
 
 	public void setAuthenticationHelper(final AuthenticationHelper authenticationHelper) {
 		this.authenticationHelper = authenticationHelper;
+	}
+
+	public void populateChangeReviewers(List<GerritChange> changes) throws IOException, URISyntaxException {
+		Map<String, GerritChangeDetails> gerritChangeDetails = getGerritChangeDetails(changes);
+		for (GerritChange gerritChange : changes) {
+			GerritChangeDetails changeDetail = gerritChangeDetails.get(gerritChange.getChangeId());
+			if(null != changeDetail){
+				gerritChange.setReviewers(changeDetail.getReviewers());
+			}
+		}
+	}
+
+	public Map<String, GerritChangeDetails> getGerritChangeDetails(List<GerritChange> changes) throws JsonSyntaxException, IOException, URISyntaxException{
+		JsonParser jsonParser = new JsonParser();
+		HashMap<String, GerritChangeDetails> result = new HashMap<>();
+		for (GerritChange gerritChange : changes) {
+			String changeId = gerritChange.getChangeId();	
+			try{
+				result.put(changeId, translateToDetails(jsonParser.parse(gerritDao.getDetails(authenticationHelper.createAuthenticationCredentials(), changeId))));
+			}catch(Exception e){
+				LOGGER.error("Error found in processing changeId: " + changeId, e);
+			}
+		}
+		return result;
+	}
+
+	private GerritChangeDetails translateToDetails(JsonElement detailsJson) {
+		GerritChangeDetails gerritChangeDetails = new GerritChangeDetails();
+		JsonElement labelsElement = detailsJson.getAsJsonObject().get(LABELS_REF);
+		JsonElement codeReviewElement = labelsElement.getAsJsonObject().get(CODE_REVIEW_REF);
+		JsonArray allArray = codeReviewElement.getAsJsonObject().get(ALL_REF).getAsJsonArray();
+		for (JsonElement jsonElement : allArray) {
+			JsonObject review = jsonElement.getAsJsonObject();
+			if(null != review){
+				String username = review.get(USERNAME_REF).getAsString();
+				int reviewValue = review.get(VALUE_REF).getAsInt();
+				gerritChangeDetails.addReviewer(username, reviewValue);
+			}
+		}
+		return gerritChangeDetails;
 	}
 
 }
