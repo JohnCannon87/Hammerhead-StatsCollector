@@ -94,31 +94,33 @@ public class GerritStatisticsService {
 
 	public ReviewStats getReviewStatistics(final String changeStatus, final String projectFilterString,
 			final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
-		int noPeerReviewCount = 0, onePeerReviewCount = 0, twoPlusPeerReviewCount = 0, collabrativeDevelopmentCount = 0, totalReviewsCount = 0;
+		List<GerritChange> noPeerReviewList = new ArrayList<>();
+		List<GerritChange> onePeerReviewList = new ArrayList<>();
+		List<GerritChange> twoPlusPeerReviewList = new ArrayList<>();
+		List<GerritChange> collabrativeDevelopmentList = new ArrayList<>();
+
 		List<GerritChange> changes = getChangesBasedOnParameters(changeStatus, projectFilterString, startDate, endDate);
 		gerritService.populateChangeReviewers(changes);
-		totalReviewsCount = changes.size();
 		for (GerritChange gerritChange : changes) {
 			int numberOfReviewers = numberOfReviewers(gerritChange);
 			LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
 			switch (numberOfReviewers) {
 			case -1:
-				collabrativeDevelopmentCount++;
+				collabrativeDevelopmentList.add(gerritChange);
 				break;
 			case 0:
-				noPeerReviewCount++;
+				noPeerReviewList.add(gerritChange);
 				break;
 			case 1:
-				onePeerReviewCount++;
+				onePeerReviewList.add(gerritChange);
 				break;
 			default:
-				twoPlusPeerReviewCount++;
+				twoPlusPeerReviewList.add(gerritChange);
 				break;
 			}
 		}
 
-		return new ReviewStats(noPeerReviewCount, onePeerReviewCount, twoPlusPeerReviewCount,
-				collabrativeDevelopmentCount, totalReviewsCount);
+		return new ReviewStats(noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList, collabrativeDevelopmentList);
 	}
 
 	/**

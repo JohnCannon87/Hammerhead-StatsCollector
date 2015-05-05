@@ -1,13 +1,18 @@
 apply from: 'versions.gradle'
 
 dependencies {
+	compile group:'org.apache.tomcat.embed', name:'tomcat-embed-jasper', version:'8.0.21'
+
 	compile(group:'org.springframework.boot', name:'spring-boot-starter-web', version:springBootVersion)
 	compile(group:'com.google.code.gson', name:'gson', version:gsonVersion)
 	compile(group:'org.apache.httpcomponents', name:'httpclient', version:httpClientVersion)
 	compile group:'joda-time', name:'joda-time', version:jodatimeVersion
 	compile group:'com.google.guava', name:'guava', version:guavaVersion
 	compile group:'org.apache.logging.log4j', name:'log4j-core', version:log4jVersion
-	compile group:'commons-configuration', name:'commons-configuration', version:commonsConfigVersion
+	compile group:'commons-configuration', name:'commons-configuration', version:commonsConfigVersion	
+	compile group:'javax.servlet.jsp.jstl', name:'jstl', version:'1.2'
+	
+	
 	/* Test Compile dependencies */
 	testCompile group:'junit', name:'junit', version:junitVersion
 	testCompile group:'org.mockito', name:'mockito-core', version:mockitoVersion

@@ -1,38 +1,56 @@
 package com.statscollector.model;
 
+import java.util.List;
+
 public class ReviewStats {
 
-	private final int noPeerReviewCount, onePeerReviewCount, twoPlusPeerReviewCount, collabrativeDevelopmentCount,
-	totalReviewsCount;
+	private final List<GerritChange> noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList,
+	collabrativeDevelopmentList;
 
-	public ReviewStats(final int noPeerReviewCount, final int onePeerReviewCount, final int twoPlusPeerReviewCount,
-			final int collabrativeDevelopmentCount, final int totalReviewsCount) {
+	public ReviewStats(final List<GerritChange> noPeerReviewCount, final List<GerritChange> onePeerReviewCount,
+			final List<GerritChange> twoPlusPeerReviewCount, final List<GerritChange> collabrativeDevelopmentCount) {
 		super();
-		this.noPeerReviewCount = noPeerReviewCount;
-		this.onePeerReviewCount = onePeerReviewCount;
-		this.twoPlusPeerReviewCount = twoPlusPeerReviewCount;
-		this.collabrativeDevelopmentCount = collabrativeDevelopmentCount;
-		this.totalReviewsCount = totalReviewsCount;
+		this.noPeerReviewList = noPeerReviewCount;
+		this.onePeerReviewList = onePeerReviewCount;
+		this.twoPlusPeerReviewList = twoPlusPeerReviewCount;
+		this.collabrativeDevelopmentList = collabrativeDevelopmentCount;
+	}
+
+	public List<GerritChange> getNoPeerReviewList() {
+		return noPeerReviewList;
+	}
+
+	public List<GerritChange> getOnePeerReviewList() {
+		return onePeerReviewList;
+	}
+
+	public List<GerritChange> getTwoPlusPeerReviewList() {
+		return twoPlusPeerReviewList;
+	}
+
+	public List<GerritChange> getCollabrativeDevelopmentList() {
+		return collabrativeDevelopmentList;
 	}
 
 	public int getNoPeerReviewCount() {
-		return noPeerReviewCount;
+		return noPeerReviewList.size();
 	}
 
 	public int getOnePeerReviewCount() {
-		return onePeerReviewCount;
+		return onePeerReviewList.size();
 	}
 
 	public int getTwoPlusPeerReviewCount() {
-		return twoPlusPeerReviewCount;
+		return twoPlusPeerReviewList.size();
 	}
 
 	public int getCollabrativeDevelopmentCount() {
-		return collabrativeDevelopmentCount;
+		return collabrativeDevelopmentList.size();
 	}
 
 	public int getTotalReviewsCount() {
-		return totalReviewsCount;
+		return getNoPeerReviewCount() + getOnePeerReviewCount() + getTwoPlusPeerReviewCount()
+				+ getCollabrativeDevelopmentCount();
 	}
 
 }
