@@ -1,24 +1,43 @@
 package com.statscollector.config;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GerritConfig {
 
 	/**
-	 * A List of reviewers to ignore, e.g. automated tools (jenkins) etc. 
+	 * KEYS
 	 */
-	private List<String> reviewersToIgnore = new ArrayList<>();
+	private static final String HOST_KEY = "gerrit.host";
+	private static final String REVIEWERS_TO_IGNORE_KEY = "gerrit.ignoreReviewers";
 
-	
+	private final PropertiesConfiguration config;
+
+	public GerritConfig() throws ConfigurationException {
+		config = new PropertiesConfiguration("GerritStatistics.properties");
+	}
+
+	public String getHost() {
+		return config.getString(HOST_KEY);
+	}
+
+	public void setHost(final String host) throws ConfigurationException {
+		config.setProperty(HOST_KEY, host);
+		config.save();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<String> getReviewersToIgnore() {
-		return reviewersToIgnore;
+		return (List) config.getList(REVIEWERS_TO_IGNORE_KEY);
 	}
-	
-	public void addReviewerToIgnore(String reviewer) {
-		reviewersToIgnore.add(reviewer);
+
+	public void setReviewersToIgnore(final List<String> reviewersToIgnore) throws ConfigurationException {
+		config.setProperty(REVIEWERS_TO_IGNORE_KEY, reviewersToIgnore);
+		config.save();
 	}
+
 }

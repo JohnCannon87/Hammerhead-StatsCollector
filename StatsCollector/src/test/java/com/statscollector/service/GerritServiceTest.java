@@ -1,9 +1,8 @@
 package com.statscollector.service;
 
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +11,7 @@ import org.junit.Test;
 
 import com.statscollector.authentication.AuthenticationHelper;
 import com.statscollector.dao.GerritDao;
+import com.statscollector.enums.StatusEnum;
 import com.statscollector.model.GerritChange;
 import com.statscollector.model.GerritChangeDetails;
 
@@ -30,16 +30,19 @@ public class GerritServiceTest {
 
 	@Test
 	public void testGetAllChanges() throws IOException, URISyntaxException {
-		List<GerritChange> allChanges = statisticsService.getAllMergedChanges();
+		List<GerritChange> allChanges = statisticsService.getAllChanges(StatusEnum.MERGED.toString());
 		System.out.println(allChanges);
 	}
 
 	@Test
 	public void testGetGerritChangeDetails() throws IOException, URISyntaxException {
-		List<GerritChange> allChanges = statisticsService.getAllMergedChanges();
+		List<GerritChange> allChanges = statisticsService.getAllChanges(StatusEnum.MERGED.toString());
 		System.out.println(allChanges);
 		Map<String, GerritChangeDetails> gerritChangeDetails = statisticsService.getGerritChangeDetails(allChanges);
+		Collection<GerritChangeDetails> values = gerritChangeDetails.values();
+		for (GerritChangeDetails gerritChangeDetail : values) {
+			System.out.println(gerritChangeDetail);
+		}
 	}
-	
 
 }

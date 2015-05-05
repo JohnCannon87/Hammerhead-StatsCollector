@@ -12,7 +12,10 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import com.statscollector.config.GerritConfig;
 
 /**
  * I'm a DAO (actually more of a http client) that accesses Gerrit data using
@@ -26,10 +29,12 @@ public class GerritDao {
 
 	private static final String HTTP_SCHEME = "http";
 	private static final String ALL_CHANGES_REST_URL = "/a/changes/";
-	private static final String HOST = "nreojp.git:8080";
 	private final static String QUERY = "q";
 	private static final String DETAIL_URL_END = "/detail";
 	private static final String BASE_STATUS_STRING = "status:";
+
+	@Autowired
+	private GerritConfig gerritConfig;
 
 	/**
 	 * I Return a String containing all changes for all projects, that have the
@@ -81,7 +86,7 @@ public class GerritDao {
 	 * @throws URISyntaxException
 	 */
 	private URIBuilder setupBaseURI(final String requestUrl) throws URISyntaxException {
-		return new URIBuilder().setScheme(HTTP_SCHEME).setHost(HOST).setPath(requestUrl);
+		return new URIBuilder().setScheme(HTTP_SCHEME).setHost(gerritConfig.getHost()).setPath(requestUrl);
 
 	}
 

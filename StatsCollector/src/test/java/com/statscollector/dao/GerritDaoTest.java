@@ -26,19 +26,19 @@ public class GerritDaoTest {
 
 	@Test
 	public void testGetAllAbandonedChanges() throws IOException, URISyntaxException {
-		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.ABANDONED);
+		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.ABANDONED.toString());
 		System.out.println(testResult);
 	}
 
 	@Test
 	public void testGetAllMergedChanges() throws IOException, URISyntaxException {
-		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.MERGED);
+		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.MERGED.toString());
 		System.out.println(testResult);
 	}
 
 	@Test
 	public void testGetAllOpenChanges() throws IOException, URISyntaxException {
-		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.OPEN);
+		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.OPEN.toString());
 		System.out.println(testResult);
 	}
 

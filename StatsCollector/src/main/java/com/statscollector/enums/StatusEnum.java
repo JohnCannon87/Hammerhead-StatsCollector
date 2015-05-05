@@ -2,7 +2,7 @@ package com.statscollector.enums;
 
 public enum StatusEnum {
 
-	OPEN("status:open"), MERGED("status:merged"), ABANDONED("status:abandoned");
+	OPEN("open"), MERGED("merged"), ABANDONED("abandoned");
 
 	private String name;
 

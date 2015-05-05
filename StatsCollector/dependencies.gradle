@@ -7,6 +7,7 @@ dependencies {
 	compile group:'joda-time', name:'joda-time', version:jodatimeVersion
 	compile group:'com.google.guava', name:'guava', version:guavaVersion
 	compile group:'org.apache.logging.log4j', name:'log4j-core', version:log4jVersion
+	compile group:'commons-configuration', name:'commons-configuration', version:commonsConfigVersion
 	/* Test Compile dependencies */
 	testCompile group:'junit', name:'junit', version:junitVersion
 	testCompile group:'org.mockito', name:'mockito-core', version:mockitoVersion
