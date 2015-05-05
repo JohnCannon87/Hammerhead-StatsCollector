@@ -23,46 +23,53 @@ public class GerritReviewController {
 	private static final String ALL_REGEX = ".*";
 
 	private static final int CURRENT_TIME_OFFSET = 100;
-	
+
 	@Autowired
 	private GerritStatisticsService statisticsService;
-	
-	@RequestMapping("/{projectFilterString}/{startDate}/{endDate}")
-	public ReviewStats review(@PathVariable String projectFilterString, @PathVariable String startDate, @PathVariable String endDate) throws IOException, URISyntaxException {
-		return getReviewStatistics(projectFilterString, parseDate(startDate), parseDate(endDate));
+
+	@RequestMapping("/{changeStatus}/{projectFilterString}/{startDate}/{endDate}")
+	public ReviewStats statusReview(@PathVariable final String changeStatus,
+			@PathVariable final String projectFilterString, @PathVariable final String startDate,
+			@PathVariable final String endDate) throws IOException, URISyntaxException {
+		return getReviewStatistics(changeStatus, projectFilterString, parseDate(startDate), parseDate(endDate));
 	}
 
-	@RequestMapping("/{projectFilterString}")
-	public ReviewStats review(@PathVariable String projectFilterString) throws IOException, URISyntaxException {
-		return getReviewStatistics(projectFilterString, null, null);
-	}
-	
-	@RequestMapping("/{startDate}/{endDate}")
-	public ReviewStats review(@PathVariable String startDate, @PathVariable String endDate) throws IOException, URISyntaxException {
-		return getReviewStatistics(null, parseDate(startDate), parseDate(endDate));
-	}
-	
-	@RequestMapping("/all")
-	public ReviewStats review() throws IOException, URISyntaxException {
-		return getReviewStatistics(null, null, null);
+	@RequestMapping("/{changeStatus}/{projectFilterString}")
+	public ReviewStats mergedReview(@PathVariable final String changeStatus,
+			@PathVariable final String projectFilterString) throws IOException, URISyntaxException {
+		return getReviewStatistics(changeStatus, projectFilterString, null, null);
 	}
 
-	public ReviewStats getReviewStatistics(String projectFilterString, DateTime startDate, DateTime endDate) throws IOException, URISyntaxException{
-		if(null == projectFilterString){
+	@RequestMapping("/{changeStatus}/{startDate}/{endDate}")
+	public ReviewStats mergedReview(@PathVariable final String changeStatus, @PathVariable final String startDate,
+			@PathVariable final String endDate) throws IOException, URISyntaxException {
+		return getReviewStatistics(changeStatus, null, parseDate(startDate), parseDate(endDate));
+	}
+
+	@RequestMapping("/{changeStatus}/all")
+	public ReviewStats mergedReview(@PathVariable final String changeStatus) throws IOException, URISyntaxException {
+		return getReviewStatistics(changeStatus, null, null, null);
+	}
+
+	public ReviewStats getReviewStatistics(final String changeStatus, String projectFilterString, DateTime startDate,
+			DateTime endDate) throws IOException, URISyntaxException {
+		if (null == projectFilterString) {
 			projectFilterString = ALL_REGEX;
 		}
-		if(null == startDate){
+		if (null == startDate) {
 			startDate = new DateTime(0);
 		}
-		if(null == endDate){
-			endDate = new DateTime().plusYears(CURRENT_TIME_OFFSET);//Search far enough into future to offset any chance of incorrect time syncs between servers.
+		if (null == endDate) {
+			// Search far enough into future to offset any chance of incorrect
+			// time syncs between servers.
+			endDate = new DateTime().plusYears(CURRENT_TIME_OFFSET);
 		}
-		return statisticsService.getReviewStatistics(projectFilterString, startDate, endDate);
+		return statisticsService.getReviewStatistics(changeStatus, projectFilterString, startDate, endDate);
 	}
-	
-	private DateTime parseDate(String stringDate) {
+
+	private DateTime parseDate(final String stringDate) {
 		DateTimeFormatter pattern = DateTimeFormat.forPattern(DATE_PATTERN);
 		return pattern.parseDateTime(stringDate);
 	}
-	
+
 }

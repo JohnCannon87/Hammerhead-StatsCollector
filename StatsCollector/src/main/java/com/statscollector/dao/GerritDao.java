@@ -14,13 +14,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Repository;
 
-import com.statscollector.enums.StatusEnum;
-import com.statscollector.model.GerritChangeDetails;
-
 /**
  * I'm a DAO (actually more of a http client) that accesses Gerrit data using
  * simple http requests.
- * 
+ *
  * @author JCannon
  *
  */
@@ -32,6 +29,7 @@ public class GerritDao {
 	private static final String HOST = "nreojp.git:8080";
 	private final static String QUERY = "q";
 	private static final String DETAIL_URL_END = "/detail";
+	private static final String BASE_STATUS_STRING = "status:";
 
 	/**
 	 * I Return a String containing all changes for all projects, that have the
@@ -44,18 +42,18 @@ public class GerritDao {
 	 * For an example
 	 *
 	 * @param credsProvider
-	 * @param status
+	 * @param changeStatus
 	 * @return result
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public String getAllChanges(final CredentialsProvider credsProvider, final StatusEnum status) throws IOException,
+	public String getAllChanges(final CredentialsProvider credsProvider, final String changeStatus) throws IOException,
 			URISyntaxException {
 		String resultString;
 
 		try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build()) {
 			URIBuilder baseURIBuilder = setupBaseURI(ALL_CHANGES_REST_URL);
-			baseURIBuilder.setParameter(QUERY, status.toString());
+			baseURIBuilder.setParameter(QUERY, BASE_STATUS_STRING + changeStatus);
 			URI uri = baseURIBuilder.build();
 			HttpGet httpGet = new HttpGet(uri);
 			try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
@@ -88,11 +86,11 @@ public class GerritDao {
 	}
 
 	public String getDetails(final CredentialsProvider credsProvider, final String changeId) throws IOException,
-	URISyntaxException {
+			URISyntaxException {
 		String resultString;
 
 		try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build()) {
-			URIBuilder baseURIBuilder = setupBaseURI(ALL_CHANGES_REST_URL+changeId+DETAIL_URL_END);
+			URIBuilder baseURIBuilder = setupBaseURI(ALL_CHANGES_REST_URL + changeId + DETAIL_URL_END);
 			URI uri = baseURIBuilder.build();
 			HttpGet httpGet = new HttpGet(uri);
 			try (CloseableHttpResponse response = httpclient.execute(httpGet)) {

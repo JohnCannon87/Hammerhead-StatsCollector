@@ -37,13 +37,13 @@ public class GerritStatisticsService {
 
 	@Autowired
 	private GerritConfig gerritConfig;
-	
+
 	final static Logger LOGGER = Logger.getLogger(GerritStatisticsService.class);
-	
+
 	/**
 	 * I return a list of changes with unwanted changes filtered out based on
 	 * the provided parameters.
-	 * 
+	 *
 	 * @param projectFilterRegex
 	 * @param startDate
 	 * @param endDate
@@ -51,9 +51,9 @@ public class GerritStatisticsService {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public List<GerritChange> getChangesBasedOnParameters(final String projectFilterRegex, final DateTime startDate,
-			final DateTime endDate) throws IOException, URISyntaxException {
-		List<GerritChange> allChanges = gerritService.getAllMergedChanges();
+	public List<GerritChange> getChangesBasedOnParameters(final String changeStatus, final String projectFilterRegex,
+			final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
+		List<GerritChange> allChanges = gerritService.getAllChanges(changeStatus);
 		return filterChanges(allChanges, getFilters(projectFilterRegex, startDate, endDate));
 	}
 
@@ -92,39 +92,43 @@ public class GerritStatisticsService {
 		return results;
 	}
 
-	public ReviewStats getReviewStatistics(String projectFilterString,
-			DateTime startDate, DateTime endDate) throws IOException, URISyntaxException {
-		int noPeerReviewCount = 0, onePeerReviewCount = 0, twoPlusPeerReviewCount = 0, collabrativeDevelopmentCount = 0;
-		List<GerritChange> changes = getChangesBasedOnParameters(projectFilterString, startDate, endDate);
+	public ReviewStats getReviewStatistics(final String changeStatus, final String projectFilterString,
+			final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
+		int noPeerReviewCount = 0, onePeerReviewCount = 0, twoPlusPeerReviewCount = 0, collabrativeDevelopmentCount = 0, totalReviewsCount = 0;
+		List<GerritChange> changes = getChangesBasedOnParameters(changeStatus, projectFilterString, startDate, endDate);
 		gerritService.populateChangeReviewers(changes);
+		totalReviewsCount = changes.size();
 		for (GerritChange gerritChange : changes) {
 			int numberOfReviewers = numberOfReviewers(gerritChange);
 			LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
-			switch(numberOfReviewers){
-				case -1:
-					collabrativeDevelopmentCount++;
+			switch (numberOfReviewers) {
+			case -1:
+				collabrativeDevelopmentCount++;
 				break;
-				case 0:
-					noPeerReviewCount++;
+			case 0:
+				noPeerReviewCount++;
 				break;
-				case 1:
-					onePeerReviewCount++;
+			case 1:
+				onePeerReviewCount++;
 				break;
-				default:
-					twoPlusPeerReviewCount++;
+			default:
+				twoPlusPeerReviewCount++;
 				break;
 			}
 		}
-		
-		return new ReviewStats(noPeerReviewCount, onePeerReviewCount, twoPlusPeerReviewCount, collabrativeDevelopmentCount);
+
+		return new ReviewStats(noPeerReviewCount, onePeerReviewCount, twoPlusPeerReviewCount,
+				collabrativeDevelopmentCount, totalReviewsCount);
 	}
 
 	/**
-	 * I return the number of reviewers for the provided change, if the change has been collaboratively developed I return -1
+	 * I return the number of reviewers for the provided change, if the change
+	 * has been collaboratively developed I return -1
+	 *
 	 * @param gerritChange
 	 * @return
 	 */
-	private int numberOfReviewers(GerritChange gerritChange) {
+	private int numberOfReviewers(final GerritChange gerritChange) {
 		LOGGER.info("Calculating changes for change: " + gerritChange);
 		String owner = gerritChange.getOwner();
 		Map<String, Integer> reviewers = gerritChange.getReviewers();
@@ -132,13 +136,14 @@ public class GerritStatisticsService {
 		List<String> reviewersList = new ArrayList<>();
 		for (String username : reviewersUsernames) {
 			Integer reviewValue = reviewers.get(username);
-			if(reviewValue > 0){
+			if (reviewValue > 0) {
 				reviewersList.add(username);
 			}
 		}
 		List<String> reviewersToIgnore = gerritConfig.getReviewersToIgnore();
-		reviewersList.removeAll(reviewersToIgnore);//Get rid of all automated reviewers etc.
-		reviewersList.remove(owner);//Remove the owner from the review list
+		reviewersList.removeAll(reviewersToIgnore);// Get rid of all automated
+		// reviewers etc.
+		reviewersList.remove(owner);// Remove the owner from the review list
 		return reviewersList.size();
 	}
 
