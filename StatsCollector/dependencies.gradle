@@ -10,7 +10,7 @@ dependencies {
 	compile group:'com.google.guava', name:'guava', version:guavaVersion
 	compile group:'org.apache.logging.log4j', name:'log4j-core', version:log4jVersion
 	compile group:'commons-configuration', name:'commons-configuration', version:commonsConfigVersion	
-	compile group:'javax.servlet.jsp.jstl', name:'jstl', version:'1.2'
+	compile group:'javax.servlet', name:'jstl', version:'1.2'
 	
 	
 	/* Test Compile dependencies */

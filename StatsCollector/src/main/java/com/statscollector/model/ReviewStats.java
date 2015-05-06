@@ -5,7 +5,7 @@ import java.util.List;
 public class ReviewStats {
 
 	private final List<GerritChange> noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList,
-	collabrativeDevelopmentList;
+			collabrativeDevelopmentList;
 
 	public ReviewStats(final List<GerritChange> noPeerReviewCount, final List<GerritChange> onePeerReviewCount,
 			final List<GerritChange> twoPlusPeerReviewCount, final List<GerritChange> collabrativeDevelopmentCount) {

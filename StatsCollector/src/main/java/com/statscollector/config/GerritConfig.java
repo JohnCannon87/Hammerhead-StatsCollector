@@ -39,5 +39,4 @@ public class GerritConfig {
 		config.setProperty(REVIEWERS_TO_IGNORE_KEY, reviewersToIgnore);
 		config.save();
 	}
-
 }

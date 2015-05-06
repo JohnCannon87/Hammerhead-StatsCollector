@@ -27,26 +27,26 @@ public class GerritReviewController {
 	@Autowired
 	private GerritStatisticsService statisticsService;
 
-	@RequestMapping("/{changeStatus}/{projectFilterString}/{startDate}/{endDate}")
+	@RequestMapping(value = "/{changeStatus}/{projectFilterString}/{startDate}/{endDate}", produces = "application/json")
 	public ReviewStats statusReview(@PathVariable final String changeStatus,
 			@PathVariable final String projectFilterString, @PathVariable final String startDate,
 			@PathVariable final String endDate) throws IOException, URISyntaxException {
 		return getReviewStatistics(changeStatus, projectFilterString, parseDate(startDate), parseDate(endDate));
 	}
 
-	@RequestMapping("/{changeStatus}/{projectFilterString}")
+	@RequestMapping(value = "/{changeStatus}/{projectFilterString}", produces = "application/json")
 	public ReviewStats mergedReview(@PathVariable final String changeStatus,
 			@PathVariable final String projectFilterString) throws IOException, URISyntaxException {
 		return getReviewStatistics(changeStatus, projectFilterString, null, null);
 	}
 
-	@RequestMapping("/{changeStatus}/{startDate}/{endDate}")
+	@RequestMapping(value = "/{changeStatus}/{startDate}/{endDate}", produces = "application/json")
 	public ReviewStats mergedReview(@PathVariable final String changeStatus, @PathVariable final String startDate,
 			@PathVariable final String endDate) throws IOException, URISyntaxException {
 		return getReviewStatistics(changeStatus, null, parseDate(startDate), parseDate(endDate));
 	}
 
-	@RequestMapping("/{changeStatus}/all")
+	@RequestMapping(value = "/{changeStatus}/all", produces = "application/json")
 	public ReviewStats mergedReview(@PathVariable final String changeStatus) throws IOException, URISyntaxException {
 		return getReviewStatistics(changeStatus, null, null, null);
 	}
