@@ -1,4 +1,4 @@
-package com.statscollector.controller;
+package com.statscollector.gerrit.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.statscollector.model.ReviewStats;
-import com.statscollector.service.GerritStatisticsService;
+import com.statscollector.gerrit.model.ReviewStats;
+import com.statscollector.gerrit.service.GerritStatisticsService;
 
 @RestController
 @RequestMapping("/gerrit/review")

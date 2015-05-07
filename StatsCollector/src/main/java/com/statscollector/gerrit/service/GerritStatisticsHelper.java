@@ -1,4 +1,4 @@
-package com.statscollector.service;
+package com.statscollector.gerrit.service;
 
 import java.util.List;
 
@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.statscollector.model.GerritChange;
-import com.statscollector.service.filter.FilterDateUpdatedPredicate;
-import com.statscollector.service.filter.FilterProjectNamePredicate;
+import com.statscollector.gerrit.model.GerritChange;
+import com.statscollector.gerrit.service.filter.FilterDateUpdatedPredicate;
+import com.statscollector.gerrit.service.filter.FilterProjectNamePredicate;
 
 /**
  * I'm a class that takes a list of changes from Gerrit and performs some

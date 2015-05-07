@@ -1,4 +1,4 @@
-package com.statscollector.authentication;
+package com.statscollector.gerrit.authentication;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;

@@ -1,8 +1,8 @@
-package com.statscollector.service.filter;
+package com.statscollector.gerrit.service.filter;
 
 import java.util.List;
 
-import com.statscollector.model.GerritChange;
+import com.statscollector.gerrit.model.GerritChange;
 
 public interface GerritChangeFilter {
 

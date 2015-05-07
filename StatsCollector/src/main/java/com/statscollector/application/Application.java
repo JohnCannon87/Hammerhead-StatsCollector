@@ -7,8 +7,10 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan({ "com.statscollector.service", "com.statscollector.dao", "com.statscollector.controller",
-	"com.statscollector.model", "com.statscollector.authentication", "com.statscollector.config" })
+@ComponentScan({ "com.statscollector.gerrit.service", "com.statscollector.gerrit.dao",
+		"com.statscollector.gerrit.controller", "com.statscollector.gerrit.model",
+		"com.statscollector.gerrit.authentication", "com.statscollector.gerrit.config",
+		"com.statscollector.information.controller" })
 public class Application extends SpringBootServletInitializer {
 
 	@Override

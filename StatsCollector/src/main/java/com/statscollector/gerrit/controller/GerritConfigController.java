@@ -1,4 +1,4 @@
-package com.statscollector.controller;
+package com.statscollector.gerrit.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,7 +12,7 @@ public class GerritConfigController {
 	@RequestMapping("/view")
 	public ModelAndView view(final ModelMap model) {
 
-		return new ModelAndView("gerritConfig", model);
+		return new ModelAndView("gerrit/gerritConfig", model);
 	}
 
 }

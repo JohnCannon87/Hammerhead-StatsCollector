@@ -1,4 +1,4 @@
-package com.statscollector.service;
+package com.statscollector.gerrit.service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -21,10 +21,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.statscollector.authentication.AuthenticationHelper;
-import com.statscollector.dao.GerritDao;
-import com.statscollector.model.GerritChange;
-import com.statscollector.model.GerritChangeDetails;
+import com.statscollector.gerrit.authentication.AuthenticationHelper;
+import com.statscollector.gerrit.dao.GerritDao;
+import com.statscollector.gerrit.model.GerritChange;
+import com.statscollector.gerrit.model.GerritChangeDetails;
 
 /**
  * I'm a service that performs some business logic to access the information

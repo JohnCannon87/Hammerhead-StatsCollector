@@ -1,4 +1,4 @@
-package com.statscollector.config;
+package com.statscollector.gerrit.config;
 
 import java.util.List;
 
@@ -38,5 +38,17 @@ public class GerritConfig {
 	public void setReviewersToIgnore(final List<String> reviewersToIgnore) throws ConfigurationException {
 		config.setProperty(REVIEWERS_TO_IGNORE_KEY, reviewersToIgnore);
 		config.save();
+	}
+
+	public void addReviewer(final String reviewer) throws ConfigurationException {
+		List<String> reviewersToIgnore = getReviewersToIgnore();
+		reviewersToIgnore.add(reviewer);
+		setReviewersToIgnore(reviewersToIgnore);
+	}
+
+	public void removeReviewer(final String reviewer) throws ConfigurationException {
+		List<String> reviewersToIgnore = getReviewersToIgnore();
+		reviewersToIgnore.remove(reviewer);
+		setReviewersToIgnore(reviewersToIgnore);
 	}
 }

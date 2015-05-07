@@ -1,4 +1,4 @@
-package com.statscollector.dao;
+package com.statscollector.gerrit.dao;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,7 +15,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.statscollector.config.GerritConfig;
+import com.statscollector.gerrit.config.GerritConfig;
 
 /**
  * I'm a DAO (actually more of a http client) that accesses Gerrit data using

@@ -1,4 +1,4 @@
-package com.statscollector.enums;
+package com.statscollector.gerrit.enums;
 
 public enum StatusEnum {
 

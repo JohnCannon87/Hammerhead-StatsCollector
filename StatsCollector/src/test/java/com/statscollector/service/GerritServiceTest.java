@@ -9,11 +9,12 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.statscollector.authentication.AuthenticationHelper;
-import com.statscollector.dao.GerritDao;
-import com.statscollector.enums.StatusEnum;
-import com.statscollector.model.GerritChange;
-import com.statscollector.model.GerritChangeDetails;
+import com.statscollector.gerrit.authentication.AuthenticationHelper;
+import com.statscollector.gerrit.dao.GerritDao;
+import com.statscollector.gerrit.enums.StatusEnum;
+import com.statscollector.gerrit.model.GerritChange;
+import com.statscollector.gerrit.model.GerritChangeDetails;
+import com.statscollector.gerrit.service.GerritService;
 
 public class GerritServiceTest {
 

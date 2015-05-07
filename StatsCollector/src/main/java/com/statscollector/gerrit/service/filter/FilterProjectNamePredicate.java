@@ -1,11 +1,11 @@
-package com.statscollector.service.filter;
+package com.statscollector.gerrit.service.filter;
 
 import java.util.List;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.statscollector.model.GerritChange;
+import com.statscollector.gerrit.model.GerritChange;
 
 public class FilterProjectNamePredicate implements Predicate<GerritChange>, GerritChangeFilter {
 

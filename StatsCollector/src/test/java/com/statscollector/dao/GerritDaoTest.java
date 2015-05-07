@@ -10,7 +10,8 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.statscollector.enums.StatusEnum;
+import com.statscollector.gerrit.dao.GerritDao;
+import com.statscollector.gerrit.enums.StatusEnum;
 
 public class GerritDaoTest {
 

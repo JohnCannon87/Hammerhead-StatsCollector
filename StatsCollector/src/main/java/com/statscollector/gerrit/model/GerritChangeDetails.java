@@ -1,4 +1,4 @@
-package com.statscollector.model;
+package com.statscollector.gerrit.model;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.statscollector.service;
+package com.statscollector.gerrit.service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
-import com.statscollector.config.GerritConfig;
-import com.statscollector.model.GerritChange;
-import com.statscollector.model.ReviewStats;
-import com.statscollector.service.filter.FilterDateUpdatedPredicate;
-import com.statscollector.service.filter.FilterProjectNamePredicate;
-import com.statscollector.service.filter.GerritChangeFilter;
+import com.statscollector.gerrit.config.GerritConfig;
+import com.statscollector.gerrit.model.GerritChange;
+import com.statscollector.gerrit.model.ReviewStats;
+import com.statscollector.gerrit.service.filter.FilterDateUpdatedPredicate;
+import com.statscollector.gerrit.service.filter.FilterProjectNamePredicate;
+import com.statscollector.gerrit.service.filter.GerritChangeFilter;
 
 /**
  * I'm a service to return information based on a Gerrit instance.
