@@ -1,5 +1,7 @@
 package com.statscollector.gerrit.controller;
 
+import java.io.IOException;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.statscollector.gerrit.config.GerritConfig;
+import com.statscollector.gerrit.service.GerritConfigTranslator;
 
 @RestController
 @RequestMapping("/gerrit/config")
@@ -19,12 +23,21 @@ public class GerritConfigRestfulController {
 
 	@Autowired
 	private GerritConfig gerritConfig;
+	
+	@Autowired
+	private GerritConfigTranslator gerritConfigTranslator;
 
 	@RequestMapping(value = "/info", produces = "application/json")
 	@ResponseBody
 	public GerritConfig gerritInfo() {
 		return gerritConfig;
 	}
+	
+	@RequestMapping(value="/upload", method=RequestMethod.POST)
+    public @ResponseBody GerritConfig handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException, ConfigurationException{
+        LOGGER.info("Uploaded File: " + file.getName());
+        return gerritConfigTranslator.updateConfigFromFile(file, gerritConfig);        
+    }
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changeInfo")
 	public GerritConfig changeInfo(@RequestParam(required = true) final String host, @RequestParam(required = true) final String username, @RequestParam(required = true) final String password) {
@@ -72,7 +85,5 @@ public class GerritConfigRestfulController {
 		return gerritConfig;
 	}
 
-	private Double parseStringAsDouble(String doubleAsString) {
-		return Double.valueOf(doubleAsString);
-	}
+	
 }

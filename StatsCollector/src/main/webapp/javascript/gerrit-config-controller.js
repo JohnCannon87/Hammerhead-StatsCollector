@@ -9,13 +9,49 @@ function UpdateGerritConfig(data, $scope){
 	$scope.collaborativeReviewTarget = data.collaborativeReviewTarget;
 }
 
-function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit) {
+function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit, Upload) {
 		
-	  $scope.toggleDropdown = function($event) {
-	    $event.preventDefault();
-	    $event.stopPropagation();
-	    $scope.status.isopen = !$scope.status.isopen;
-	  };
+	$scope.$watch('files', function(files) {
+		$scope.formUpload = false;
+		if (files != null) {
+			for (var i = 0; i < files.length; i++) {
+				$scope.errorMsg = null;
+				(function(file) {
+					generateThumbAndUpload(file);
+				})(files[i]);
+			}
+		}
+	});
+	
+	function generateThumbAndUpload(file) {
+		$scope.errorMsg = null;
+		uploadUsing$http(file);
+	}
+	
+	function uploadUsing$http(file) {
+		file.upload = Upload.upload({
+			url: '/gerrit/config/upload',
+			method: 'POST',
+			headers: {
+				'Content-Type': file.type
+			},
+			fields: {username: $scope.username},
+			file: file,
+			fileFormDataName: 'file'
+		});
+	
+		file.upload.then(function(response) {
+			file.result = response.data;
+			UpdateGerritConfig(response.data, $scope);
+		}, function(response) {
+			if (response.status > 0)
+				$scope.errorMsg = response.status + ': ' + response.data;
+		});
+	
+		file.upload.progress(function(evt) {
+			file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+		});
+	}
 	
 	Gerrit.configInfo().then(function(response){
 		UpdateGerritConfig(response.data, $scope);
@@ -26,8 +62,7 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit) {
 			//Download File Now...
 			var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
 			saveAs(file, 'GerritConfig.json');
-		});
-		
+		});		
 	};
 	
 	$scope.addReviewer = function(){
@@ -73,4 +108,4 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit) {
 	
 };
 
-appGerritStatsModule.controller('GerritConfigCtrl', ['$http', '$scope', '$log', '$q', 'gerritAppConfig', 'Gerrit', GerritConfig]);
+appGerritStatsModule.controller('GerritConfigCtrl', ['$http', '$scope', '$log', '$q', 'gerritAppConfig', 'Gerrit', 'Upload', GerritConfig]);

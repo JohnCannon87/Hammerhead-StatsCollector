@@ -16,6 +16,9 @@
 <script src="/javascript/gerrit-config-controller.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2014-11-29/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/4.1.4/ng-file-upload-shim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/4.1.4/ng-file-upload.min.js"></script>
+
 <link rel="stylesheet"
 	href="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 <link rel="stylesheet" href="/css/app.css">
@@ -30,17 +33,11 @@
 			<div class="page-header col-mid-12">
 				<h1>
 					<span class="glyphicon glyphicon-cog"></span> Gerrit Config
-					<!-- Single button -->
-				    <div class="btn-group" dropdown is-open="status.isopen">
-				      <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
-				        Config Management <span class="caret"></span>
-				      </button>
-				      <ul class="dropdown-menu" role="menu">
-				        <li><a ng-click="downloadConfig()">Download Config</a></li>
-				        <li class="divider"></li>
-				        <li><a href="#">Upload Config</a></li>
-				      </ul>
-				    </div>
+					<button class="btn btn-primary" ng-click="downloadConfig()">
+						<span class="glyphicon glyphicon-download"></span>  Download Config
+					</button>
+					<button class="btn btn-primary" ngf-select="" ng-model="files" ngf-multiple="true" class="ng-pristine ng-valid"><span class="glyphicon glyphicon-upload"></span>  Upload Config</button>						
+					</button>
 				</h1>
 			</div>
 

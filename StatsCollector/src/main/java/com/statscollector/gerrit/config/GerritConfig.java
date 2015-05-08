@@ -8,19 +8,20 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GerritConfig {
+public class GerritConfig{
 
 	/**
 	 * KEYS
 	 */
-	private static final String HOST_KEY = "gerrit.host";
-	private static final String REVIEWERS_TO_IGNORE_KEY = "gerrit.ignoreReviewers";
-	private static final String USERNAME_KEY = "gerrit.username";
-	private static final String PASSWORD_KEY = "gerrit.password";
-	private static final String NO_PEER_REVIEW_TARGET_KEY = "gerrit.noPeerReviewTarget";
-	private static final String ONE_PEER_REVIEW_TARGET_KEY = "gerrit.onePeerReviewTarget";
-	private static final String TWO_PEER_REVIEW_TARGET_KEY = "gerrit.twoPeerReviewTarget";
-	private static final String COLLABORATIVE_REVIEW_TARGET_KEY = "gerrit.collaborativeReviewTarget";
+	protected static final String HOST_KEY = "gerrit.host";
+	protected static final String REVIEWERS_TO_IGNORE_KEY = "gerrit.ignoreReviewers";
+	protected static final String USERNAME_KEY = "gerrit.username";
+	protected static final String PASSWORD_KEY = "gerrit.password";
+	protected static final String NO_PEER_REVIEW_TARGET_KEY = "gerrit.noPeerReviewTarget";
+	protected static final String ONE_PEER_REVIEW_TARGET_KEY = "gerrit.onePeerReviewTarget";
+	protected static final String TWO_PEER_REVIEW_TARGET_KEY = "gerrit.twoPeerReviewTarget";
+	protected static final String COLLABORATIVE_REVIEW_TARGET_KEY = "gerrit.collaborativeReviewTarget";
+	protected static final String CONFIG_VERSION_KEY = "gerrit.configVersion";
 	private DecimalFormat df = new DecimalFormat("###.##");
 
 	private final PropertiesConfiguration config;
@@ -96,5 +97,22 @@ public class GerritConfig {
 	
 	public Float getCollaborativeReviewTarget(){
 		return config.getFloat(COLLABORATIVE_REVIEW_TARGET_KEY);
+	}
+	
+	public String getConfigVersion(){
+		return config.getString(CONFIG_VERSION_KEY);
+	}
+	
+	public void setConfigVersion(String configVersion) throws ConfigurationException{
+		config.setProperty(CONFIG_VERSION_KEY, configVersion);
+		config.save();
+	}
+
+	public void replaceWith(GerritConfig newGerritConfig) throws ConfigurationException {
+		this.setHost(newGerritConfig.getHost());
+		this.setReviewersToIgnore(newGerritConfig.getReviewersToIgnore());
+		this.setTargets(newGerritConfig.getNoPeerReviewTarget(), newGerritConfig.getOnePeerReviewTarget(), newGerritConfig.getTwoPeerReviewTarget(), newGerritConfig.getCollaborativeReviewTarget());
+		this.setUsernameAndPassword(newGerritConfig.getUsername(), newGerritConfig.getPassword());
+		
 	}
 }

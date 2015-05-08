@@ -11,6 +11,7 @@ dependencies {
 	compile group:'org.apache.logging.log4j', name:'log4j-core', version:log4jVersion
 	compile group:'commons-configuration', name:'commons-configuration', version:commonsConfigVersion	
 	compile group:'javax.servlet', name:'jstl', version:jstlVersion
+	compile group:'commons-io', name:'commons-io', version:commonsIoVersion
 	
 	
 	/* Test Compile dependencies */

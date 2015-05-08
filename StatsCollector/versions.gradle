@@ -11,4 +11,5 @@ ext {
 	commonsConfigVersion='1.10'
 	tomcatEmbeddedVersion='8.0.21'
 	jstlVersion='1.2'
+	commonsIoVersion='2.4'
 }
