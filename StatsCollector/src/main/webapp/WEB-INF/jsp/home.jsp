@@ -9,28 +9,38 @@
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
 <script src="/javascript/gerrit-app.js"></script>
 <script src="/javascript/gerrit-stats.js"></script>
-<script src="/javascript/gerrit-stats-service.js"></script>
+<script src="/javascript/gerrit-service.js"></script>
 <script src="/javascript/gerrit-stats-controller.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 <link rel="stylesheet"
-	href="https://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+	href="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 
 </head>
 <body>
 	<%@include file="common/navbar.jsp"%>
 
-	<div ng-controller="GerritCtrl" class="col-sm-4">
-			<h3>Gerrit stats for server {{gerritHostName}} are:</h3>
+	<div ng-controller="GerritStatsCtrl" class="col-sm-12">
+		<div class="col-sm-4">
+			<h3>Gerrit stats for server {{gerritHostname}} are:</h3>
 			<ul class="list-group">
-				<li class="list-group-item">No Peer Reviewers: <span class="badge">{{noPeerReviewers}}</span></li>
-				<li class="list-group-item">One Peer Reviewer: <span class="badge">{{onePeerReviewer}}</span></li>
-				<li class="list-group-item">Two Peer Reviewers: <span class="badge">{{twoPeerReviewers}}</span></li>
-				<li class="list-group-item">Collaborative Development: <span class="badge">{{collabrativeDevelopment}}</span></li>
+				<li ng-class="getNoPeerReviewRowClass(noPeerPercentage)"
+					class="list-group-item">No Peer Reviewers: <span class="badge">{{noPeerReviewers}}</span></li>
+				<li ng-class="getOnePeerReviewRowClass(onePeerPercentage)"
+					class="list-group-item">One Peer Reviewer: <span class="badge">{{onePeerReviewer}}</span></li>
+				<li ng-class="getTwoPeerReviewRowClass(twoPeerPercentage)"
+					class="list-group-item">Two Peer Reviewers: <span
+					class="badge">{{twoPeerReviewers}}</span></li>
+				<li
+					ng-class="getCollabrativeDevelopmentRowClass(collaborativePercentage)"
+					class="list-group-item">Collaborative Development: <span
+					class="badge">{{collabrativeDevelopment}}</span></li>
 				<li class="list-group-item">Total Reviews: <span class="badge">{{totalReviews}}</span></li>
 			</ul>
+		</div>
+		<div class="col-sm-8">
+			<canvas id="gerritPieChart" width="400" height="400"></canvas>
+		</div>
 	</div>
-	<div class="col-sm-8"></div>
-
 </body>
 </html>

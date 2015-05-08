@@ -1,13 +1,13 @@
 angular.module('appGerritStats').service('Gerrit', ['$http', 'gerritAppConfig',
 	 function($http, gerritAppConfig) {
 		return ({
-			hostname: hostname,
+			configInfo: configInfo,
 			metrics: metrics
 		});
 		
 		$http.defaults.withCredentials = false;
 		
-		function hostname(key, date){
+		function configInfo(key, date){
 			return $http.get(gerritAppConfig.gerrit.baseUrl + '/gerrit/config/info');
 		}
 		

@@ -47,6 +47,22 @@ public class ReviewStats {
 	public int getCollabrativeDevelopmentCount() {
 		return collabrativeDevelopmentList.size();
 	}
+	
+	public float getNoPeerReviewPercentage() {
+		return (float)noPeerReviewList.size()/(float)getTotalReviewsCount();
+	}
+
+	public float getOnePeerReviewPercentage() {
+		return (float)onePeerReviewList.size()/(float)getTotalReviewsCount();
+	}
+
+	public float getTwoPlusPeerReviewPercentage() {
+		return (float)twoPlusPeerReviewList.size()/(float)getTotalReviewsCount();
+	}
+
+	public float getCollabrativeDevelopmentPercentage() {
+		return (float)collabrativeDevelopmentList.size()/(float)getTotalReviewsCount();
+	}
 
 	public int getTotalReviewsCount() {
 		return getNoPeerReviewCount() + getOnePeerReviewCount() + getTwoPlusPeerReviewCount()

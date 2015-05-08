@@ -138,7 +138,7 @@ public class GerritStatisticsService {
 		List<String> reviewersList = new ArrayList<>();
 		for (String username : reviewersUsernames) {
 			Integer reviewValue = reviewers.get(username);
-			if (reviewValue > 0) {
+			if (reviewValue != null && reviewValue > 0) {
 				reviewersList.add(username);
 			}
 		}
@@ -149,4 +149,16 @@ public class GerritStatisticsService {
 		return reviewersList.size();
 	}
 
+	public void setGerritService(GerritService gerritService) {
+		this.gerritService = gerritService;
+	}
+
+	public void setGerritStatisticsHelper(
+			GerritStatisticsHelper gerritStatisticsHelper) {
+		this.gerritStatisticsHelper = gerritStatisticsHelper;
+	}
+
+	public void setGerritConfig(GerritConfig gerritConfig) {
+		this.gerritConfig = gerritConfig;
+	}
 }

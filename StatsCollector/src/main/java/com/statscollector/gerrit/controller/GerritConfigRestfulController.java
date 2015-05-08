@@ -26,11 +26,24 @@ public class GerritConfigRestfulController {
 		return gerritConfig;
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/changeHost")
-	public GerritConfig changeHost(@RequestParam(required = true) final String host) {
+	@RequestMapping(method = RequestMethod.POST, value = "/changeInfo")
+	public GerritConfig changeInfo(@RequestParam(required = true) final String host, @RequestParam(required = true) final String username, @RequestParam(required = true) final String password) {
 		try {
 			LOGGER.info("Changing Gerrit Host To: " + host);
 			gerritConfig.setHost(host);
+			LOGGER.info("Changing Gerrit Username & Password To: " + username + ", " + password);
+			gerritConfig.setUsernameAndPassword(username, password);
+		} catch (ConfigurationException e) {
+			return gerritConfig;
+		}
+		return gerritConfig;
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, value = "/saveTargets")
+	public GerritConfig saveTargets(@RequestParam(required = true) final Float noPeerReviewTarget, @RequestParam(required = true) final Float onePeerReviewTarget, @RequestParam(required = true) final Float twoPeerReviewTarget, @RequestParam(required = true) final Float collaborativeDevelopmentTarget) {
+		try {			
+			LOGGER.info("Changing Gerrit Targets for NoPeer, OnePeer, TwoPeer & Collaborative (respectively) To: " + noPeerReviewTarget + ", " + onePeerReviewTarget + ", " +twoPeerReviewTarget+ ", " +collaborativeDevelopmentTarget);
+			gerritConfig.setTargets(noPeerReviewTarget, onePeerReviewTarget, twoPeerReviewTarget, collaborativeDevelopmentTarget);
 		} catch (ConfigurationException e) {
 			return gerritConfig;
 		}
@@ -57,5 +70,9 @@ public class GerritConfigRestfulController {
 			return gerritConfig;
 		}
 		return gerritConfig;
+	}
+
+	private Double parseStringAsDouble(String doubleAsString) {
+		return Double.valueOf(doubleAsString);
 	}
 }

@@ -8,8 +8,10 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.statscollector.gerrit.authentication.AuthenticationHelper;
+import com.statscollector.gerrit.config.GerritConfig;
 import com.statscollector.gerrit.dao.GerritDao;
 import com.statscollector.gerrit.enums.StatusEnum;
 import com.statscollector.gerrit.model.GerritChange;
@@ -22,8 +24,11 @@ public class GerritServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
+		GerritConfig gerritConfig = Mockito.mock(GerritConfig.class);
+		Mockito.when(gerritConfig.getHost()).thenReturn("nreojp.git:8080");
 		statisticsService = new GerritService();
 		GerritDao statisticsDao = new GerritDao();
+		statisticsDao.setGerritConfig(gerritConfig);
 		statisticsService.setStatisticsDao(statisticsDao);
 		AuthenticationHelper authenticationHelper = new AuthenticationHelper();
 		statisticsService.setAuthenticationHelper(authenticationHelper);
@@ -37,7 +42,7 @@ public class GerritServiceTest {
 
 	@Test
 	public void testGetGerritChangeDetails() throws IOException, URISyntaxException {
-		List<GerritChange> allChanges = statisticsService.getAllChanges(StatusEnum.MERGED.toString());
+		List<GerritChange> allChanges = statisticsService.getAllChanges(StatusEnum.OPEN.toString());
 		System.out.println(allChanges);
 		Map<String, GerritChangeDetails> gerritChangeDetails = statisticsService.getGerritChangeDetails(allChanges);
 		Collection<GerritChangeDetails> values = gerritChangeDetails.values();

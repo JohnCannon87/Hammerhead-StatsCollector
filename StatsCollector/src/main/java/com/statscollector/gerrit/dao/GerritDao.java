@@ -113,4 +113,7 @@ public class GerritDao {
 		return resultString;
 	}
 
+	public void setGerritConfig(GerritConfig gerritConfig) {
+		this.gerritConfig = gerritConfig;
+	}
 }

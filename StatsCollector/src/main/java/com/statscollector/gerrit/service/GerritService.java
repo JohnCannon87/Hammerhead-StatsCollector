@@ -150,13 +150,19 @@ public class GerritService {
 		GerritChangeDetails gerritChangeDetails = new GerritChangeDetails();
 		JsonElement labelsElement = detailsJson.getAsJsonObject().get(LABELS_REF);
 		JsonElement codeReviewElement = labelsElement.getAsJsonObject().get(CODE_REVIEW_REF);
-		JsonArray allArray = codeReviewElement.getAsJsonObject().get(ALL_REF).getAsJsonArray();
-		for (JsonElement jsonElement : allArray) {
-			JsonObject review = jsonElement.getAsJsonObject();
-			if (null != review) {
-				String username = review.get(USERNAME_REF).getAsString();
-				int reviewValue = review.get(VALUE_REF).getAsInt();
-				gerritChangeDetails.addReviewer(username, reviewValue);
+		JsonElement allReference = codeReviewElement.getAsJsonObject().get(ALL_REF);
+		if(allReference != null){
+			JsonArray allArray = allReference.getAsJsonArray();
+			for (JsonElement jsonElement : allArray) {
+				JsonObject review = jsonElement.getAsJsonObject();
+				if (null != review) {
+					String username = review.get(USERNAME_REF).getAsString();
+					Integer reviewValue = null;
+					if(review.get(VALUE_REF) != null){
+						reviewValue = review.get(VALUE_REF).getAsInt();
+					}				
+					gerritChangeDetails.addReviewer(username, reviewValue);
+				}
 			}
 		}
 		return gerritChangeDetails;
