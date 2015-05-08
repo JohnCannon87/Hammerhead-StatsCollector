@@ -36,9 +36,8 @@ function GetReviewRowClassLimit(value, target) {
 function GerritStats($http, $scope, $log, $q, gerritAppConfig, Gerrit) {
 	$scope.metrics = new Array();
 	$scope.goals = gerritAppConfig.gerrit.goals;
-
+	
 	$scope.gerritChartOptions = {
-
 
 		      // Sets the chart to be responsive
 		      responsive: false,
@@ -89,6 +88,7 @@ function GerritStats($http, $scope, $log, $q, gerritAppConfig, Gerrit) {
 						$scope.onePeerPercentage = response.data.onePeerReviewPercentage;
 						$scope.twoPeerPercentage = response.data.twoPeerReviewPercentage;
 						$scope.collaborativePercentage = response.data.collaborativeReviewPercentage;
+						$scope.noPeerReviews = response.data.noPeerReviewList;
 
 						$scope.gerritChartData = [ 
                         {

@@ -25,11 +25,14 @@ public class GerritStatisticsServiceTest {
 		GerritStatisticsHelper gerritStatisticsHelper = new GerritStatisticsHelper();
 		GerritConfig gerritConfig = Mockito.mock(GerritConfig.class);
 		Mockito.when(gerritConfig.getHost()).thenReturn("nreojp.git:8080");
+		Mockito.when(gerritConfig.getUsername()).thenReturn("jcannon");
+		Mockito.when(gerritConfig.getPassword()).thenReturn("testpassword");
 		GerritService statisticsService = new GerritService();
 		GerritDao statisticsDao = new GerritDao();
 		statisticsDao.setGerritConfig(gerritConfig);
 		statisticsService.setStatisticsDao(statisticsDao);
 		AuthenticationHelper authenticationHelper = new AuthenticationHelper();
+		authenticationHelper.setGerritConfig(gerritConfig);
 		statisticsService.setAuthenticationHelper(authenticationHelper);
 		gerritStatisticsService = new GerritStatisticsService();
 		gerritStatisticsService.setGerritConfig(gerritConfig);

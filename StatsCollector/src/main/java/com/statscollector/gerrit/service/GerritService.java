@@ -61,6 +61,8 @@ public class GerritService {
 	private static final String USERNAME_REF = "username";
 
 	private static final String VALUE_REF = "value";
+	
+	private static final String NUMBER_REF = "_number";
 
 	@Autowired
 	private GerritDao gerritDao;
@@ -124,6 +126,7 @@ public class GerritService {
 			GerritChangeDetails changeDetail = gerritChangeDetails.get(gerritChange.getChangeId());
 			if (null != changeDetail) {
 				gerritChange.setReviewers(changeDetail.getReviewers());
+				gerritChange.setChangeNumber(changeDetail.getChangeNumber());
 			}
 		}
 	}
@@ -165,6 +168,7 @@ public class GerritService {
 				}
 			}
 		}
+		gerritChangeDetails.setChangeNumber(detailsJson.getAsJsonObject().get(NUMBER_REF).getAsInt());
 		return gerritChangeDetails;
 	}
 

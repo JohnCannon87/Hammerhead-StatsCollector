@@ -35,4 +35,7 @@ public class AuthenticationHelper {
 		return credsProvider;
 	}
 
+	public void setGerritConfig(GerritConfig gerritConfig) {
+		this.gerritConfig = gerritConfig;
+	}
 }

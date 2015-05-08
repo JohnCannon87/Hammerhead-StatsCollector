@@ -16,6 +16,7 @@ public class GerritChange {
 	private final DateTime created, updated;
 	private Map<String, Integer> reviewers;
 	private final boolean haveCheckedForReviewers = false;
+	private Integer changeNumber;
 
 	public GerritChange(final String id, final String changeId, final String project, final String owner,
 			final DateTime created, final DateTime updated) {
@@ -65,79 +66,93 @@ public class GerritChange {
 		return reviewers.isEmpty() || haveCheckedForReviewers;
 	}
 
+	public Integer getChangeNumber() {
+		return changeNumber;
+	}
+
+	public void setChangeNumber(Integer changeNumber) {
+		this.changeNumber = changeNumber;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((changeId == null) ? 0 : changeId.hashCode());
+		result = prime * result
+				+ ((changeId == null) ? 0 : changeId.hashCode());
+		result = prime * result
+				+ ((changeNumber == null) ? 0 : changeNumber.hashCode());
 		result = prime * result + ((created == null) ? 0 : created.hashCode());
+		result = prime * result + (haveCheckedForReviewers ? 1231 : 1237);
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((owner == null) ? 0 : owner.hashCode());
 		result = prime * result + ((project == null) ? 0 : project.hashCode());
+		result = prime * result
+				+ ((reviewers == null) ? 0 : reviewers.hashCode());
 		result = prime * result + ((updated == null) ? 0 : updated.hashCode());
 		return result;
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
+	public boolean equals(Object obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (getClass() != obj.getClass()) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
 		GerritChange other = (GerritChange) obj;
 		if (changeId == null) {
-			if (other.changeId != null) {
+			if (other.changeId != null)
 				return false;
-			}
-		} else if (!changeId.equals(other.changeId)) {
+		} else if (!changeId.equals(other.changeId))
 			return false;
-		}
+		if (changeNumber == null) {
+			if (other.changeNumber != null)
+				return false;
+		} else if (!changeNumber.equals(other.changeNumber))
+			return false;
 		if (created == null) {
-			if (other.created != null) {
+			if (other.created != null)
 				return false;
-			}
-		} else if (!created.equals(other.created)) {
+		} else if (!created.equals(other.created))
 			return false;
-		}
+		if (haveCheckedForReviewers != other.haveCheckedForReviewers)
+			return false;
 		if (id == null) {
-			if (other.id != null) {
+			if (other.id != null)
 				return false;
-			}
-		} else if (!id.equals(other.id)) {
+		} else if (!id.equals(other.id))
 			return false;
-		}
 		if (owner == null) {
-			if (other.owner != null) {
+			if (other.owner != null)
 				return false;
-			}
-		} else if (!owner.equals(other.owner)) {
+		} else if (!owner.equals(other.owner))
 			return false;
-		}
 		if (project == null) {
-			if (other.project != null) {
+			if (other.project != null)
 				return false;
-			}
-		} else if (!project.equals(other.project)) {
+		} else if (!project.equals(other.project))
 			return false;
-		}
+		if (reviewers == null) {
+			if (other.reviewers != null)
+				return false;
+		} else if (!reviewers.equals(other.reviewers))
+			return false;
 		if (updated == null) {
-			if (other.updated != null) {
+			if (other.updated != null)
 				return false;
-			}
-		} else if (!updated.equals(other.updated)) {
+		} else if (!updated.equals(other.updated))
 			return false;
-		}
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Change [id=" + id + ", changeId=" + changeId + ", project=" + project + ", owner=" + owner
-				+ ", created=" + created + ", updated=" + updated + "]";
+		return "GerritChange [id=" + id + ", changeId=" + changeId
+				+ ", project=" + project + ", owner=" + owner + ", created="
+				+ created + ", updated=" + updated + ", reviewers=" + reviewers
+				+ ", haveCheckedForReviewers=" + haveCheckedForReviewers
+				+ ", changeNumber=" + changeNumber + "]";
 	}
 }
