@@ -1,20 +1,22 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <html ng-app="app">
 <head>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.min.js"></script>
 <script
-	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+<script src="/javascript/tc-angular-chartjs.js"></script>
 <script src="/javascript/gerrit-app.js"></script>
 <script src="/javascript/gerrit-stats.js"></script>
 <script src="/javascript/gerrit-service.js"></script>
 <script src="/javascript/gerrit-stats-controller.js"></script>
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
 <link rel="stylesheet"
 	href="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet"
+href="/css/app.css">	
 
 </head>
 <body>
@@ -39,7 +41,11 @@
 			</ul>
 		</div>
 		<div class="col-sm-8">
-			<canvas id="gerritPieChart" width="400" height="400"></canvas>
+			<div class="col-sm-6">
+			<canvas tc-chartjs-pie chart-data="gerritChartData" chart-options="gerritChartOptions" chart-legend="gerritChart" height="500" width="500"></canvas>
+			</div>
+			<div tc-chartjs-legend chart-legend="gerritChart" class="ng-isolate-scope col-sm-6">			
+			</div>
 		</div>
 	</div>
 </body>

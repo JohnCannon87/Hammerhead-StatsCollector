@@ -58,4 +58,4 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit) {
 	
 };
 
-angular.module('appGerritStats').controller('GerritConfigCtrl', ['$http', '$scope', '$log', '$q', 'gerritAppConfig', 'Gerrit', GerritConfig]);
+appGerritStatsModule.controller('GerritConfigCtrl', ['$http', '$scope', '$log', '$q', 'gerritAppConfig', 'Gerrit', GerritConfig]);

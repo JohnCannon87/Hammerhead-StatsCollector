@@ -1,1 +1,1 @@
-angular.module('appGerritStats', []);
+var appGerritStatsModule = angular.module('appGerritStats', ['tc.chartjs']);
