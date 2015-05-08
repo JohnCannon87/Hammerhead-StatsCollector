@@ -6,16 +6,20 @@
 <html ng-app="app">
 <head>
 <script
-	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+	src="http://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+<script src="/javascript/tc-angular-chartjs.js"></script>
 <script src="/javascript/gerrit-app.js"></script>
 <script src="/javascript/gerrit-stats.js"></script>
 <script src="/javascript/gerrit-service.js"></script>
-<script src="/javascript/gerrit-stats-controller.js"></script>
 <script src="/javascript/gerrit-config-controller.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2014-11-29/FileSaver.min.js"></script>
 <link rel="stylesheet"
-	href="https://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-<link rel="stylesheet"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+	href="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+<link rel="stylesheet" href="/css/app.css">
+
 <link rel="stylesheet" href="/css/gerritConfig.css">
 </head>
 <body ng-controller="GerritConfigCtrl">
@@ -26,6 +30,17 @@
 			<div class="page-header col-mid-12">
 				<h1>
 					<span class="glyphicon glyphicon-cog"></span> Gerrit Config
+					<!-- Single button -->
+				    <div class="btn-group" dropdown is-open="status.isopen">
+				      <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+				        Config Management <span class="caret"></span>
+				      </button>
+				      <ul class="dropdown-menu" role="menu">
+				        <li><a ng-click="downloadConfig()">Download Config</a></li>
+				        <li class="divider"></li>
+				        <li><a href="#">Upload Config</a></li>
+				      </ul>
+				    </div>
 				</h1>
 			</div>
 

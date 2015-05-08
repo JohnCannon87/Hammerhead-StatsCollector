@@ -11,9 +11,24 @@ function UpdateGerritConfig(data, $scope){
 
 function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit) {
 		
+	  $scope.toggleDropdown = function($event) {
+	    $event.preventDefault();
+	    $event.stopPropagation();
+	    $scope.status.isopen = !$scope.status.isopen;
+	  };
+	
 	Gerrit.configInfo().then(function(response){
 		UpdateGerritConfig(response.data, $scope);
 	});
+	
+	$scope.downloadConfig = function(){
+		$http.get(gerritAppConfig.gerrit.baseUrl + '/gerrit/config/info').then(function(response){
+			//Download File Now...
+			var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
+			saveAs(file, 'GerritConfig.json');
+		});
+		
+	};
 	
 	$scope.addReviewer = function(){
 		$http.post('/gerrit/config/addReviewerToIgnore?reviewer='+$scope.gerritReviewer)
@@ -24,7 +39,7 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit) {
 			console.log(data);
 		});
 	};
-	
+		
 	$scope.removeReviewer = function(reviewer){
 		$http.post('/gerrit/config/removeReviewerToIgnore?reviewer='+reviewer)
 		.success(function(data){

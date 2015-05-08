@@ -1,1 +1,1 @@
-var appGerritStatsModule = angular.module('appGerritStats', ['tc.chartjs']);
+var appGerritStatsModule = angular.module('appGerritStats', ['tc.chartjs', 'ui.bootstrap']);
