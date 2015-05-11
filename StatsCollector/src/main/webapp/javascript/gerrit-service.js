@@ -12,7 +12,7 @@ angular.module('appGerritStats').service('Gerrit', ['$http', 'gerritAppConfig',
 		}
 		
 		function metrics(key, date) {
-			return $http.get(gerritAppConfig.gerrit.baseUrl + '/gerrit/review/open/all');
+			return $http.get(gerritAppConfig.gerrit.baseUrl + '/gerrit/review/merged/all');
 		}
 	}
 ]);
