@@ -67,6 +67,9 @@
 				    <button type="button" class="btn btn-success" ng-click="manuallyRefreshData()"><span class="glyphicon glyphicon-repeat"></span>    Manually Refresh Data Cache</button>
 				</li>
 			</ul>
+			<div ng-show="gerritStatsStatus.show">
+			  <alert type="{{gerritStatsStatus.type}}" close="closeAlert()">{{gerritStatsStatus.msg}}</alert>
+			</div>
 		</div>
 		<div class="col-sm-8">
 			<div class="col-sm-6">

@@ -1,9 +1,11 @@
 function UpdateGerritConfig(data, $scope){
 	$scope.gerritHostname = data.host;
+	$scope.gerritHostPort = data.hostPort;
 	$scope.reviewersToIgnore = data.reviewersToIgnore;
 	$scope.gerritUsername = data.username;
 	$scope.gerritPassword = data.password;
-	$scope.gerritTopicRegex = data.topicRegex
+	$scope.gerritTopicRegex = data.topicRegex;
+	$scope.gerritThreadSplitSize = data.threadSplitSize;
 	$scope.noPeerReviewsTarget = data.noPeerReviewTarget;
 	$scope.onePeerReviewTarget = data.onePeerReviewTarget;
 	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
@@ -88,7 +90,12 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit, Upload) 
 	
 	//Form Data Setup
 	$scope.saveGerritConfig = function(){
-		$http.post('/gerrit/config/changeInfo?host='+$scope.gerritHostname+'&username='+$scope.gerritUsername+'&password='+$scope.gerritPassword+'&topicRegex='+$scope.gerritTopicRegex)
+		$http.post('/gerrit/config/changeInfo?host='+$scope.gerritHostname
+				+'&hostPort='+$scope.gerritHostPort
+				+'&username='+$scope.gerritUsername
+				+'&password='+$scope.gerritPassword
+				+'&topicRegex='+$scope.gerritTopicRegex
+				+'&threadSplitSize='+$scope.gerritThreadSplitSize)
 		.success(function(data){
 			console.log(data);
 			UpdateGerritConfig(data, $scope);
@@ -98,7 +105,10 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit, Upload) 
 	};
 	
 	$scope.saveTargetConfig = function(){
-		$http.post('/gerrit/config/saveTargets?noPeerReviewTarget='+$scope.noPeerReviewsTarget+'&onePeerReviewTarget='+$scope.onePeerReviewTarget+'&twoPeerReviewTarget='+$scope.twoPeerReviewTarget+'&collaborativeDevelopmentTarget='+$scope.collaborativeReviewTarget)
+		$http.post('/gerrit/config/saveTargets?noPeerReviewTarget='+$scope.noPeerReviewsTarget
+				+'&onePeerReviewTarget='+$scope.onePeerReviewTarget
+				+'&twoPeerReviewTarget='+$scope.twoPeerReviewTarget
+				+'&collaborativeDevelopmentTarget='+$scope.collaborativeReviewTarget)
 		.success(function(data){
 			console.log(data);
 			UpdateGerritConfig(data, $scope);

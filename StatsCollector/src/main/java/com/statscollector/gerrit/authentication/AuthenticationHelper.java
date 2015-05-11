@@ -21,8 +21,6 @@ public class AuthenticationHelper {
 
 	@Autowired
 	private GerritConfig gerritConfig;	
-	private static final int PORT = 8080;
-	private static final String HOST = "nreojp.git";
 	private CredentialsProvider credsProvider;
 	private boolean credsProviderCreated;
 
@@ -30,7 +28,7 @@ public class AuthenticationHelper {
 		if (!credsProviderCreated) {
 			credsProvider = new BasicCredentialsProvider();
 			credsProvider
-			.setCredentials(new AuthScope(HOST, PORT), new UsernamePasswordCredentials(gerritConfig.getUsername(), gerritConfig.getPassword()));
+			.setCredentials(new AuthScope(gerritConfig.getHost(), gerritConfig.getHostPort()), new UsernamePasswordCredentials(gerritConfig.getUsername(), gerritConfig.getPassword()));
 		}
 		return credsProvider;
 	}

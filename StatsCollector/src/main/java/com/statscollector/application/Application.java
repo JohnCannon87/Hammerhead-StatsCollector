@@ -5,10 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
+@EnableAsync
 @ComponentScan({ "com.statscollector.gerrit.service", "com.statscollector.gerrit.dao",
 	"com.statscollector.gerrit.controller", "com.statscollector.gerrit.model",
 	"com.statscollector.gerrit.authentication", "com.statscollector.gerrit.config",

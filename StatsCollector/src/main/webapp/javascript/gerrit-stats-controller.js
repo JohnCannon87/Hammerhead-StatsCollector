@@ -1,8 +1,11 @@
 function UpdateGerritConfig(data, $scope) {
 	$scope.gerritHostname = data.host;
+	$scope.gerritHostPort = data.hostPort;
 	$scope.reviewersToIgnore = data.reviewersToIgnore;
 	$scope.gerritUsername = data.username;
 	$scope.gerritPassword = data.password;
+	$scope.gerritTopicRegex = data.topicRegex;
+	$scope.gerritThreadSplitSize = data.threadSplitSize;
 	$scope.noPeerReviewsTarget = data.noPeerReviewTarget;
 	$scope.onePeerReviewTarget = data.onePeerReviewTarget;
 	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
@@ -33,7 +36,58 @@ function GetReviewRowClassLimit(value, target) {
 	}
 }
 
-function GerritStats($http, $scope, $log, $q, Gerrit) {
+function GetGerritStats(gerritStatus, Gerrit, $scope, $timeout){
+	Gerrit
+	.metrics(gerritStatus)
+	.then(
+			function(response) {
+				$scope.noPeerReviewers = response.data.noPeerReviewCount;
+				$scope.onePeerReviewer = response.data.onePeerReviewCount;
+				$scope.twoPeerReviewers = response.data.twoPlusPeerReviewCount;
+				$scope.collabrativeDevelopment = response.data.collabrativeDevelopmentCount;
+				$scope.totalReviews = response.data.totalReviewsCount;
+				$scope.noPeerPercentage = response.data.noPeerReviewPercentage;
+				$scope.onePeerPercentage = response.data.onePeerReviewPercentage;
+				$scope.twoPeerPercentage = response.data.twoPeerReviewPercentage;
+				$scope.collaborativePercentage = response.data.collaborativeReviewPercentage;
+				$scope.noPeerReviews = response.data.noPeerReviewList;
+				
+				if (response.data.error){
+					$scope.gerritStatsStatus = { type: 'danger', msg: response.data.status, show: true};
+					$timeout(function() {$scope.closeAlert()}, 15000);
+				}else{
+					$scope.gerritStatsStatus = { type: 'success', msg: response.data.status, show: true};
+					$timeout(function() {$scope.closeAlert()}, 15000);
+				}
+				
+				if (!response.data.error){
+					$scope.gerritChartData = [ 
+	                {
+						value : response.data.noPeerReviewCount,
+						color : "#CC0000",
+						highlight : "#CC0000",
+						label : "No Peer Reviews"
+					}, {
+						value : response.data.onePeerReviewCount,
+						color : "#009933",
+						highlight : "#009933",
+						label : "One Peer Review"
+					}, {
+						value : response.data.twoPlusPeerReviewCount,
+						color : "#0099FF",
+						highlight : "#0099FF",
+						label : "Two Peer Review"
+					}, {
+						value : response.data.collabrativeDevelopmentCount,
+						color : "#6600FF",
+						highlight : "#6600FF",
+						label : "Collaborative Development"
+					} ];
+				}
+			});
+}
+
+function GerritStats($http, $scope, $timeout, $log, $q, Gerrit) {
 	$scope.metrics = new Array();
 	$scope.gerritStatus = 'merged';
 	
@@ -74,50 +128,15 @@ function GerritStats($http, $scope, $log, $q, Gerrit) {
 	Gerrit.configInfo().then(function(response) {
 		UpdateGerritConfig(response.data, $scope);
 	});
+	
+	$scope.closeAlert = function() {
+		$scope.gerritStatsStatus.show = false;
+	}
 
-	$scope.$watch('gerritStatus', function (gerritStatus){
-		Gerrit
-		.metrics(gerritStatus)
-		.then(
-				function(response) {
-					$scope.noPeerReviewers = response.data.noPeerReviewCount;
-					$scope.onePeerReviewer = response.data.onePeerReviewCount;
-					$scope.twoPeerReviewers = response.data.twoPlusPeerReviewCount;
-					$scope.collabrativeDevelopment = response.data.collabrativeDevelopmentCount;
-					$scope.totalReviews = response.data.totalReviewsCount;
-					$scope.noPeerPercentage = response.data.noPeerReviewPercentage;
-					$scope.onePeerPercentage = response.data.onePeerReviewPercentage;
-					$scope.twoPeerPercentage = response.data.twoPeerReviewPercentage;
-					$scope.collaborativePercentage = response.data.collaborativeReviewPercentage;
-					$scope.noPeerReviews = response.data.noPeerReviewList;
-
-					$scope.gerritChartData = [ 
-	                {
-						value : response.data.noPeerReviewCount,
-						color : "#CC0000",
-						highlight : "#CC0000",
-						label : "No Peer Reviews"
-					}, {
-						value : response.data.onePeerReviewCount,
-						color : "#009933",
-						highlight : "#009933",
-						label : "One Peer Review"
-					}, {
-						value : response.data.twoPlusPeerReviewCount,
-						color : "#0099FF",
-						highlight : "#0099FF",
-						label : "Two Peer Review"
-					}, {
-						value : response.data.collabrativeDevelopmentCount,
-						color : "#6600FF",
-						highlight : "#6600FF",
-						label : "Collaborative Development"
-					} ];
-				});
-	}, true);
+	$scope.$watch('gerritStatus', function(){GetGerritStats($scope.gerritStatus, Gerrit, $scope, $timeout)}, true);
 		
 	$scope.manuallyRefreshData = function(){
-		$http.get('/gerrit/review/refreshCache');
+		$http.get('/gerrit/review/refreshCache').then(function(){GetGerritStats($scope.gerritStatus, Gerrit, $scope, $timeout);});		
 	}
 	
 	$scope.changeGerritStatus = function(gerritStatus){
@@ -143,5 +162,5 @@ function GerritStats($http, $scope, $log, $q, Gerrit) {
 
 };
 
-appGerritStatsModule.controller('GerritStatsCtrl', [ '$http', '$scope', '$log',
+appGerritStatsModule.controller('GerritStatsCtrl', [ '$http', '$scope', '$timeout', '$log',
 		'$q', 'Gerrit', GerritStats ]);

@@ -4,42 +4,49 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.springframework.stereotype.Component;
 
-@Component
-public class GerritConfig {
+import com.statscollector.application.config.AbstractWebConfig;
 
+@Component
+public class GerritConfig extends AbstractWebConfig{
 	/**
 	 * KEYS
 	 */
-	protected static final String HOST_KEY = "gerrit.host";
-	protected static final String REVIEWERS_TO_IGNORE_KEY = "gerrit.ignoreReviewers";
-	protected static final String USERNAME_KEY = "gerrit.username";
-	protected static final String PASSWORD_KEY = "gerrit.password";
-	protected static final String NO_PEER_REVIEW_TARGET_KEY = "gerrit.noPeerReviewTarget";
-	protected static final String ONE_PEER_REVIEW_TARGET_KEY = "gerrit.onePeerReviewTarget";
-	protected static final String TWO_PEER_REVIEW_TARGET_KEY = "gerrit.twoPeerReviewTarget";
-	protected static final String COLLABORATIVE_REVIEW_TARGET_KEY = "gerrit.collaborativeReviewTarget";
-	protected static final String CONFIG_VERSION_KEY = "gerrit.configVersion";
+	private static final String HOST_KEY = "gerrit.host";
+	private static final String HOST_PORT_KEY = "gerrit.hostPort";
+	private static final String REVIEWERS_TO_IGNORE_KEY = "gerrit.ignoreReviewers";
+	private static final String USERNAME_KEY = "gerrit.username";
+	private static final String PASSWORD_KEY = "gerrit.password";
+	private static final String NO_PEER_REVIEW_TARGET_KEY = "gerrit.noPeerReviewTarget";
+	private static final String ONE_PEER_REVIEW_TARGET_KEY = "gerrit.onePeerReviewTarget";
+	private static final String TWO_PEER_REVIEW_TARGET_KEY = "gerrit.twoPeerReviewTarget";
+	private static final String COLLABORATIVE_REVIEW_TARGET_KEY = "gerrit.collaborativeReviewTarget";
+	private static final String CONFIG_VERSION_KEY = "gerrit.configVersion";
 	private static final String CONFIG_FILE_PATH_KEY = "configFile.path";
 	private static final String DEFAULT_FILE_PATH = "GerritStatistics.properties";
 	private static final String TOPIC_REGEX_KEY = "gerrit.topicRegex";
+	private static final String THREAD_SPLIT_SIZE = "gerrit.threadSplitSize";
 	private final DecimalFormat df = new DecimalFormat("###.##");
 
-	private final PropertiesConfiguration config;
-
 	public GerritConfig() throws ConfigurationException {
-		config = new PropertiesConfiguration(System.getProperty(CONFIG_FILE_PATH_KEY, DEFAULT_FILE_PATH));
+		super();
 	}
-
-	public String getHost() {
-		return config.getString(HOST_KEY);
+	
+	protected String getHostKey(){
+		return HOST_KEY;
 	}
-
-	public void setHost(final String host) throws ConfigurationException {
-		config.setProperty(HOST_KEY, host);
-		config.save();
+	
+	protected String getHostPortKey(){
+		return HOST_PORT_KEY;
+	}
+	
+	protected String getConfigFilePathKey(){
+		return CONFIG_FILE_PATH_KEY;
+	}
+	
+	protected String getDefaultFilePath(){
+		return DEFAULT_FILE_PATH;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -112,15 +119,6 @@ public class GerritConfig {
 		config.save();
 	}
 
-	public void replaceWith(final GerritConfig newGerritConfig) throws ConfigurationException {
-		this.setHost(newGerritConfig.getHost());
-		this.setReviewersToIgnore(newGerritConfig.getReviewersToIgnore());
-		this.setTargets(newGerritConfig.getNoPeerReviewTarget(), newGerritConfig.getOnePeerReviewTarget(),
-				newGerritConfig.getTwoPeerReviewTarget(), newGerritConfig.getCollaborativeReviewTarget());
-		this.setUsernameAndPassword(newGerritConfig.getUsername(), newGerritConfig.getPassword());
-
-	}
-
 	public String getTopicRegex() {
 		return config.getString(TOPIC_REGEX_KEY);
 	}
@@ -128,5 +126,25 @@ public class GerritConfig {
 	public void setTopicRegex(final String topicRegex) throws ConfigurationException {
 		config.setProperty(TOPIC_REGEX_KEY, topicRegex);
 		config.save();
+	}
+
+	public Integer getThreadSplitSize() {
+		return config.getInt(THREAD_SPLIT_SIZE);
+	}
+	
+	public void setThreadSplitSize(Integer threadSplitSize) throws ConfigurationException{
+		config.setProperty(THREAD_SPLIT_SIZE, threadSplitSize);
+		config.save();
+	}
+
+	public void replaceWith(final GerritConfig newGerritConfig) throws ConfigurationException {
+		this.setHost(newGerritConfig.getHost());
+		this.setHostPort(newGerritConfig.getHostPort());
+		this.setReviewersToIgnore(newGerritConfig.getReviewersToIgnore());
+		this.setTargets(newGerritConfig.getNoPeerReviewTarget(), newGerritConfig.getOnePeerReviewTarget(),
+				newGerritConfig.getTwoPeerReviewTarget(), newGerritConfig.getCollaborativeReviewTarget());
+		this.setUsernameAndPassword(newGerritConfig.getUsername(), newGerritConfig.getPassword());
+		this.setTopicRegex(newGerritConfig.getTopicRegex());
+		this.setThreadSplitSize(newGerritConfig.getThreadSplitSize());
 	}
 }

@@ -41,16 +41,24 @@ public class GerritConfigRestfulController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changeInfo")
-	public GerritConfig changeInfo(@RequestParam(required = true) final String host,
-			@RequestParam(required = true) final String username, @RequestParam(required = true) final String password,
-			@RequestParam(required = true) final String topicRegex) {
+	public GerritConfig changeInfo(
+			@RequestParam(required = true) final String host, 
+			@RequestParam(required = true) final Integer hostPort,
+			@RequestParam(required = true) final String username, 
+			@RequestParam(required = true) final String password,
+			@RequestParam(required = true) final String topicRegex,
+			@RequestParam(required = true) final Integer threadSplitSize) {
 		try {
 			LOGGER.info("Changing Gerrit Host To: " + host);
 			gerritConfig.setHost(host);
+			LOGGER.info("Changing Gerrit Host Port To: " + hostPort);
+			gerritConfig.setHostPort(hostPort);
 			LOGGER.info("Changing Gerrit Username & Password To: " + username + ", " + password);
 			gerritConfig.setUsernameAndPassword(username, password);
 			LOGGER.info("Changing Gerrit Topic To: " + topicRegex);
 			gerritConfig.setTopicRegex(topicRegex);
+			LOGGER.info("Changing Gerrit Thread Split Size To: " + threadSplitSize);
+			gerritConfig.setThreadSplitSize(threadSplitSize);
 		} catch (ConfigurationException e) {
 			return gerritConfig;
 		}

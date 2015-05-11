@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -17,7 +16,8 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Lists;
 import com.statscollector.gerrit.config.GerritConfig;
 import com.statscollector.gerrit.model.GerritChange;
-import com.statscollector.gerrit.model.ReviewStats;
+import com.statscollector.gerrit.model.GerritReviewStats;
+import com.statscollector.gerrit.model.GerritReviewStatsResult;
 import com.statscollector.gerrit.service.filter.FilterDateUpdatedPredicate;
 import com.statscollector.gerrit.service.filter.FilterProjectNamePredicate;
 import com.statscollector.gerrit.service.filter.FilterTopicPredicate;
@@ -43,11 +43,12 @@ public class GerritStatisticsService {
 
 	final static String[] CHANGE_STATUSES = { "open", "merged", "abandoned" };
 
-	final static Logger LOGGER = Logger.getLogger(GerritStatisticsService.class);
+	final static Logger LOGGER = Logger
+			.getLogger(GerritStatisticsService.class);
 
-	final Map<String, List<GerritChange>> allChanges = new ConcurrentHashMap<>();
+	static final String REVIEW_STATS_STATUS_OK = "OK";
 
-	final Map<String, ReviewStats> allReviewStats = new ConcurrentHashMap<>();
+	private static final String REVIEW_STATS_STATUS_FAILED = "Error No Results Loaded Into Cache";
 
 	private boolean refreshInProgress = false;
 
@@ -62,11 +63,14 @@ public class GerritStatisticsService {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public List<GerritChange> getChangesBasedOnParameters(final String changeStatus, final String projectFilterRegex,
-			final DateTime startDate, final DateTime endDate, final String topicNameRegex) throws IOException,
-			URISyntaxException {
-		return filterChanges(allChanges.get(changeStatus),
-				getFilters(projectFilterRegex, startDate, endDate, topicNameRegex));
+	public List<GerritChange> getChangesBasedOnParameters(
+			final String changeStatus, final String projectFilterRegex,
+			final DateTime startDate, final DateTime endDate,
+			final String topicNameRegex) throws IOException, URISyntaxException {
+		return filterChanges(
+				gerritStatisticsHelper.getAllChanges().get(changeStatus),
+				getFilters(projectFilterRegex, startDate, endDate,
+						topicNameRegex));
 	}
 
 	/**
@@ -77,7 +81,9 @@ public class GerritStatisticsService {
 	 * @param filters
 	 * @return
 	 */
-	private List<GerritChange> filterChanges(final List<GerritChange> allChanges, final List<GerritChangeFilter> filters) {
+	private List<GerritChange> filterChanges(
+			final List<GerritChange> allChanges,
+			final List<GerritChangeFilter> filters) {
 		List<GerritChange> results = Lists.newArrayList(allChanges);
 		for (GerritChangeFilter filter : filters) {
 			results = filter.filter(results);
@@ -96,7 +102,8 @@ public class GerritStatisticsService {
 	 * @param endDate
 	 * @return
 	 */
-	private List<GerritChangeFilter> getFilters(final String projectFilterRegex, final DateTime startDate,
+	private List<GerritChangeFilter> getFilters(
+			final String projectFilterRegex, final DateTime startDate,
 			final DateTime endDate, final String topicNameRegex) {
 		List<GerritChangeFilter> results = new ArrayList<GerritChangeFilter>();
 		results.add(new FilterDateUpdatedPredicate(startDate, endDate));
@@ -107,88 +114,128 @@ public class GerritStatisticsService {
 		return results;
 	}
 
-	@Scheduled(initialDelay = 30000, fixedRate = 4500000)
-	// Every 15 minutes
-	public void getReviewStatisticsScheduledTask() throws IOException, URISyntaxException {
+	/**
+	 * Every 15 minutes I run multiple threads to pull back all the gerrit
+	 * details, I split based on gerritConfig.ThreadSplitSize, which is
+	 * configurable in the UI.
+	 * 
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 */
+	@Scheduled(fixedRate = 4500000)
+	public void getReviewStatisticsScheduledTask() throws IOException,
+			URISyntaxException, InterruptedException, ExecutionException {
+		LOGGER.info("Is Refresh In Progress ?: " + refreshInProgress);
 		if (!refreshInProgress) {
 			refreshInProgress = true;
 			for (String changeStatus : CHANGE_STATUSES) {
+				long start = System.currentTimeMillis();
 				List<GerritChange> noPeerReviewList = new ArrayList<>();
 				List<GerritChange> onePeerReviewList = new ArrayList<>();
 				List<GerritChange> twoPlusPeerReviewList = new ArrayList<>();
 				List<GerritChange> collabrativeDevelopmentList = new ArrayList<>();
+				LOGGER.info("Getting Changes For Status: " + changeStatus);
+				
+				List<GerritChange> changes = gerritService
+						.getAllChanges(changeStatus);
 
-				List<GerritChange> changes = gerritService.getAllChanges(changeStatus);
-				gerritService.populateChangeReviewers(changes);
-				allChanges.put(changeStatus, changes);
-				for (GerritChange gerritChange : changes) {
-					int numberOfReviewers = numberOfReviewers(gerritChange);
-					LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
-					switch (numberOfReviewers) {
-					case -1:
-						collabrativeDevelopmentList.add(gerritChange);
-						break;
-					case 0:
-						noPeerReviewList.add(gerritChange);
-						break;
-					case 1:
-						onePeerReviewList.add(gerritChange);
-						break;
-					default:
-						twoPlusPeerReviewList.add(gerritChange);
-						break;
+				Integer threadSplitSize = gerritConfig.getThreadSplitSize();
+
+				if (changes.size() < threadSplitSize) {
+					
+					GerritReviewStatsResult result = null;
+					try{
+						gerritStatisticsHelper.populateReviewStats(changeStatus, noPeerReviewList,
+								onePeerReviewList, twoPlusPeerReviewList,
+								collabrativeDevelopmentList, changes);
+						result = new GerritReviewStatsResult(true, changes);
+					}catch(Exception e){
+						LOGGER.info("CAUGHT EXCEPTION");
+						result = new GerritReviewStatsResult(false, e, changes);
 					}
+					
+					GerritReviewStats gerritReviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
+					gerritReviewStats.setError(!result.getSuccess());
+					if(!result.getSuccess()){
+						gerritReviewStats.setStatus(gerritReviewStats.getStatus()+"Error Thrown During Processing: " + result.getError().getMessage());
+					}else{
+						gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK");
+					}
+					gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : 1 Thread");					
+				} else {
+					List<Future<GerritReviewStatsResult>> asyncResults = new ArrayList<>();
+					List<List<GerritChange>> partitionedLists = Lists
+							.partition(changes, threadSplitSize);
+					for (List<GerritChange> list : partitionedLists) {
+						asyncResults.add(gerritStatisticsHelper.populateReviewStatsAsync(changeStatus,
+								noPeerReviewList, onePeerReviewList,
+								twoPlusPeerReviewList,
+								collabrativeDevelopmentList, list));
+					}
+					// Wait for all threads to complete.
+					for (Future<GerritReviewStatsResult> asyncResult : asyncResults) {
+						while(!asyncResult.isDone()){
+						}
+					}
+					//Process Thread Responses
+					GerritReviewStats gerritReviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
+					for (Future<GerritReviewStatsResult> asyncResult : asyncResults) {
+						GerritReviewStatsResult result = asyncResult.get();
+						if(result == null){
+							gerritReviewStats.setStatus(gerritReviewStats.getStatus()+"Error Thrown During Processing: Null Pointer Returned, ");
+							gerritReviewStats.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
+						}else if(!result.getSuccess()){
+							gerritReviewStats.setStatus(gerritReviewStats.getStatus()+"Error Thrown During Processing: " + result.getError().getMessage()+", ");
+							gerritReviewStats.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result.getSuccess()));
+						}else{
+							gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK, ");
+							gerritReviewStats.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result.getSuccess()));
+						}
+					}		
+					gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : " + asyncResults.size() +" Threads");
 				}
-				allReviewStats.put(changeStatus, new ReviewStats(noPeerReviewList, onePeerReviewList,
-						twoPlusPeerReviewList, collabrativeDevelopmentList));
+				long end = System.currentTimeMillis();				
+				LOGGER.info("Got Changes For Status: " + changeStatus + " In: " + (end-start)/1000 + " Seconds");
 			}
 			refreshInProgress = false;
+			LOGGER.info("Refresh Completed");
 		}
 	}
 
-	public ReviewStats getReviewStatistics(final String changeStatus, final String projectFilterString,
-			final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
+	
 
-		List<GerritChangeFilter> filters = getFilters(projectFilterString, startDate, endDate,
-				gerritConfig.getTopicRegex());
+	public GerritReviewStats getReviewStatistics(final String changeStatus,
+			final String projectFilterString, final DateTime startDate,
+			final DateTime endDate) throws IOException, URISyntaxException {
 
-		ReviewStats reviewStats = allReviewStats.get(changeStatus);
-		return new ReviewStats(filterChanges(reviewStats.getNoPeerReviewList(), filters), filterChanges(
-				reviewStats.getOnePeerReviewList(), filters), filterChanges(reviewStats.getTwoPlusPeerReviewList(),
-				filters), filterChanges(reviewStats.getCollabrativeDevelopmentList(), filters));
+		List<GerritChangeFilter> filters = getFilters(projectFilterString,
+				startDate, endDate, gerritConfig.getTopicRegex());
+
+		GerritReviewStats reviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
+		return buildReviewStatsObject(filters, reviewStats);
 	}
 
-	/**
-	 * I return the number of reviewers for the provided change, if the change
-	 * has been collaboratively developed I return -1
-	 *
-	 * @param gerritChange
-	 * @return
-	 */
-	private int numberOfReviewers(final GerritChange gerritChange) {
-		LOGGER.info("Calculating changes for change: " + gerritChange);
-		String owner = gerritChange.getOwner();
-		Map<String, Integer> reviewers = gerritChange.getReviewers();
-		Set<String> reviewersUsernames = reviewers.keySet();
-		List<String> reviewersList = new ArrayList<>();
-		for (String username : reviewersUsernames) {
-			Integer reviewValue = reviewers.get(username);
-			if (reviewValue != null && reviewValue > 0) {
-				reviewersList.add(username);
-			}
+	private GerritReviewStats buildReviewStatsObject(
+			List<GerritChangeFilter> filters, GerritReviewStats reviewStats) {
+		if(null != reviewStats){
+			return GerritReviewStats.buildStatsObjectWithValuesAndStatus(filterChanges(reviewStats.getNoPeerReviewList(),
+					filters), filterChanges(reviewStats.getOnePeerReviewList(),
+					filters), filterChanges(reviewStats.getTwoPlusPeerReviewList(),
+					filters), filterChanges(
+					reviewStats.getCollabrativeDevelopmentList(), filters), reviewStats.getStatus(), reviewStats.getError());
+		}else{
+			return GerritReviewStats.buildEmptyStatsObjectWithStatus(REVIEW_STATS_STATUS_FAILED, true);
 		}
-		List<String> reviewersToIgnore = gerritConfig.getReviewersToIgnore();
-		reviewersList.removeAll(reviewersToIgnore);// Get rid of all automated
-		// reviewers etc.
-		reviewersList.remove(owner);// Remove the owner from the review list
-		return reviewersList.size();
 	}
 
 	public void setGerritService(final GerritService gerritService) {
 		this.gerritService = gerritService;
 	}
 
-	public void setGerritStatisticsHelper(final GerritStatisticsHelper gerritStatisticsHelper) {
+	public void setGerritStatisticsHelper(
+			final GerritStatisticsHelper gerritStatisticsHelper) {
 		this.gerritStatisticsHelper = gerritStatisticsHelper;
 	}
 

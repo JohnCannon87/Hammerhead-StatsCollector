@@ -15,6 +15,8 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.statscollector.application.config.AbstractWebConfig;
+import com.statscollector.application.dao.AbstractWebDao;
 import com.statscollector.gerrit.config.GerritConfig;
 
 /**
@@ -25,7 +27,7 @@ import com.statscollector.gerrit.config.GerritConfig;
  *
  */
 @Repository
-public class GerritDao {
+public class GerritDao extends AbstractWebDao{
 
 	private static final String HTTP_SCHEME = "http";
 	private static final String ALL_CHANGES_REST_URL = "/a/changes/";
@@ -66,11 +68,11 @@ public class GerritDao {
 				resultString = EntityUtils.toString(httpEntity);
 				EntityUtils.consume(httpEntity);
 			} catch (Exception e) {
-				System.out.println(e.getMessage());
+				System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
 				throw e;
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
 			throw e;
 		}
 		return resultString;
@@ -86,7 +88,7 @@ public class GerritDao {
 	 * @throws URISyntaxException
 	 */
 	private URIBuilder setupBaseURI(final String requestUrl) throws URISyntaxException {
-		return new URIBuilder().setScheme(HTTP_SCHEME).setHost(gerritConfig.getHost()).setPath(requestUrl);
+		return new URIBuilder().setScheme(HTTP_SCHEME).setHost(getTargetHost()).setPath(requestUrl);
 
 	}
 
@@ -103,11 +105,11 @@ public class GerritDao {
 				resultString = EntityUtils.toString(httpEntity);
 				EntityUtils.consume(httpEntity);
 			} catch (Exception e) {
-				System.out.println(e.getMessage());
+				System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
 				throw e;
 			}
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
 			throw e;
 		}
 		return resultString;
@@ -115,5 +117,10 @@ public class GerritDao {
 
 	public void setGerritConfig(GerritConfig gerritConfig) {
 		this.gerritConfig = gerritConfig;
+	}
+
+	@Override
+	protected AbstractWebConfig getConfig() {
+		return gerritConfig;
 	}
 }

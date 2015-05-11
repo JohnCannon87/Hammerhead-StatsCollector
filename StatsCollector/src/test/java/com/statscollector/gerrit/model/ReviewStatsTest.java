@@ -12,7 +12,7 @@ public class ReviewStatsTest {
 		
 	@Test
 	public void testPercentages() {
-		GerritChange change = new GerritChange("testId", "testChangeId", "testProject", "testOwner", new DateTime(), new DateTime());
+		GerritChange change = new GerritChange("testId", "testChangeId", "testProject", "testOwner", new DateTime(), new DateTime(), "", "");
 		List<GerritChange> noPeerReviewCount = new ArrayList<>();
 		List<GerritChange> onePeerReviewCount = new ArrayList<>();
 		List<GerritChange> twoPeerReviewCount = new ArrayList<>();
@@ -24,7 +24,7 @@ public class ReviewStatsTest {
 		twoPeerReviewCount.add(change);
 		twoPeerReviewCount.add(change);
 		
-		ReviewStats stats = new ReviewStats(noPeerReviewCount, onePeerReviewCount, twoPeerReviewCount, collaborativeDevelopmentCount);
+		GerritReviewStats stats = GerritReviewStats.buildStatsObjectWithValuesAndStatus(noPeerReviewCount, onePeerReviewCount, twoPeerReviewCount, collaborativeDevelopmentCount, "ok", false);
 		
 		float noPeerReviewPercentage = stats.getNoPeerReviewPercentage();
 		float onePeerReviewPercentage = stats.getOnePeerReviewPercentage();

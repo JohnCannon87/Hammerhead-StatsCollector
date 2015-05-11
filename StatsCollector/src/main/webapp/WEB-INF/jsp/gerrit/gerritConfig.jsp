@@ -71,10 +71,24 @@
 							</div>
 						</div>
 						<div class="form-group">
+							<label class="col-sm-2 control-label">Host Port:</label>
+							<div class="col-sm-10">
+								<input type="number" ng-model="gerritHostPort"
+									placeholder="Gerrit Server Host Port" />
+							</div>
+						</div>
+						<div class="form-group">
 							<label class="col-sm-2 control-label">Topic Filter Regex:</label>
 							<div class="col-sm-10">
 								<input type="text" ng-model="gerritTopicRegex"
 									placeholder="Topics to ignore as a regex (leave blank for none)" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Topic Filter Regex:</label>
+							<div class="col-sm-10">
+								<input type="number" ng-model="gerritThreadSplitSize"
+									placeholder="Thread size to split Gerrit requests" />
 							</div>
 						</div>
 					</form>
