@@ -6,13 +6,13 @@ angular.module('appGerritStats').service('Gerrit', ['$http', 'gerritAppConfig',
 		});
 		
 		$http.defaults.withCredentials = false;
-		
+				
 		function configInfo(){
-			return $http.get(gerritAppConfig.gerrit.baseUrl + '/gerrit/config/info');
+			return $http.get('/gerrit/config/info');
 		}
 		
 		function metrics(gerritStatus) {
-			return $http.get(gerritAppConfig.gerrit.baseUrl + '/gerrit/review/'+gerritStatus+'/all');
+			return $http.get('/gerrit/review/'+gerritStatus+'/all');
 		}
 	}
 ]);

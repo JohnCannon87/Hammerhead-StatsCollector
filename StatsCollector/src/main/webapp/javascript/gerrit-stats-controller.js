@@ -116,6 +116,10 @@ function GerritStats($http, $scope, $log, $q, Gerrit) {
 				});
 	}, true);
 		
+	$scope.manuallyRefreshData = function(){
+		$http.get('/gerrit/review/refreshCache');
+	}
+	
 	$scope.changeGerritStatus = function(gerritStatus){
 		$scope.gerritStatus = gerritStatus;
 	};

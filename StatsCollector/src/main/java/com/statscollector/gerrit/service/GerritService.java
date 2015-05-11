@@ -15,8 +15,6 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -87,15 +85,16 @@ public class GerritService {
 	}
 
 	private List<GerritChange> translateToChanges(final JsonElement rawJsonElement) {
+		List<GerritChange> results = new ArrayList<GerritChange>();
 		if (rawJsonElement.isJsonArray()) {
-			List<GerritChange> results = new ArrayList<GerritChange>();
 			JsonArray rawJsonArray = rawJsonElement.getAsJsonArray();
 			for (JsonElement jsonElement : rawJsonArray) {
 				results.add(translateToChange(jsonElement));
 			}
 			return results;
 		} else {
-			throw new NotImplementedException();
+			LOGGER.error("Failed To Parse JSON: " + rawJsonElement.toString());
+			return results;
 		}
 	}
 

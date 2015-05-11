@@ -27,6 +27,11 @@ public class GerritReviewController {
 	@Autowired
 	private GerritStatisticsService statisticsService;
 
+	@RequestMapping(value = "/refreshCache")
+	public void refreshCache() throws IOException, URISyntaxException {
+		statisticsService.getReviewStatisticsScheduledTask();
+	}
+
 	@RequestMapping(value = "/{changeStatus}/{projectFilterString}/{startDate}/{endDate}", produces = "application/json")
 	public ReviewStats statusReview(@PathVariable final String changeStatus,
 			@PathVariable final String projectFilterString, @PathVariable final String startDate,

@@ -49,6 +49,8 @@ public class GerritStatisticsService {
 
 	final Map<String, ReviewStats> allReviewStats = new ConcurrentHashMap<>();
 
+	private boolean refreshInProgress = false;
+
 	/**
 	 * I return a list of changes with unwanted changes filtered out based on
 	 * the provided parameters.
@@ -105,40 +107,43 @@ public class GerritStatisticsService {
 		return results;
 	}
 
-	@Scheduled(fixedRate = 4500000)
+	@Scheduled(initialDelay = 30000, fixedRate = 4500000)
 	// Every 15 minutes
 	public void getReviewStatisticsScheduledTask() throws IOException, URISyntaxException {
-		for (String changeStatus : CHANGE_STATUSES) {
-			List<GerritChange> noPeerReviewList = new ArrayList<>();
-			List<GerritChange> onePeerReviewList = new ArrayList<>();
-			List<GerritChange> twoPlusPeerReviewList = new ArrayList<>();
-			List<GerritChange> collabrativeDevelopmentList = new ArrayList<>();
+		if (!refreshInProgress) {
+			refreshInProgress = true;
+			for (String changeStatus : CHANGE_STATUSES) {
+				List<GerritChange> noPeerReviewList = new ArrayList<>();
+				List<GerritChange> onePeerReviewList = new ArrayList<>();
+				List<GerritChange> twoPlusPeerReviewList = new ArrayList<>();
+				List<GerritChange> collabrativeDevelopmentList = new ArrayList<>();
 
-			List<GerritChange> changes = gerritService.getAllChanges(changeStatus);
-			gerritService.populateChangeReviewers(changes);
-			allChanges.put(changeStatus, changes);
-			for (GerritChange gerritChange : changes) {
-				int numberOfReviewers = numberOfReviewers(gerritChange);
-				LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
-				switch (numberOfReviewers) {
-				case -1:
-					collabrativeDevelopmentList.add(gerritChange);
-					break;
-				case 0:
-					noPeerReviewList.add(gerritChange);
-					break;
-				case 1:
-					onePeerReviewList.add(gerritChange);
-					break;
-				default:
-					twoPlusPeerReviewList.add(gerritChange);
-					break;
+				List<GerritChange> changes = gerritService.getAllChanges(changeStatus);
+				gerritService.populateChangeReviewers(changes);
+				allChanges.put(changeStatus, changes);
+				for (GerritChange gerritChange : changes) {
+					int numberOfReviewers = numberOfReviewers(gerritChange);
+					LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
+					switch (numberOfReviewers) {
+					case -1:
+						collabrativeDevelopmentList.add(gerritChange);
+						break;
+					case 0:
+						noPeerReviewList.add(gerritChange);
+						break;
+					case 1:
+						onePeerReviewList.add(gerritChange);
+						break;
+					default:
+						twoPlusPeerReviewList.add(gerritChange);
+						break;
+					}
 				}
+				allReviewStats.put(changeStatus, new ReviewStats(noPeerReviewList, onePeerReviewList,
+						twoPlusPeerReviewList, collabrativeDevelopmentList));
 			}
-			allReviewStats.put(changeStatus, new ReviewStats(noPeerReviewList, onePeerReviewList,
-					twoPlusPeerReviewList, collabrativeDevelopmentList));
+			refreshInProgress = false;
 		}
-
 	}
 
 	public ReviewStats getReviewStatistics(final String changeStatus, final String projectFilterString,
@@ -150,7 +155,7 @@ public class GerritStatisticsService {
 		ReviewStats reviewStats = allReviewStats.get(changeStatus);
 		return new ReviewStats(filterChanges(reviewStats.getNoPeerReviewList(), filters), filterChanges(
 				reviewStats.getOnePeerReviewList(), filters), filterChanges(reviewStats.getTwoPlusPeerReviewList(),
-						filters), filterChanges(reviewStats.getCollabrativeDevelopmentList(), filters));
+				filters), filterChanges(reviewStats.getCollabrativeDevelopmentList(), filters));
 	}
 
 	/**
