@@ -23,6 +23,21 @@ war {
     version =  '1.0'
 }
 
+task createDist (){
+	build
+	copy {
+        from "build/libs"
+        into "../dist"
+        include 'StatsCollector-1.0.war'
+    }
+    copy {
+        from "src/main/resources"
+        into "../dist"
+        include 'GerritStatistics.properties'
+    }
+}
+
+
 repositories {
     mavenCentral()
 }

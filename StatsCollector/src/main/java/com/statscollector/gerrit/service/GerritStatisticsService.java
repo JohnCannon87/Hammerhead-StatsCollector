@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
@@ -18,6 +20,7 @@ import com.statscollector.gerrit.model.GerritChange;
 import com.statscollector.gerrit.model.ReviewStats;
 import com.statscollector.gerrit.service.filter.FilterDateUpdatedPredicate;
 import com.statscollector.gerrit.service.filter.FilterProjectNamePredicate;
+import com.statscollector.gerrit.service.filter.FilterTopicPredicate;
 import com.statscollector.gerrit.service.filter.GerritChangeFilter;
 
 /**
@@ -38,7 +41,13 @@ public class GerritStatisticsService {
 	@Autowired
 	private GerritConfig gerritConfig;
 
+	final static String[] CHANGE_STATUSES = { "open", "merged", "abandoned" };
+
 	final static Logger LOGGER = Logger.getLogger(GerritStatisticsService.class);
+
+	final Map<String, List<GerritChange>> allChanges = new ConcurrentHashMap<>();
+
+	final Map<String, ReviewStats> allReviewStats = new ConcurrentHashMap<>();
 
 	/**
 	 * I return a list of changes with unwanted changes filtered out based on
@@ -52,9 +61,10 @@ public class GerritStatisticsService {
 	 * @throws URISyntaxException
 	 */
 	public List<GerritChange> getChangesBasedOnParameters(final String changeStatus, final String projectFilterRegex,
-			final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
-		List<GerritChange> allChanges = gerritService.getAllChanges(changeStatus);
-		return filterChanges(allChanges, getFilters(projectFilterRegex, startDate, endDate));
+			final DateTime startDate, final DateTime endDate, final String topicNameRegex) throws IOException,
+			URISyntaxException {
+		return filterChanges(allChanges.get(changeStatus),
+				getFilters(projectFilterRegex, startDate, endDate, topicNameRegex));
 	}
 
 	/**
@@ -85,42 +95,62 @@ public class GerritStatisticsService {
 	 * @return
 	 */
 	private List<GerritChangeFilter> getFilters(final String projectFilterRegex, final DateTime startDate,
-			final DateTime endDate) {
+			final DateTime endDate, final String topicNameRegex) {
 		List<GerritChangeFilter> results = new ArrayList<GerritChangeFilter>();
 		results.add(new FilterDateUpdatedPredicate(startDate, endDate));
 		results.add(new FilterProjectNamePredicate(projectFilterRegex));
+		if (!topicNameRegex.isEmpty()) {
+			results.add(new FilterTopicPredicate(topicNameRegex));
+		}
 		return results;
+	}
+
+	@Scheduled(fixedRate = 4500000)
+	// Every 15 minutes
+	public void getReviewStatisticsScheduledTask() throws IOException, URISyntaxException {
+		for (String changeStatus : CHANGE_STATUSES) {
+			List<GerritChange> noPeerReviewList = new ArrayList<>();
+			List<GerritChange> onePeerReviewList = new ArrayList<>();
+			List<GerritChange> twoPlusPeerReviewList = new ArrayList<>();
+			List<GerritChange> collabrativeDevelopmentList = new ArrayList<>();
+
+			List<GerritChange> changes = gerritService.getAllChanges(changeStatus);
+			gerritService.populateChangeReviewers(changes);
+			allChanges.put(changeStatus, changes);
+			for (GerritChange gerritChange : changes) {
+				int numberOfReviewers = numberOfReviewers(gerritChange);
+				LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
+				switch (numberOfReviewers) {
+				case -1:
+					collabrativeDevelopmentList.add(gerritChange);
+					break;
+				case 0:
+					noPeerReviewList.add(gerritChange);
+					break;
+				case 1:
+					onePeerReviewList.add(gerritChange);
+					break;
+				default:
+					twoPlusPeerReviewList.add(gerritChange);
+					break;
+				}
+			}
+			allReviewStats.put(changeStatus, new ReviewStats(noPeerReviewList, onePeerReviewList,
+					twoPlusPeerReviewList, collabrativeDevelopmentList));
+		}
+
 	}
 
 	public ReviewStats getReviewStatistics(final String changeStatus, final String projectFilterString,
 			final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
-		List<GerritChange> noPeerReviewList = new ArrayList<>();
-		List<GerritChange> onePeerReviewList = new ArrayList<>();
-		List<GerritChange> twoPlusPeerReviewList = new ArrayList<>();
-		List<GerritChange> collabrativeDevelopmentList = new ArrayList<>();
 
-		List<GerritChange> changes = getChangesBasedOnParameters(changeStatus, projectFilterString, startDate, endDate);
-		gerritService.populateChangeReviewers(changes);
-		for (GerritChange gerritChange : changes) {
-			int numberOfReviewers = numberOfReviewers(gerritChange);
-			LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
-			switch (numberOfReviewers) {
-			case -1:
-				collabrativeDevelopmentList.add(gerritChange);
-				break;
-			case 0:
-				noPeerReviewList.add(gerritChange);
-				break;
-			case 1:
-				onePeerReviewList.add(gerritChange);
-				break;
-			default:
-				twoPlusPeerReviewList.add(gerritChange);
-				break;
-			}
-		}
+		List<GerritChangeFilter> filters = getFilters(projectFilterString, startDate, endDate,
+				gerritConfig.getTopicRegex());
 
-		return new ReviewStats(noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList, collabrativeDevelopmentList);
+		ReviewStats reviewStats = allReviewStats.get(changeStatus);
+		return new ReviewStats(filterChanges(reviewStats.getNoPeerReviewList(), filters), filterChanges(
+				reviewStats.getOnePeerReviewList(), filters), filterChanges(reviewStats.getTwoPlusPeerReviewList(),
+						filters), filterChanges(reviewStats.getCollabrativeDevelopmentList(), filters));
 	}
 
 	/**
@@ -149,16 +179,15 @@ public class GerritStatisticsService {
 		return reviewersList.size();
 	}
 
-	public void setGerritService(GerritService gerritService) {
+	public void setGerritService(final GerritService gerritService) {
 		this.gerritService = gerritService;
 	}
 
-	public void setGerritStatisticsHelper(
-			GerritStatisticsHelper gerritStatisticsHelper) {
+	public void setGerritStatisticsHelper(final GerritStatisticsHelper gerritStatisticsHelper) {
 		this.gerritStatisticsHelper = gerritStatisticsHelper;
 	}
 
-	public void setGerritConfig(GerritConfig gerritConfig) {
+	public void setGerritConfig(final GerritConfig gerritConfig) {
 		this.gerritConfig = gerritConfig;
 	}
 }

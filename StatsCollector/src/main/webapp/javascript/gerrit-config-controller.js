@@ -3,6 +3,7 @@ function UpdateGerritConfig(data, $scope){
 	$scope.reviewersToIgnore = data.reviewersToIgnore;
 	$scope.gerritUsername = data.username;
 	$scope.gerritPassword = data.password;
+	$scope.gerritTopicRegex = data.topicRegex
 	$scope.noPeerReviewsTarget = data.noPeerReviewTarget;
 	$scope.onePeerReviewTarget = data.onePeerReviewTarget;
 	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
@@ -87,7 +88,7 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit, Upload) 
 	
 	//Form Data Setup
 	$scope.saveGerritConfig = function(){
-		$http.post('/gerrit/config/changeInfo?host='+$scope.gerritHostname+'&username='+$scope.gerritUsername+'&password='+$scope.gerritPassword)
+		$http.post('/gerrit/config/changeInfo?host='+$scope.gerritHostname+'&username='+$scope.gerritUsername+'&password='+$scope.gerritPassword+'&topic='+$scope.gerritTopicRegex)
 		.success(function(data){
 			console.log(data);
 			UpdateGerritConfig(data, $scope);

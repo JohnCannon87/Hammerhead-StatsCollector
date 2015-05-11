@@ -23,7 +23,7 @@ public class GerritConfigRestfulController {
 
 	@Autowired
 	private GerritConfig gerritConfig;
-	
+
 	@Autowired
 	private GerritConfigTranslator gerritConfigTranslator;
 
@@ -32,31 +32,42 @@ public class GerritConfigRestfulController {
 	public GerritConfig gerritInfo() {
 		return gerritConfig;
 	}
-	
-	@RequestMapping(value="/upload", method=RequestMethod.POST)
-    public @ResponseBody GerritConfig handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException, ConfigurationException{
-        LOGGER.info("Uploaded File: " + file.getName());
-        return gerritConfigTranslator.updateConfigFromFile(file, gerritConfig);        
-    }
+
+	@RequestMapping(value = "/upload", method = RequestMethod.POST)
+	public @ResponseBody GerritConfig handleFileUpload(@RequestParam("file") final MultipartFile file)
+			throws IOException, ConfigurationException {
+		LOGGER.info("Uploaded File: " + file.getName());
+		return gerritConfigTranslator.updateConfigFromFile(file, gerritConfig);
+	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changeInfo")
-	public GerritConfig changeInfo(@RequestParam(required = true) final String host, @RequestParam(required = true) final String username, @RequestParam(required = true) final String password) {
+	public GerritConfig changeInfo(@RequestParam(required = true) final String host,
+			@RequestParam(required = true) final String username, @RequestParam(required = true) final String password,
+			@RequestParam(required = true) final String topicRegex) {
 		try {
 			LOGGER.info("Changing Gerrit Host To: " + host);
 			gerritConfig.setHost(host);
 			LOGGER.info("Changing Gerrit Username & Password To: " + username + ", " + password);
 			gerritConfig.setUsernameAndPassword(username, password);
+			LOGGER.info("Changing Gerrit Topic To: " + topicRegex);
+			gerritConfig.setTopicRegex(topicRegex);
 		} catch (ConfigurationException e) {
 			return gerritConfig;
 		}
 		return gerritConfig;
 	}
-	
+
 	@RequestMapping(method = RequestMethod.POST, value = "/saveTargets")
-	public GerritConfig saveTargets(@RequestParam(required = true) final Float noPeerReviewTarget, @RequestParam(required = true) final Float onePeerReviewTarget, @RequestParam(required = true) final Float twoPeerReviewTarget, @RequestParam(required = true) final Float collaborativeDevelopmentTarget) {
-		try {			
-			LOGGER.info("Changing Gerrit Targets for NoPeer, OnePeer, TwoPeer & Collaborative (respectively) To: " + noPeerReviewTarget + ", " + onePeerReviewTarget + ", " +twoPeerReviewTarget+ ", " +collaborativeDevelopmentTarget);
-			gerritConfig.setTargets(noPeerReviewTarget, onePeerReviewTarget, twoPeerReviewTarget, collaborativeDevelopmentTarget);
+	public GerritConfig saveTargets(@RequestParam(required = true) final Float noPeerReviewTarget,
+			@RequestParam(required = true) final Float onePeerReviewTarget,
+			@RequestParam(required = true) final Float twoPeerReviewTarget,
+			@RequestParam(required = true) final Float collaborativeDevelopmentTarget) {
+		try {
+			LOGGER.info("Changing Gerrit Targets for NoPeer, OnePeer, TwoPeer & Collaborative (respectively) To: "
+					+ noPeerReviewTarget + ", " + onePeerReviewTarget + ", " + twoPeerReviewTarget + ", "
+					+ collaborativeDevelopmentTarget);
+			gerritConfig.setTargets(noPeerReviewTarget, onePeerReviewTarget, twoPeerReviewTarget,
+					collaborativeDevelopmentTarget);
 		} catch (ConfigurationException e) {
 			return gerritConfig;
 		}
@@ -85,5 +96,4 @@ public class GerritConfigRestfulController {
 		return gerritConfig;
 	}
 
-	
 }

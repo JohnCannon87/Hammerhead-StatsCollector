@@ -9,6 +9,8 @@
 	src="http://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.min.js"></script>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.min.js"></script>
 <script src="/javascript/tc-angular-chartjs.js"></script>
 <script src="/javascript/gerrit-app.js"></script>
 <script src="/javascript/gerrit-stats.js"></script>
@@ -50,6 +52,19 @@
 					class="list-group-item">Collaborative Development: <span
 					class="badge">{{collabrativeDevelopment}}</span></li>
 				<li class="list-group-item">Total Reviews: <span class="badge">{{totalReviews}}</span></li>
+				<li class="list-group-item">
+					<!-- Single button -->
+				    <div class="btn-group" dropdown is-open="status.isopen">
+				      <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+				        Stats for status {{gerritStatus}} <span class="caret"></span>
+				      </button>
+				      <ul class="dropdown-menu" role="menu">
+				        <li><a ng-click="changeGerritStatus('merged')">Set status to merged</a></li>
+				        <li><a ng-click="changeGerritStatus('open')">Set status to open</a></li>
+				        <li><a ng-click="changeGerritStatus('abandoned')">Set status to abandoned</a></li>
+				      </ul>
+				    </div>
+				</li>
 			</ul>
 		</div>
 		<div class="col-sm-8">

@@ -5,15 +5,15 @@ import java.util.List;
 public class ReviewStats {
 
 	private final List<GerritChange> noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList,
-			collabrativeDevelopmentList;
+	collabrativeDevelopmentList;
 
-	public ReviewStats(final List<GerritChange> noPeerReviewCount, final List<GerritChange> onePeerReviewCount,
-			final List<GerritChange> twoPlusPeerReviewCount, final List<GerritChange> collabrativeDevelopmentCount) {
+	public ReviewStats(final List<GerritChange> noPeerReviewList, final List<GerritChange> onePeerReviewList,
+			final List<GerritChange> twoPlusPeerReviewList, final List<GerritChange> collabrativeDevelopmentList) {
 		super();
-		this.noPeerReviewList = noPeerReviewCount;
-		this.onePeerReviewList = onePeerReviewCount;
-		this.twoPlusPeerReviewList = twoPlusPeerReviewCount;
-		this.collabrativeDevelopmentList = collabrativeDevelopmentCount;
+		this.noPeerReviewList = noPeerReviewList;
+		this.onePeerReviewList = onePeerReviewList;
+		this.twoPlusPeerReviewList = twoPlusPeerReviewList;
+		this.collabrativeDevelopmentList = collabrativeDevelopmentList;
 	}
 
 	public List<GerritChange> getNoPeerReviewList() {
@@ -47,21 +47,21 @@ public class ReviewStats {
 	public int getCollabrativeDevelopmentCount() {
 		return collabrativeDevelopmentList.size();
 	}
-	
+
 	public float getNoPeerReviewPercentage() {
-		return (float)noPeerReviewList.size()/(float)getTotalReviewsCount();
+		return (float) noPeerReviewList.size() / (float) getTotalReviewsCount();
 	}
 
 	public float getOnePeerReviewPercentage() {
-		return (float)onePeerReviewList.size()/(float)getTotalReviewsCount();
+		return (float) onePeerReviewList.size() / (float) getTotalReviewsCount();
 	}
 
 	public float getTwoPlusPeerReviewPercentage() {
-		return (float)twoPlusPeerReviewList.size()/(float)getTotalReviewsCount();
+		return (float) twoPlusPeerReviewList.size() / (float) getTotalReviewsCount();
 	}
 
 	public float getCollabrativeDevelopmentPercentage() {
-		return (float)collabrativeDevelopmentList.size()/(float)getTotalReviewsCount();
+		return (float) collabrativeDevelopmentList.size() / (float) getTotalReviewsCount();
 	}
 
 	public int getTotalReviewsCount() {

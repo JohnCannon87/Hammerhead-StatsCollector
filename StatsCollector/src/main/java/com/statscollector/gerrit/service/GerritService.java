@@ -1,6 +1,7 @@
 package com.statscollector.gerrit.service;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
 import com.statscollector.gerrit.authentication.AuthenticationHelper;
 import com.statscollector.gerrit.dao.GerritDao;
 import com.statscollector.gerrit.model.GerritChange;
@@ -61,8 +63,12 @@ public class GerritService {
 	private static final String USERNAME_REF = "username";
 
 	private static final String VALUE_REF = "value";
-	
+
 	private static final String NUMBER_REF = "_number";
+
+	private static final String TOPIC_REF = "topic";
+
+	private static final String BRANCH_REF = "branch";
 
 	@Autowired
 	private GerritDao gerritDao;
@@ -100,9 +106,16 @@ public class GerritService {
 			String changeId = rawJsonObject.get(CHANGE_ID_REF).getAsString();
 			String project = rawJsonObject.get(PROJECT_REF).getAsString();
 			String owner = rawJsonObject.get(OWNER_REF).getAsJsonObject().get(OWNER_NAME_REF).getAsString();
+			String topic = "";
+			try {
+				topic = rawJsonObject.get(TOPIC_REF).getAsString();
+			} catch (Exception e) {
+				// No Topic Found, Ignore
+			}
+			String branch = rawJsonObject.get(BRANCH_REF).getAsString();
 			DateTime created = parseDateTime(rawJsonObject.get(CREATED_REF).getAsString());
 			DateTime updated = parseDateTime(rawJsonObject.get(UPDATED_REF).getAsString());
-			return new GerritChange(id, changeId, project, owner, created, updated);
+			return new GerritChange(id, changeId, project, owner, created, updated, topic, branch);
 		}
 		return null;
 	}
@@ -137,11 +150,11 @@ public class GerritService {
 		HashMap<String, GerritChangeDetails> result = new HashMap<>();
 		for (GerritChange gerritChange : changes) {
 			String changeId = gerritChange.getChangeId();
+			JsonReader jsonReader = new JsonReader(new StringReader(gerritDao.getDetails(
+					authenticationHelper.createAuthenticationCredentials(), changeId)));
+			jsonReader.setLenient(true);
 			try {
-				result.put(
-						changeId,
-						translateToDetails(jsonParser.parse(gerritDao.getDetails(
-								authenticationHelper.createAuthenticationCredentials(), changeId))));
+				result.put(changeId, translateToDetails(jsonParser.parse(jsonReader)));
 			} catch (Exception e) {
 				LOGGER.error("Error found in processing changeId: " + changeId, e);
 			}
@@ -154,16 +167,16 @@ public class GerritService {
 		JsonElement labelsElement = detailsJson.getAsJsonObject().get(LABELS_REF);
 		JsonElement codeReviewElement = labelsElement.getAsJsonObject().get(CODE_REVIEW_REF);
 		JsonElement allReference = codeReviewElement.getAsJsonObject().get(ALL_REF);
-		if(allReference != null){
+		if (allReference != null) {
 			JsonArray allArray = allReference.getAsJsonArray();
 			for (JsonElement jsonElement : allArray) {
 				JsonObject review = jsonElement.getAsJsonObject();
 				if (null != review) {
 					String username = review.get(USERNAME_REF).getAsString();
 					Integer reviewValue = null;
-					if(review.get(VALUE_REF) != null){
+					if (review.get(VALUE_REF) != null) {
 						reviewValue = review.get(VALUE_REF).getAsInt();
-					}				
+					}
 					gerritChangeDetails.addReviewer(username, reviewValue);
 				}
 			}

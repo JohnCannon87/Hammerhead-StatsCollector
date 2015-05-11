@@ -70,6 +70,13 @@
 									placeholder="Gerrit Server Hostname" />
 							</div>
 						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Topic Filter Regex:</label>
+							<div class="col-sm-10">
+								<input type="text" ng-model="gerritTopicRegex"
+									placeholder="Topics to ignore as a regex (leave blank for none)" />
+							</div>
+						</div>
 					</form>
 					<hr>
 					<button class="btn btn-success" ng-click="saveGerritConfig()">

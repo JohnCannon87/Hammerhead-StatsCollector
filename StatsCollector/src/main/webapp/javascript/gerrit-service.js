@@ -7,12 +7,12 @@ angular.module('appGerritStats').service('Gerrit', ['$http', 'gerritAppConfig',
 		
 		$http.defaults.withCredentials = false;
 		
-		function configInfo(key, date){
+		function configInfo(){
 			return $http.get(gerritAppConfig.gerrit.baseUrl + '/gerrit/config/info');
 		}
 		
-		function metrics(key, date) {
-			return $http.get(gerritAppConfig.gerrit.baseUrl + '/gerrit/review/merged/all');
+		function metrics(gerritStatus) {
+			return $http.get(gerritAppConfig.gerrit.baseUrl + '/gerrit/review/'+gerritStatus+'/all');
 		}
 	}
 ]);
