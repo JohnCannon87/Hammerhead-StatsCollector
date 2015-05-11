@@ -4,7 +4,6 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
@@ -12,3 +11,4 @@
 hs_err_pid*
 StatsCollector/.gradle/*
 StatsCollector/.settings/*
+StatsCollector/build/*
