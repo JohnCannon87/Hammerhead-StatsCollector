@@ -88,7 +88,7 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit, Upload) 
 	
 	//Form Data Setup
 	$scope.saveGerritConfig = function(){
-		$http.post('/gerrit/config/changeInfo?host='+$scope.gerritHostname+'&username='+$scope.gerritUsername+'&password='+$scope.gerritPassword+'&topic='+$scope.gerritTopicRegex)
+		$http.post('/gerrit/config/changeInfo?host='+$scope.gerritHostname+'&username='+$scope.gerritUsername+'&password='+$scope.gerritPassword+'&topicRegex='+$scope.gerritTopicRegex)
 		.success(function(data){
 			console.log(data);
 			UpdateGerritConfig(data, $scope);
