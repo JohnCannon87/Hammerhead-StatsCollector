@@ -4,6 +4,7 @@ dependencies {
 	compile group:'org.apache.tomcat.embed', name:'tomcat-embed-jasper', version:tomcatEmbeddedVersion
 
 	compile(group:'org.springframework.boot', name:'spring-boot-starter-web', version:springBootVersion)
+    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 	compile(group:'com.google.code.gson', name:'gson', version:gsonVersion)
 	compile(group:'org.apache.httpcomponents', name:'httpclient', version:httpClientVersion)
 	compile group:'joda-time', name:'joda-time', version:jodatimeVersion

@@ -11,14 +11,24 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
+apply plugin: 'war'
 
 jar {
-    baseName = 'gs-rest-service'
-    version =  '0.1.0'
+    baseName = 'StatsCollector'
+    version =  '1.0'
+}
+
+war {
+    baseName = 'StatsCollector'
+    version =  '1.0'
 }
 
 repositories {
     mavenCentral()
+}
+
+configurations {
+    providedRuntime
 }
 
 sourceCompatibility = 1.7
