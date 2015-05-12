@@ -30,15 +30,14 @@ public class GerritConfigTranslator {
 	private static final String REVIEWERS_TO_IGNORE_KEY = "reviewersToIgnore";
 	private static final String CONFIG_VERSION_KEY = "configVersion";
 
-	public GerritConfig updateConfigFromFile(MultipartFile file, GerritConfig gerritConfig)
+	public GerritConfig updateConfigFromFile(final MultipartFile file, final GerritConfig gerritConfig)
 			throws IOException, ConfigurationException {
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(file.getInputStream(), writer);
 		String value = writer.toString();
 		JsonElement root = new JsonParser().parse(value);
 		JsonObject rootObject = root.getAsJsonObject();
-		String versionString = rootObject
-				.get(CONFIG_VERSION_KEY).getAsString();
+		String versionString = rootObject.get(CONFIG_VERSION_KEY).getAsString();
 
 		switch (versionString) {
 		case VERSION_1_STRING:
@@ -48,16 +47,20 @@ public class GerritConfigTranslator {
 		}
 	}
 
-	private GerritConfig translateV1ConfigFile(JsonObject rootObject, GerritConfig gerritConfig)
+	private GerritConfig translateV1ConfigFile(final JsonObject rootObject, final GerritConfig gerritConfig)
 			throws ConfigurationException {
 		gerritConfig.setHost(rootObject.get(HOST_KEY).getAsString());
 		gerritConfig.setReviewersToIgnore(convertArrayToList(rootObject.get(REVIEWERS_TO_IGNORE_KEY).getAsJsonArray()));
-		gerritConfig.setTargets(Float.valueOf(rootObject.get(NO_PEER_REVIEW_TARGET_KEY).getAsString()), Float.valueOf(rootObject.get(ONE_PEER_REVIEW_TARGET_KEY).getAsString()), Float.valueOf(rootObject.get(TWO_PEER_REVIEW_TARGET_KEY).getAsString()), Float.valueOf(rootObject.get(COLLABORATIVE_REVIEW_TARGET_KEY).getAsString()));
-		gerritConfig.setUsernameAndPassword(rootObject.get(USERNAME_KEY).getAsString(), rootObject.get(PASSWORD_KEY).getAsString());
+		gerritConfig.setTargets(Float.valueOf(rootObject.get(NO_PEER_REVIEW_TARGET_KEY).getAsString()),
+				Float.valueOf(rootObject.get(ONE_PEER_REVIEW_TARGET_KEY).getAsString()),
+				Float.valueOf(rootObject.get(TWO_PEER_REVIEW_TARGET_KEY).getAsString()),
+				Float.valueOf(rootObject.get(COLLABORATIVE_REVIEW_TARGET_KEY).getAsString()));
+		gerritConfig.setUsernameAndPassword(rootObject.get(USERNAME_KEY).getAsString(), rootObject.get(PASSWORD_KEY)
+				.getAsString());
 		return gerritConfig;
 	}
 
-	private List<String> convertArrayToList(JsonArray jsonArray) {
+	private List<String> convertArrayToList(final JsonArray jsonArray) {
 		List<String> result = new ArrayList<>();
 		for (JsonElement jsonElement : jsonArray) {
 			result.add(jsonElement.getAsString());

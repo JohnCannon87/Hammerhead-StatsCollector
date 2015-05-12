@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.statscollector.application.config.AbstractWebConfig;
 
 @Component
-public class GerritConfig extends AbstractWebConfig{
+public class GerritConfig extends AbstractWebConfig {
 	/**
 	 * KEYS
 	 */
@@ -27,25 +27,32 @@ public class GerritConfig extends AbstractWebConfig{
 	private static final String DEFAULT_FILE_PATH = "GerritStatistics.properties";
 	private static final String TOPIC_REGEX_KEY = "gerrit.topicRegex";
 	private static final String THREAD_SPLIT_SIZE = "gerrit.threadSplitSize";
+	private static final String START_DATE_KEY = "gerrit.startDateOffset";
+	private static final String END_DATE_KEY = "gerrit.endDateOffset";
+	private static final String PROJECT_REGEX_KEY = "gerrit.projectRegex";
 	private final DecimalFormat df = new DecimalFormat("###.##");
 
 	public GerritConfig() throws ConfigurationException {
 		super();
 	}
-	
-	protected String getHostKey(){
+
+	@Override
+	protected String getHostKey() {
 		return HOST_KEY;
 	}
-	
-	protected String getHostPortKey(){
+
+	@Override
+	protected String getHostPortKey() {
 		return HOST_PORT_KEY;
 	}
-	
-	protected String getConfigFilePathKey(){
+
+	@Override
+	protected String getConfigFilePathKey() {
 		return CONFIG_FILE_PATH_KEY;
 	}
-	
-	protected String getDefaultFilePath(){
+
+	@Override
+	protected String getDefaultFilePath() {
 		return DEFAULT_FILE_PATH;
 	}
 
@@ -131,9 +138,36 @@ public class GerritConfig extends AbstractWebConfig{
 	public Integer getThreadSplitSize() {
 		return config.getInt(THREAD_SPLIT_SIZE);
 	}
-	
-	public void setThreadSplitSize(Integer threadSplitSize) throws ConfigurationException{
+
+	public void setThreadSplitSize(final Integer threadSplitSize) throws ConfigurationException {
 		config.setProperty(THREAD_SPLIT_SIZE, threadSplitSize);
+		config.save();
+	}
+
+	public Integer getStartDateOffset() {
+		return config.getInt(START_DATE_KEY);
+	}
+
+	public void setStartDateOffset(final Integer startDateOffset) throws ConfigurationException {
+		config.setProperty(START_DATE_KEY, startDateOffset);
+		config.save();
+	}
+
+	public Integer getEndDateOffset() {
+		return config.getInt(END_DATE_KEY);
+	}
+
+	public void setEndDateOffset(final Integer endDateOffset) throws ConfigurationException {
+		config.setProperty(END_DATE_KEY, endDateOffset);
+		config.save();
+	}
+
+	public String getProjectRegex() {
+		return config.getString(PROJECT_REGEX_KEY);
+	}
+
+	public void setProjectRegex(final String projectRegex) throws ConfigurationException {
+		config.setProperty(PROJECT_REGEX_KEY, projectRegex);
 		config.save();
 	}
 
@@ -146,5 +180,8 @@ public class GerritConfig extends AbstractWebConfig{
 		this.setUsernameAndPassword(newGerritConfig.getUsername(), newGerritConfig.getPassword());
 		this.setTopicRegex(newGerritConfig.getTopicRegex());
 		this.setThreadSplitSize(newGerritConfig.getThreadSplitSize());
+		this.setStartDateOffset(newGerritConfig.getStartDateOffset());
+		this.setEndDateOffset(newGerritConfig.getEndDateOffset());
+		this.setProjectRegex(newGerritConfig.getProjectRegex());
 	}
 }

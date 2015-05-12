@@ -6,6 +6,9 @@ function UpdateGerritConfig(data, $scope){
 	$scope.gerritPassword = data.password;
 	$scope.gerritTopicRegex = data.topicRegex;
 	$scope.gerritThreadSplitSize = data.threadSplitSize;
+	$scope.gerritStartDateOffset = data.startDateOffset;
+	$scope.gerritEndDateOffset = data.endDateOffset;
+	$scope.gerritProjectRegex = data.projectRegex;
 	$scope.noPeerReviewsTarget = data.noPeerReviewTarget;
 	$scope.onePeerReviewTarget = data.onePeerReviewTarget;
 	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
@@ -95,7 +98,11 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit, Upload) 
 				+'&username='+$scope.gerritUsername
 				+'&password='+$scope.gerritPassword
 				+'&topicRegex='+$scope.gerritTopicRegex
-				+'&threadSplitSize='+$scope.gerritThreadSplitSize)
+				+'&threadSplitSize='+$scope.gerritThreadSplitSize
+				+'&startDateOffset='+$scope.gerritStartDateOffset
+				+'&endDateOffset='+$scope.gerritEndDateOffset
+				+'&projectRegex='+$scope.gerritProjectRegex
+				)
 		.success(function(data){
 			console.log(data);
 			UpdateGerritConfig(data, $scope);

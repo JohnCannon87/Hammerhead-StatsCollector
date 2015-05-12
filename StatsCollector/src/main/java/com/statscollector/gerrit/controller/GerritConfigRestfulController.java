@@ -41,13 +41,14 @@ public class GerritConfigRestfulController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changeInfo")
-	public GerritConfig changeInfo(
-			@RequestParam(required = true) final String host, 
+	public GerritConfig changeInfo(@RequestParam(required = true) final String host,
 			@RequestParam(required = true) final Integer hostPort,
-			@RequestParam(required = true) final String username, 
-			@RequestParam(required = true) final String password,
+			@RequestParam(required = true) final String username, @RequestParam(required = true) final String password,
 			@RequestParam(required = true) final String topicRegex,
-			@RequestParam(required = true) final Integer threadSplitSize) {
+			@RequestParam(required = true) final Integer threadSplitSize,
+			@RequestParam(required = true) final Integer startDateOffset,
+			@RequestParam(required = true) final Integer endDateOffset,
+			@RequestParam(required = true) final String projectRegex) {
 		try {
 			LOGGER.info("Changing Gerrit Host To: " + host);
 			gerritConfig.setHost(host);
@@ -59,6 +60,11 @@ public class GerritConfigRestfulController {
 			gerritConfig.setTopicRegex(topicRegex);
 			LOGGER.info("Changing Gerrit Thread Split Size To: " + threadSplitSize);
 			gerritConfig.setThreadSplitSize(threadSplitSize);
+			LOGGER.info("Changing Start Date Offset To: " + startDateOffset);
+			gerritConfig.setStartDateOffset(startDateOffset);
+			LOGGER.info("Changing End Date Offset To: " + endDateOffset);
+			gerritConfig.setEndDateOffset(endDateOffset);
+			LOGGER.info("Changing Project Regex To: " + projectRegex);
 		} catch (ConfigurationException e) {
 			return gerritConfig;
 		}

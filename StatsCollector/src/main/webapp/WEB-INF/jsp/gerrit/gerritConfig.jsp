@@ -91,6 +91,27 @@
 									placeholder="Thread size to split Gerrit requests" />
 							</div>
 						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Start Date Offset (Days):</label>
+							<div class="col-sm-10">
+								<input type="number" ng-model="gerritStartDateOffset"
+									placeholder="Start Date Offset In Days" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">End Date Offset (Days):</label>
+							<div class="col-sm-10">
+								<input type="number" ng-model="gerritEndDateOffset"
+									placeholder="End Date Offset In Days" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Project Include Regex:</label>
+							<div class="col-sm-10">
+								<input type="text" ng-model="gerritProjectRegex"
+									placeholder="Projects to include as a regex" />
+							</div>
+						</div>
 					</form>
 					<hr>
 					<button class="btn btn-success" ng-click="saveGerritConfig()">

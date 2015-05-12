@@ -6,10 +6,14 @@ function UpdateGerritConfig(data, $scope) {
 	$scope.gerritPassword = data.password;
 	$scope.gerritTopicRegex = data.topicRegex;
 	$scope.gerritThreadSplitSize = data.threadSplitSize;
+	$scope.gerritStartDateOffset = data.startDateOffset;
+	$scope.gerritEndDateOffset = data.endDateOffset;
+	$scope.gerritProjectRegex = data.projectRegex;
 	$scope.noPeerReviewsTarget = data.noPeerReviewTarget;
 	$scope.onePeerReviewTarget = data.onePeerReviewTarget;
 	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
 	$scope.collaborativeReviewTarget = data.collaborativeReviewTarget;
+	$scope.configLoaded = true;
 }
 
 function GetReviewRowClassTarget(value, target) {
@@ -36,60 +40,73 @@ function GetReviewRowClassLimit(value, target) {
 	}
 }
 
-function GetGerritStats(gerritStatus, Gerrit, $scope, $timeout){
-	Gerrit
-	.metrics(gerritStatus)
-	.then(
-			function(response) {
-				$scope.noPeerReviewers = response.data.noPeerReviewCount;
-				$scope.onePeerReviewer = response.data.onePeerReviewCount;
-				$scope.twoPeerReviewers = response.data.twoPlusPeerReviewCount;
-				$scope.collabrativeDevelopment = response.data.collabrativeDevelopmentCount;
-				$scope.totalReviews = response.data.totalReviewsCount;
-				$scope.noPeerPercentage = response.data.noPeerReviewPercentage;
-				$scope.onePeerPercentage = response.data.onePeerReviewPercentage;
-				$scope.twoPeerPercentage = response.data.twoPeerReviewPercentage;
-				$scope.collaborativePercentage = response.data.collaborativeReviewPercentage;
-				$scope.noPeerReviews = response.data.noPeerReviewList;
-				
-				if (response.data.error){
-					$scope.gerritStatsStatus = { type: 'danger', msg: response.data.status, show: true};
-					$timeout(function() {$scope.closeAlert()}, 15000);
-				}else{
-					$scope.gerritStatsStatus = { type: 'success', msg: response.data.status, show: true};
-					$timeout(function() {$scope.closeAlert()}, 15000);
-				}
-				
-				if (!response.data.error){
-					$scope.gerritChartData = [ 
-	                {
-						value : response.data.noPeerReviewCount,
-						color : "#CC0000",
-						highlight : "#CC0000",
-						label : "No Peer Reviews"
-					}, {
-						value : response.data.onePeerReviewCount,
-						color : "#009933",
-						highlight : "#009933",
-						label : "One Peer Review"
-					}, {
-						value : response.data.twoPlusPeerReviewCount,
-						color : "#0099FF",
-						highlight : "#0099FF",
-						label : "Two Peer Review"
-					}, {
-						value : response.data.collabrativeDevelopmentCount,
-						color : "#6600FF",
-						highlight : "#6600FF",
-						label : "Collaborative Development"
-					} ];
-				}
-			});
+function GetGerritStats($http, $scope, $timeout){	
+	if($scope.configLoaded == true){
+		if($scope.gerritProjectRegex !== undefined && $scope.gerritStartDateOffset !== undefined && $scope.gerritEndDateOffset !== undefined){
+			url = '/gerrit/review/'+$scope.gerritStatus+'/'+$scope.gerritProjectRegex+'/'+$scope.gerritStartDateOffset+'/'+$scope.gerritEndDateOffset;
+		}else if($scope.gerritProjectRegex === undefined && $scope.gerritStartDateOffset !== undefined && $scope.gerritEndDateOffset !== undefined){
+			url = '/gerrit/review/'+$scope.gerritStatus+'/'+$scope.gerritStartDateOffset+'/'+$scope.gerritEndDateOffset;
+		}else if($scope.gerritProjectRegex !== undefined && ($scope.gerritStartDateOffset !== undefined || $scope.gerritEndDateOffset !== undefined)){
+			url = '/gerrit/review/'+$scope.gerritStatus+'/'+$scope.gerritProjectRegex;
+		}else{
+			url = '/gerrit/review/'+$scope.gerritStatus+'/all';
+		}
+		$http.get(url)
+		.then(
+				function(response) {
+					$scope.noPeerReviewers = response.data.noPeerReviewCount;
+					$scope.onePeerReviewer = response.data.onePeerReviewCount;
+					$scope.twoPeerReviewers = response.data.twoPlusPeerReviewCount;
+					$scope.collabrativeDevelopment = response.data.collabrativeDevelopmentCount;
+					$scope.totalReviews = response.data.totalReviewsCount;
+					$scope.noPeerPercentage = response.data.noPeerReviewPercentage;
+					$scope.onePeerPercentage = response.data.onePeerReviewPercentage;
+					$scope.twoPeerPercentage = response.data.twoPeerReviewPercentage;
+					$scope.collaborativePercentage = response.data.collaborativeReviewPercentage;
+					$scope.noPeerReviews = response.data.noPeerReviewList;
+					
+					if (response.data.error){
+						$scope.gerritStatsStatus = { type: 'danger', msg: response.data.status, show: true};
+						$timeout(function() {$scope.closeAlert()}, 15000);
+					}else{
+						$scope.gerritStatsStatus = { type: 'success', msg: response.data.status, show: true};
+						$timeout(function() {$scope.closeAlert()}, 15000);
+					}
+					
+					if (!response.data.error){
+						$scope.gerritChartData = [ 
+		                {
+							value : response.data.noPeerReviewCount,
+							color : "#CC0000",
+							highlight : "#CC0000",
+							label : "No Peer Reviews"
+						}, {
+							value : response.data.onePeerReviewCount,
+							color : "#009933",
+							highlight : "#009933",
+							label : "One Peer Review"
+						}, {
+							value : response.data.twoPlusPeerReviewCount,
+							color : "#0099FF",
+							highlight : "#0099FF",
+							label : "Two Peer Review"
+						}, {
+							value : response.data.collabrativeDevelopmentCount,
+							color : "#6600FF",
+							highlight : "#6600FF",
+							label : "Collaborative Development"
+						} ];
+					}
+				});
+	}
 }
 
 function GerritStats($http, $scope, $timeout, $log, $q, Gerrit) {
 	$scope.metrics = new Array();
 	$scope.gerritStatus = 'merged';
+	if($scope.configLoaded === undefined){
+		$scope.configLoaded = false;
+	}
 	
 	$scope.gerritChartOptions = {
 
@@ -135,10 +152,12 @@ function GerritStats($http, $scope, $timeout, $log, $q, Gerrit) {
 		$scope.gerritStatsStatus.show = false;
 	}
 
-	$scope.$watch('gerritStatus', function(){GetGerritStats($scope.gerritStatus, Gerrit, $scope, $timeout)}, true);
+	$scope.$watch('gerritStatus', function(){GetGerritStats($http, $scope, $timeout)}, true);
+	
+	$scope.$watch('configLoaded', function(){GetGerritStats($http, $scope, $timeout)}, true);
 		
 	$scope.manuallyRefreshData = function(){
-		$http.get('/gerrit/review/refreshCache').then(function(){GetGerritStats($scope.gerritStatus, Gerrit, $scope, $timeout);});		
+		$http.get('/gerrit/review/refreshCache').then(function(){GetGerritStats($http, $scope, $timeout);});		
 	}
 	
 	$scope.changeGerritStatus = function(gerritStatus){

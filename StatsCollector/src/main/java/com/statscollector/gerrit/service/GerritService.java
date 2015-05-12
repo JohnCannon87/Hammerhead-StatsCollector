@@ -80,7 +80,7 @@ public class GerritService {
 		JsonParser jsonParser = new JsonParser();
 		String allOpenChangesUnparsed = gerritDao.getAllChanges(authenticationHelper.createAuthenticationCredentials(),
 				changeStatus);
-		LOGGER.info(allOpenChangesUnparsed);
+		// LOGGER.info(allOpenChangesUnparsed);
 		JsonElement allOpenChanges = jsonParser.parse(allOpenChangesUnparsed);
 		return translateToChanges(allOpenChanges);
 	}
