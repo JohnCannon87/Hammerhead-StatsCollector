@@ -80,6 +80,7 @@ public class GerritService {
 		JsonParser jsonParser = new JsonParser();
 		String allOpenChangesUnparsed = gerritDao.getAllChanges(authenticationHelper.createAuthenticationCredentials(),
 				changeStatus);
+		LOGGER.info(allOpenChangesUnparsed);
 		JsonElement allOpenChanges = jsonParser.parse(allOpenChangesUnparsed);
 		return translateToChanges(allOpenChanges);
 	}
@@ -93,7 +94,7 @@ public class GerritService {
 			}
 			return results;
 		} else {
-			//LOGGER.error("Failed To Parse JSON: " + rawJsonElement.toString());
+			LOGGER.error("Failed To Parse JSON: " + rawJsonElement.toString());
 			return results;
 		}
 	}
@@ -155,7 +156,8 @@ public class GerritService {
 			try {
 				result.put(changeId, translateToDetails(jsonParser.parse(jsonReader)));
 			} catch (Exception e) {
-				//LOGGER.error("Error found in processing changeId: " + changeId, e);
+				// LOGGER.error("Error found in processing changeId: " +
+				// changeId, e);
 			}
 		}
 		return result;
@@ -163,7 +165,13 @@ public class GerritService {
 
 	private GerritChangeDetails translateToDetails(final JsonElement detailsJson) {
 		GerritChangeDetails gerritChangeDetails = new GerritChangeDetails();
-		JsonElement labelsElement = detailsJson.getAsJsonObject().get(LABELS_REF); //TODO: Exception being thrown here, Why ?
+		JsonElement labelsElement = detailsJson.getAsJsonObject().get(LABELS_REF); // TODO:
+		// Exception
+		// being
+		// thrown
+		// here,
+		// Why
+		// ?
 		JsonElement codeReviewElement = labelsElement.getAsJsonObject().get(CODE_REVIEW_REF);
 		JsonElement allReference = codeReviewElement.getAsJsonObject().get(ALL_REF);
 		if (allReference != null) {
