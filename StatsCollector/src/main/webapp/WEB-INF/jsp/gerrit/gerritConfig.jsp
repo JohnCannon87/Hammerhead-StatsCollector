@@ -85,7 +85,7 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-2 control-label">Topic Filter Regex:</label>
+							<label class="col-sm-2 control-label">Gerrit Thread Split Size:</label>
 							<div class="col-sm-10">
 								<input type="number" ng-model="gerritThreadSplitSize"
 									placeholder="Thread size to split Gerrit requests" />
