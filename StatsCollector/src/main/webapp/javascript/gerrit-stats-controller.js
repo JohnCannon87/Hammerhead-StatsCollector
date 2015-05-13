@@ -130,6 +130,13 @@ function GerritStats($http, $scope, $timeout, $log, $q, Gerrit) {
 		      animationSteps : 100,
 
 		      // String - Animation easing effect
+		      // [easeInOutQuart, linear, easeOutBounce, easeInBack, easeInOutQuad,
+		      //  easeOutQuart, easeOutQuad, easeInOutBounce, easeOutSine, easeInOutCubic,
+		      //  easeInExpo, easeInOutBack, easeInCirc, easeInOutElastic, easeOutBack,
+		      //  easeInQuad, easeInOutExpo, easeInQuart, easeOutQuint, easeInOutCirc,
+		      //  easeInSine, easeOutExpo, easeOutCirc, easeOutCubic, easeInQuint,
+		      //  easeInElastic, easeInOutSine, easeInOutQuint, easeInBounce,
+		      //  easeOutElastic, easeInCubic]
 		      animationEasing : 'easeOutBounce',
 
 		      // Boolean - Whether we animate the rotation of the Doughnut
@@ -137,11 +144,11 @@ function GerritStats($http, $scope, $timeout, $log, $q, Gerrit) {
 
 		      // Boolean - Whether we animate scaling the Doughnut from the
 				// centre
-		      animateScale : false,
+		      animateScale : true,
 
 		      // String - A legend template
 		      legendTemplate : '<ul class="tc-chart-js-legend"><% for (var i=0; i<segments.length; i++){%><li><span style="background-color:<%=segments[i].fillColor%>"></span><%if(segments[i].label){%><%=segments[i].label%><%}%></li><%}%></ul>'
-
+		      
 	};
 
 	Gerrit.configInfo().then(function(response) {
@@ -179,8 +186,8 @@ function GerritStats($http, $scope, $timeout, $log, $q, Gerrit) {
 	$scope.getCollabrativeDevelopmentRowClass = function(percentage) {
 		return GetReviewRowClassTarget(percentage,
 				$scope.collaborativeReviewTarget);
-	};
-
+	};	
+	
 };
 
 appGerritStatsModule.controller('GerritStatsCtrl', [ '$http', '$scope', '$timeout', '$log',

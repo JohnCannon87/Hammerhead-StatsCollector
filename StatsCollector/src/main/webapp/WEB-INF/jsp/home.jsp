@@ -36,20 +36,20 @@
 			<h3>Gerrit stats for server {{gerritHostname}} are:</h3>
 			<ul class="list-group">
 				<li ng-click="isNoPeerCollapsed = !isNoPeerCollapsed" ng-class="getNoPeerReviewRowClass(noPeerPercentage)"
-					class="list-group-item">No Peer Reviewers: <span class="badge">{{noPeerReviewers}}</span></li>
+					class="list-group-item"><span class="legendBox" style="background-color:#CC0000"></span>No Peer Reviewers: <span class="badge">{{noPeerReviewers}}</span></li>
 					<div collapse="!isNoPeerCollapsed">
 						<div ng-repeat="review in noPeerReviews">
 							<a href="http://nreojp.git:8080/#/c/{{review.changeNumber}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
 				<li ng-class="getOnePeerReviewRowClass(onePeerPercentage)"
-					class="list-group-item">One Peer Reviewer: <span class="badge">{{onePeerReviewer}}</span></li>
+					class="list-group-item"><span class="legendBox" style="background-color:#009933"></span>One Peer Reviewer: <span class="badge">{{onePeerReviewer}}</span></li>
 				<li ng-class="getTwoPeerReviewRowClass(twoPeerPercentage)"
-					class="list-group-item">Two Peer Reviewers: <span
+					class="list-group-item"><span class="legendBox" style="background-color:#0099FF"></span>Two Peer Reviewers: <span
 					class="badge">{{twoPeerReviewers}}</span></li>
 				<li
 					ng-class="getCollabrativeDevelopmentRowClass(collaborativePercentage)"
-					class="list-group-item">Collaborative Development: <span
+					class="list-group-item"><span class="legendBox" style="background-color:#6600FF"></span>Collaborative Development: <span
 					class="badge">{{collabrativeDevelopment}}</span></li>
 				<li class="list-group-item">Total Reviews: <span class="badge">{{totalReviews}}</span></li>
 				<li class="list-group-item">
@@ -74,11 +74,9 @@
 		<div class="col-sm-8">
 			<div class="col-sm-6">
 				<canvas tc-chartjs-pie chart-data="gerritChartData"
-					chart-options="gerritChartOptions" chart-legend="gerritChart"
+					chart-options="gerritChartOptions""
 					height="500" width="500"></canvas>
 			</div>
-			<div tc-chartjs-legend chart-legend="gerritChart"
-				class="ng-isolate-scope col-sm-6"></div>
 		</div>
 	</div>
 </body>

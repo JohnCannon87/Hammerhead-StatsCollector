@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
-import com.statscollector.gerrit.authentication.AuthenticationHelper;
+import com.statscollector.gerrit.authentication.GerritAuthenticationHelper;
 import com.statscollector.gerrit.dao.GerritDao;
 import com.statscollector.gerrit.model.GerritChange;
 import com.statscollector.gerrit.model.GerritChangeDetails;
@@ -72,7 +72,7 @@ public class GerritService {
 	private GerritDao gerritDao;
 
 	@Autowired
-	private AuthenticationHelper authenticationHelper;
+	private GerritAuthenticationHelper authenticationHelper;
 
 	final static Logger LOGGER = Logger.getLogger(GerritService.class);
 
@@ -129,7 +129,7 @@ public class GerritService {
 		this.gerritDao = statisticsDao;
 	}
 
-	public void setAuthenticationHelper(final AuthenticationHelper authenticationHelper) {
+	public void setAuthenticationHelper(final GerritAuthenticationHelper authenticationHelper) {
 		this.authenticationHelper = authenticationHelper;
 	}
 

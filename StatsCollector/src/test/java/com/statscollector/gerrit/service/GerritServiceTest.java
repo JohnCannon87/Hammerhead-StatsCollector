@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.statscollector.gerrit.authentication.AuthenticationHelper;
+import com.statscollector.gerrit.authentication.GerritAuthenticationHelper;
 import com.statscollector.gerrit.config.GerritConfig;
 import com.statscollector.gerrit.dao.GerritDao;
 import com.statscollector.gerrit.enums.StatusEnum;
@@ -32,7 +32,7 @@ public class GerritServiceTest {
 		GerritDao statisticsDao = new GerritDao();
 		statisticsDao.setGerritConfig(gerritConfig);
 		statisticsService.setStatisticsDao(statisticsDao);
-		AuthenticationHelper authenticationHelper = new AuthenticationHelper();
+		GerritAuthenticationHelper authenticationHelper = new GerritAuthenticationHelper();
 		authenticationHelper.setGerritConfig(gerritConfig);
 		statisticsService.setAuthenticationHelper(authenticationHelper);
 	}

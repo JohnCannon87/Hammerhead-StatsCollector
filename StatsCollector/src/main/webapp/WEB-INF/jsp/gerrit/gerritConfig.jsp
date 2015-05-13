@@ -59,7 +59,7 @@
 						<div class="form-group">
 							<label class="col-sm-2 control-label">Password:</label>
 							<div class="col-sm-10">
-								<input type="text" ng-model="gerritPassword"
+								<input type="password" ng-model="gerritPassword"
 									placeholder="Gerrit Server Password" />
 							</div>
 						</div>

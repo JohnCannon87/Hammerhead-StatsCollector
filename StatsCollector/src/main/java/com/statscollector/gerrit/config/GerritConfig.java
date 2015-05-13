@@ -7,9 +7,10 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.springframework.stereotype.Component;
 
 import com.statscollector.application.config.AbstractWebConfig;
+import com.statscollector.application.config.WebConfig;
 
 @Component
-public class GerritConfig extends AbstractWebConfig {
+public class GerritConfig extends AbstractWebConfig implements WebConfig {
 	/**
 	 * KEYS
 	 */
@@ -56,6 +57,16 @@ public class GerritConfig extends AbstractWebConfig {
 		return DEFAULT_FILE_PATH;
 	}
 
+	@Override
+	protected String getUsernameKey() {
+		return USERNAME_KEY;
+	}
+
+	@Override
+	protected String getPasswordKey() {
+		return PASSWORD_KEY;
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<String> getReviewersToIgnore() {
 		return (List) config.getList(REVIEWERS_TO_IGNORE_KEY);
@@ -76,20 +87,6 @@ public class GerritConfig extends AbstractWebConfig {
 		List<String> reviewersToIgnore = getReviewersToIgnore();
 		reviewersToIgnore.remove(reviewer);
 		setReviewersToIgnore(reviewersToIgnore);
-	}
-
-	public String getUsername() {
-		return config.getString(USERNAME_KEY);
-	}
-
-	public void setUsernameAndPassword(final String username, final String password) throws ConfigurationException {
-		config.setProperty(USERNAME_KEY, username);
-		config.setProperty(PASSWORD_KEY, password);
-		config.save();
-	}
-
-	public String getPassword() {
-		return config.getString(PASSWORD_KEY);
 	}
 
 	public void setTargets(final Float noPeerReviewTarget, final Float onePeerReviewTarget,
