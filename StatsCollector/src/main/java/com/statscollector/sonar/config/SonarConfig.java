@@ -1,10 +1,12 @@
 package com.statscollector.sonar.config;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.springframework.stereotype.Component;
 
 import com.statscollector.application.config.AbstractWebConfig;
 import com.statscollector.application.config.WebConfig;
 
+@Component
 public class SonarConfig extends AbstractWebConfig implements WebConfig {
 	/**
 	 * KEYS

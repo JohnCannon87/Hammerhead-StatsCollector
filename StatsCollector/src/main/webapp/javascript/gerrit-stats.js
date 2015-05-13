@@ -1,1 +1,0 @@
-var appGerritStatsModule = angular.module('appGerritStats', ['tc.chartjs', 'ui.bootstrap', 'ngFileUpload']);

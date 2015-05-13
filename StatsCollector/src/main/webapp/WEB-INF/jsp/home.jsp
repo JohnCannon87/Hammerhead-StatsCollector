@@ -5,28 +5,10 @@
 
 <html ng-app="app">
 <head>
-<script
-	src="http://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.1/Chart.min.js"></script>
-<script
-	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.min.js"></script>
-<script src="/javascript/tc-angular-chartjs.js"></script>
-<script src="/javascript/gerrit-app.js"></script>
-<script src="/javascript/gerrit-stats.js"></script>
-<script src="/javascript/gerrit-service.js"></script>
-<script src="/javascript/gerrit-stats-controller.js"></script>
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.min.js"></script>
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/4.1.4/ng-file-upload-shim.min.js"></script>
-<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/danialfarid-angular-file-upload/4.1.4/ng-file-upload.min.js"></script>
-<link rel="stylesheet"
-	href="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-<link rel="stylesheet" href="/css/app.css">
-<link rel="stylesheet" href="/css/gerritConfig.css">
-
+<%@include file="common/allPages.jsp"%>
+<%@include file="common/gerrit.jsp"%>
+<%@include file="common/charting.jsp"%>
+<%@include file="common/configPages.jsp"%>
 </head>
 <body>
 	<%@include file="common/navbar.jsp"%>

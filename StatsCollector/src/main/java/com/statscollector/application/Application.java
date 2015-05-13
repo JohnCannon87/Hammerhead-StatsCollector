@@ -18,6 +18,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan({ "com.statscollector.gerrit.service", "com.statscollector.gerrit.dao",
 		"com.statscollector.gerrit.controller", "com.statscollector.gerrit.model",
 		"com.statscollector.gerrit.authentication", "com.statscollector.gerrit.config",
+		 "com.statscollector.sonar.service", "com.statscollector.sonar.dao",
+			"com.statscollector.sonar.controller", "com.statscollector.sonar.model",
+			"com.statscollector.sonar.authentication", "com.statscollector.sonar.config",
 		"com.statscollector.information.controller" })
 public class Application extends SpringBootServletInitializer {
 
