@@ -1,1 +1,1 @@
-java -jar StatsCollector-1.0.war -DconfigFile.path=GerritStatistics.properties
+java -DconfigFile.path=GerritStatistics.properties -Dserver.port=9002 -jar StatsCollector-1.0.war
