@@ -15,7 +15,7 @@ function UpdateGerritConfig(data, $scope){
 	$scope.collaborativeReviewTarget = data.collaborativeReviewTarget;
 }
 
-function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit, Upload) {
+function GerritConfig($http, $scope, $log, $q, Gerrit, Upload) {
 		
 	$scope.$watch('files', function(files) {
 		$scope.formUpload = false;
@@ -64,7 +64,7 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit, Upload) 
 	});
 	
 	$scope.downloadConfig = function(){
-		$http.get(appConfig.collector.baseUrl + '/gerrit/config/info').then(function(response){
+		$http.get('/gerrit/config/info').then(function(response){
 			//Download File Now...
 			var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
 			saveAs(file, 'GerritConfig.json');
@@ -126,4 +126,4 @@ function GerritConfig($http, $scope, $log, $q, gerritAppConfig, Gerrit, Upload) 
 	
 };
 
-appGerritStatsModule.controller('GerritConfigCtrl', ['$http', '$scope', '$log', '$q', 'appConfig', 'Gerrit', 'Upload', GerritConfig]);
+appGerritStatsModule.controller('GerritConfigCtrl', ['$http', '$scope', '$log', '$q', 'Gerrit', 'Upload', GerritConfig]);

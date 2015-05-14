@@ -12,4 +12,5 @@ ext {
 	tomcatEmbeddedVersion='8.0.21'
 	jstlVersion='1.2'
 	commonsIoVersion='2.4'
+	beanUtils='1.9.2'
 }

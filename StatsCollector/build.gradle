@@ -54,3 +54,7 @@ apply from: 'dependencies.gradle'
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
+
+applicationDefaultJvmArgs = [
+
+"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005" ]

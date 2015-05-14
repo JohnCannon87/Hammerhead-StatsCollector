@@ -13,6 +13,7 @@ dependencies {
 	compile group:'commons-configuration', name:'commons-configuration', version:commonsConfigVersion	
 	compile group:'javax.servlet', name:'jstl', version:jstlVersion
 	compile group:'commons-io', name:'commons-io', version:commonsIoVersion
+	compile group:'commons-beanutils', name:'commons-beanutils', version:beanUtils
 	
 	
 	/* Test Compile dependencies */

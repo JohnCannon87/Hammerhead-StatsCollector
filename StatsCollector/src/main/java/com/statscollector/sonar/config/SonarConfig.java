@@ -1,6 +1,7 @@
 package com.statscollector.sonar.config;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import com.statscollector.application.config.AbstractWebConfig;
@@ -17,6 +18,11 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
 	private static final String DEFAULT_FILE_PATH = "SonarStatistics.properties";
 	private static final String USERNAME_KEY = "sonar.username";
 	private static final String PASSWORD_KEY = "sonar.password";
+	private static final String PROJECT_REGEX_KEY = "sonar.projectRegex";
+	private static final String METHOD_COMPLEXITY_TARGET = "sonar.methodComplexityTarget";
+	private static final String FILE_COMPLEXITY_TARGET = "sonar.fileComplexityTarget";
+	private static final String TEST_COVERAGE_TARGET = "sonar.testCoverageTarget";
+	private static final String RULES_COMPLIANCE_TARGET = "sonar.rulesComplianceTarget";
 
 	public SonarConfig() throws ConfigurationException {
 		super();
@@ -50,6 +56,55 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
 	@Override
 	protected String getPasswordKey() {
 		return PASSWORD_KEY;
+	}
+
+	public String getProjectRegex() {
+		return config.getString(PROJECT_REGEX_KEY);
+	}
+
+	public void setProjectRegex(final String projectRegex) throws ConfigurationException {
+		config.setProperty(PROJECT_REGEX_KEY, projectRegex);
+		config.save();
+	}
+
+	public String getMethodComplexityTarget() {
+		return config.getString(METHOD_COMPLEXITY_TARGET);
+	}
+
+	public void setMethodComplexityTarget(final String methodComplexityTarget) throws ConfigurationException {
+		config.setProperty(METHOD_COMPLEXITY_TARGET, methodComplexityTarget);
+		config.save();
+	}
+
+	public String getFileComplexityTarget() {
+		return config.getString(FILE_COMPLEXITY_TARGET);
+	}
+
+	public void setFileComplexityTarget(final String fileComplexityTarget) throws ConfigurationException {
+		config.setProperty(FILE_COMPLEXITY_TARGET, fileComplexityTarget);
+		config.save();
+	}
+
+	public String getTestCoverageTarget() {
+		return config.getString(TEST_COVERAGE_TARGET);
+	}
+
+	public void setTestCoverageTarget(final String testCoverageTarget) throws ConfigurationException {
+		config.setProperty(TEST_COVERAGE_TARGET, testCoverageTarget);
+		config.save();
+	}
+
+	public String getRulesComplianceTarget() {
+		return config.getString(RULES_COMPLIANCE_TARGET);
+	}
+
+	public void setRulesComplianceTarget(final String rulesComplianceTarget) throws ConfigurationException {
+		config.setProperty(RULES_COMPLIANCE_TARGET, rulesComplianceTarget);
+		config.save();
+	}
+
+	public void replaceWith(final TempSonarConfig newSonarConfig) {
+		BeanUtils.copyProperties(newSonarConfig, this);
 	}
 
 }

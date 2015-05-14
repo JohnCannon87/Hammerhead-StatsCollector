@@ -65,6 +65,7 @@ public class GerritConfigRestfulController {
 			LOGGER.info("Changing End Date Offset To: " + endDateOffset);
 			gerritConfig.setEndDateOffset(endDateOffset);
 			LOGGER.info("Changing Project Regex To: " + projectRegex);
+			gerritConfig.setProjectRegex(projectRegex);
 		} catch (ConfigurationException e) {
 			return gerritConfig;
 		}

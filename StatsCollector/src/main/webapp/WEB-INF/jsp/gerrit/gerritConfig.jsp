@@ -7,6 +7,7 @@
 <head>
 <%@include file="../common/allPages.jsp"%>
 <%@include file="../common/gerrit.jsp"%>
+<%@include file="../common/sonar.jsp"%>
 <%@include file="../common/charting.jsp"%>
 <%@include file="../common/configPages.jsp"%>
 </head>

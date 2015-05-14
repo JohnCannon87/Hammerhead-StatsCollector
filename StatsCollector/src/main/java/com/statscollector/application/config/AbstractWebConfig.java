@@ -45,6 +45,11 @@ public abstract class AbstractWebConfig {
 		return config.getString(getUsernameKey());
 	}
 
+	public void setUsername(final String username) throws ConfigurationException {
+		config.setProperty(getUsernameKey(), username);
+		config.save();
+	}
+
 	public void setUsernameAndPassword(final String username, final String password) throws ConfigurationException {
 		config.setProperty(getUsernameKey(), username);
 		config.setProperty(getPasswordKey(), password);
@@ -53,5 +58,10 @@ public abstract class AbstractWebConfig {
 
 	public String getPassword() {
 		return config.getString(getPasswordKey());
+	}
+
+	public void setPassword(final String password) throws ConfigurationException {
+		config.setProperty(getPasswordKey(), password);
+		config.save();
 	}
 }

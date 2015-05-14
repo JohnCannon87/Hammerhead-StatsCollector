@@ -7,6 +7,7 @@
 <head>
 <%@include file="common/allPages.jsp"%>
 <%@include file="common/gerrit.jsp"%>
+<%@include file="common/sonar.jsp"%>
 <%@include file="common/charting.jsp"%>
 <%@include file="common/configPages.jsp"%>
 </head>
@@ -59,6 +60,22 @@
 					chart-options="gerritChartOptions""
 					height="500" width="500"></canvas>
 			</div>
+		</div>
+	</div>
+	<div ng-controller="SonarStatsCtrl" class="col-sm-12">
+	<div class="col-sm-4">
+			<h3>Sonar stats for server {{sonarHostname}} are:</h3>
+			<ul class="list-group">
+				<li class="list-group-item">Method Complexity: <span class="badge">{{methodComplexity}}</span></li>
+				<li class="list-group-item">File Complexity: <span class="badge">{{fileComplexity}}</span></li>
+				<li class="list-group-item">Test Coverage: <span class="badge">{{testCoverage}}</span></li>
+				<li class="list-group-item">Rules Compliance: <span class="badge">{{rulesCompliance}}</span></li>
+				<li class="list-group-item">Total Lines: <span class="badge">{{linesOfCode}}</span></li>
+								
+			</ul>
+		</div>
+		<div class="col-sm-8">		
+			<canvas tc-chartjs-line chart-data="methodComplexityChartData" chart-options="lineChartOptions"></canvas>	
 		</div>
 	</div>
 </body>

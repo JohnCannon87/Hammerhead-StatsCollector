@@ -3,6 +3,12 @@ package com.statscollector.sonar.model;
 import com.google.gson.annotations.SerializedName;
 
 public class SonarMetric {
+	public static final Object METHOD_COMPLEXITY_KEY = "function_complexity";
+	public static final Object FILE_COMPLEXITY_KEY = "file_complexity";
+	public static final Object RULES_COMPLIANCE_KEY = "violations_density";
+	public static final Object TEST_COVERAGE_KEY = "coverage";
+	public static final Object LINES_OF_CODE_KEY = "ncloc";
+
 	@SerializedName("key")
 	private String key;
 	@SerializedName("val")
