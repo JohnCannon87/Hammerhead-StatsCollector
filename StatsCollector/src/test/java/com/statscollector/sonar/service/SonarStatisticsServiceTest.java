@@ -33,7 +33,7 @@ public class SonarStatisticsServiceTest {
 		credsProvider.setCredentials(new AuthScope("sonar.ojp", 9000), new UsernamePasswordCredentials("jcannon",
 				"testpassword"));
 		sonarDao = Mockito.mock(SonarDao.class);
-		Mockito.when(sonarDao.getAllChanges(Mockito.any(CredentialsProvider.class))).thenReturn(TEST_RESULTS);
+		Mockito.when(sonarDao.getLatestStats(Mockito.any(CredentialsProvider.class))).thenReturn(TEST_RESULTS);
 		authenticationHelper = Mockito.mock(SonarAuthenticationHelper.class);
 		Mockito.when(authenticationHelper.createAuthenticationCredentials()).thenReturn(credsProvider);
 		service.setAuthenticationHelper(authenticationHelper);

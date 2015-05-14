@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import org.joda.time.DateMidnight;
+import org.joda.time.Interval;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +21,6 @@ import com.google.gson.JsonParser;
 import com.statscollector.sonar.authentication.SonarAuthenticationHelper;
 import com.statscollector.sonar.config.SonarConfig;
 import com.statscollector.sonar.dao.SonarDao;
-import com.statscollector.sonar.model.SonarMetric;
 import com.statscollector.sonar.model.SonarProject;
 import com.statscollector.sonar.model.SonarStatistics;
 import com.statscollector.sonar.service.filter.FilterProjectNamePredicate;
@@ -35,6 +37,9 @@ public class SonarStatisticsService {
 	@Autowired
 	private SonarConfig sonarConfig;
 
+	private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendDayOfYear(4)
+			.appendLiteral("-").appendMonthOfYear(2).appendLiteral("-").appendDayOfMonth(2).toFormatter();
+
 	public List<SonarProject> getProjectsFilteredByName(final String projectFilterRegex) throws IOException,
 	URISyntaxException {
 		List<SonarProject> toBeFiltered = getAllSonarProjects();
@@ -44,7 +49,7 @@ public class SonarStatisticsService {
 	}
 
 	public List<SonarProject> getAllSonarProjects() throws IOException, URISyntaxException {
-		String allChanges = sonarDao.getAllChanges(authenticationHelper.createAuthenticationCredentials());
+		String allChanges = sonarDao.getLatestStats(authenticationHelper.createAuthenticationCredentials());
 		List<SonarProject> result = translateIntoProjectList(allChanges);
 		return result;
 	}
@@ -78,42 +83,21 @@ public class SonarStatisticsService {
 
 	}
 
-	public SonarStatistics getStatistics() throws IOException, URISyntaxException {
-		List<SonarProject> allSonarProjects = getProjectsFilteredByName(sonarConfig.getProjectRegex());
-		SonarStatistics result = null;
-		for (SonarProject sonarProject : allSonarProjects) {
-			Map<String, SonarMetric> metricsMap = sonarProject.getMetricsMap();
-
-			SonarMetric methodComplexityMetric = metricsMap.get(SonarMetric.METHOD_COMPLEXITY_KEY);
-			SonarMetric fileComplexityMetric = metricsMap.get(SonarMetric.FILE_COMPLEXITY_KEY);
-			SonarMetric rulesComplianceMetric = metricsMap.get(SonarMetric.RULES_COMPLIANCE_KEY);
-			SonarMetric testCoverageMetric = metricsMap.get(SonarMetric.TEST_COVERAGE_KEY);
-			SonarMetric linesOfCodeMetric = metricsMap.get(SonarMetric.LINES_OF_CODE_KEY);
-
-			String methodComplexity = "";
-			String fileComplexity = "";
-			String rulesCompliance = "";
-			String testCoverage = "";
-			String linesOfCode = "";
-
-			if (null != methodComplexityMetric) {
-				methodComplexity = methodComplexityMetric.getValue();
-			}
-			if (null != fileComplexityMetric) {
-				fileComplexity = fileComplexityMetric.getValue();
-			}
-			if (null != rulesComplianceMetric) {
-				rulesCompliance = rulesComplianceMetric.getValue();
-			}
-			if (null != testCoverageMetric) {
-				testCoverage = testCoverageMetric.getValue();
-			}
-			if (null != linesOfCodeMetric) {
-				linesOfCode = linesOfCodeMetric.getValue();
-			}
-
-			result = new SonarStatistics(methodComplexity, fileComplexity, rulesCompliance, testCoverage, linesOfCode);
+	public SonarStatistics getStatisticsForPeriod(final String startDate, final String endDate,
+			final String projectRegex) throws IOException, URISyntaxException {
+		List<SonarProject> projects = getProjectsFilteredByName(projectRegex);
+		DateMidnight startDateMidnight = new DateMidnight(formatter.parseMillis(startDate));
+		DateMidnight endDateMidnight = new DateMidnight(formatter.parseMillis(endDate));
+		Interval period = new Interval(startDateMidnight, endDateMidnight);
+		for (SonarProject sonarProject : projects) {
+			sonarDao.getStatsForDateWindow(authenticationHelper.createAuthenticationCredentials(), period,
+					sonarProject.getKey());
 		}
-		return result;
+
+		return null;
+	}
+
+	public SonarMetrics getStatisticsForPeriod(final Interval period) {
+
 	}
 }

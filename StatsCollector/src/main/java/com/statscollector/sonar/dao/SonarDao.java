@@ -16,6 +16,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -35,8 +39,15 @@ public class SonarDao extends AbstractWebDao {
 
 	private static final String HTTP_SCHEME = "http";
 	private static final String ALL_METRICS_URL = "/api/resources";
-	private static final BasicNameValuePair METRICS_PAIR = new BasicNameValuePair("metrics",
-			"function_complexity,file_complexity,ncloc,coverage,violations_density");
+	private static final BasicNameValuePair METRICS_PAIR = new BasicNameValuePair(
+			"metrics",
+			"function_complexity,file_complexity,ncloc,coverage,violations_density,files,functions,blocker_violations,critical_violations,major_violations,minor_violations");
+	private static final String TIME_MACHINE_URL = "/api/timemachine";
+	private static final String FROM_DATE_KEY = "fromDateTime";
+	private static final String END_DATE_KEY = "toDateTime";
+	private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendDayOfYear(4)
+			.appendLiteral("-").appendMonthOfYear(2).appendLiteral("-").appendDayOfMonth(2).toFormatter();
+	private static final String RESOURCE_KEY = "resource";
 
 	@Autowired
 	private SonarConfig sonarConfig;
@@ -56,12 +67,12 @@ public class SonarDao extends AbstractWebDao {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public String getAllChanges(final CredentialsProvider credsProvider) throws IOException, URISyntaxException {
+	public String getLatestStats(final CredentialsProvider credsProvider) throws IOException, URISyntaxException {
 		String resultString;
 
 		try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build()) {
 			URIBuilder baseURIBuilder = setupBaseURI(ALL_METRICS_URL);
-			baseURIBuilder.addParameters(getAllChangesParameters());
+			baseURIBuilder.addParameters(getLatestStatsParameters());
 			URI uri = baseURIBuilder.build();
 			HttpGet httpGet = new HttpGet(uri);
 
@@ -80,10 +91,66 @@ public class SonarDao extends AbstractWebDao {
 		return resultString;
 	}
 
-	private List<NameValuePair> getAllChangesParameters() {
+	private List<NameValuePair> getLatestStatsParameters() {
 		List<NameValuePair> result = new ArrayList<>();
 		result.add(METRICS_PAIR);
 		return result;
+	}
+
+	/**
+	 * I Return a String containing all changes for all projects, that have the
+	 * provided status, I require a username and password passed in as a
+	 * credentials provider, see:
+	 *
+	 * https://hc.apache.org/httpcomponents-client-ga/httpclient
+	 * /examples/org/apache/http/examples/client/ClientAuthentication.java
+	 *
+	 * For an example
+	 *
+	 * @param credsProvider
+	 * @return result
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	public String getStatsForDateWindow(final CredentialsProvider credsProvider, final Interval interval,
+			final String resourceKey) throws IOException, URISyntaxException {
+		String resultString;
+
+		try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build()) {
+			URIBuilder baseURIBuilder = setupBaseURI(TIME_MACHINE_URL);
+			baseURIBuilder.addParameters(getDateWindowParameters(interval, resourceKey));
+			URI uri = baseURIBuilder.build();
+			HttpGet httpGet = new HttpGet(uri);
+
+			try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+				HttpEntity httpEntity = response.getEntity();
+				resultString = EntityUtils.toString(httpEntity);
+				EntityUtils.consume(httpEntity);
+			} catch (Exception e) {
+				System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
+				throw e;
+			}
+		} catch (Exception e) {
+			System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
+			throw e;
+		}
+		return resultString;
+	}
+
+	private List<NameValuePair> getDateWindowParameters(final Interval interval, final String resourceKey) {
+		BasicNameValuePair fromDateParam = new BasicNameValuePair(FROM_DATE_KEY, formatDateOnly(interval.getStart()));
+		BasicNameValuePair endDateParam = new BasicNameValuePair(END_DATE_KEY, formatDateOnly(interval.getEnd()));
+		BasicNameValuePair resourceParam = new BasicNameValuePair(RESOURCE_KEY, resourceKey);
+		List<NameValuePair> result = new ArrayList<>();
+		result.add(METRICS_PAIR);
+		result.add(fromDateParam);
+		result.add(endDateParam);
+		result.add(resourceParam);
+		return result;
+	}
+
+	private String formatDateOnly(final DateTime date) {
+		return formatter.print(date.getMillis());
 	}
 
 	/**
