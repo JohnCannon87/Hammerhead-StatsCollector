@@ -10,14 +10,14 @@ import com.statscollector.application.config.WebConfig;
 /**
  * I am an abstract class that provides common authentication methods for an
  * extending class
- * 
+ *
  * @author JCannon
  *
  */
 public abstract class AbstractAuthenticationHelper {
 
 	private CredentialsProvider credsProvider;
-	private boolean credsProviderCreated;
+	private boolean credsProviderCreated = false;
 
 	public CredentialsProvider createAuthenticationCredentials() {
 		if (!credsProviderCreated) {
@@ -25,6 +25,7 @@ public abstract class AbstractAuthenticationHelper {
 			credsProvider = new BasicCredentialsProvider();
 			credsProvider.setCredentials(new AuthScope(config.getHost(), config.getHostPort()),
 					new UsernamePasswordCredentials(config.getUsername(), config.getPassword()));
+			credsProviderCreated = true;
 		}
 		return credsProvider;
 	}

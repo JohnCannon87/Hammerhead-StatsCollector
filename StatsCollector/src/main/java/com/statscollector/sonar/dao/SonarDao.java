@@ -45,7 +45,7 @@ public class SonarDao extends AbstractWebDao {
 	private static final String TIME_MACHINE_URL = "/api/timemachine";
 	private static final String FROM_DATE_KEY = "fromDateTime";
 	private static final String END_DATE_KEY = "toDateTime";
-	private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendDayOfYear(4)
+	private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendYear(4, 4)
 			.appendLiteral("-").appendMonthOfYear(2).appendLiteral("-").appendDayOfMonth(2).toFormatter();
 	private static final String RESOURCE_KEY = "resource";
 

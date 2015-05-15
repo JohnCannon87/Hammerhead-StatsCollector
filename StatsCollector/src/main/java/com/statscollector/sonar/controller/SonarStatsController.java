@@ -30,7 +30,7 @@ public class SonarStatsController {
 	@RequestMapping(value = "/allStatistics")
 	public SonarStatistics allStatistics() throws IOException, URISyntaxException {
 		LOGGER.info("Getting Sonar Statistics");
-		return sonarStatisticsService.getStatistics();
+		return null;
 	}
 
 }

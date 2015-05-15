@@ -16,6 +16,16 @@ public class SonarMetric {
 	@SerializedName("frmt_val")
 	private String formattedValue;
 
+	public SonarMetric() {
+	};
+
+	public SonarMetric(final String key, final String value, final String formattedValue) {
+		super();
+		this.key = key;
+		this.value = value;
+		this.formattedValue = formattedValue;
+	}
+
 	public String getKey() {
 		return key;
 	}

@@ -3,9 +3,13 @@ package com.statscollector.sonar.service;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
@@ -20,9 +24,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.statscollector.sonar.authentication.SonarAuthenticationHelper;
 import com.statscollector.sonar.config.SonarConfig;
+import com.statscollector.sonar.dao.Cell;
+import com.statscollector.sonar.dao.Col;
+import com.statscollector.sonar.dao.DatedSonarMetric;
 import com.statscollector.sonar.dao.SonarDao;
+import com.statscollector.sonar.model.SonarMetric;
 import com.statscollector.sonar.model.SonarProject;
-import com.statscollector.sonar.model.SonarStatistics;
 import com.statscollector.sonar.service.filter.FilterProjectNamePredicate;
 
 @Service
@@ -37,8 +44,15 @@ public class SonarStatisticsService {
 	@Autowired
 	private SonarConfig sonarConfig;
 
-	private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendDayOfYear(4)
+	private static final DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendYear(4, 4)
 			.appendLiteral("-").appendMonthOfYear(2).appendLiteral("-").appendDayOfMonth(2).toFormatter();
+
+	private static final DateTimeFormatter sonarTimeFormatter = new DateTimeFormatterBuilder().appendYear(4, 4)
+			.appendLiteral("-").appendMonthOfYear(2).appendLiteral("-").appendDayOfMonth(2).appendLiteral("T")
+			.appendHourOfDay(2).appendLiteral(":").appendMinuteOfHour(2).appendLiteral(":").appendMinuteOfHour(2)
+			.appendTimeZoneOffset(null, false, 1, 1).toFormatter();
+
+	final static Logger LOGGER = Logger.getLogger(SonarStatisticsService.class);
 
 	public List<SonarProject> getProjectsFilteredByName(final String projectFilterRegex) throws IOException,
 	URISyntaxException {
@@ -83,21 +97,54 @@ public class SonarStatisticsService {
 
 	}
 
-	public SonarStatistics getStatisticsForPeriod(final String startDate, final String endDate,
+	public List<SonarProject> getStatisticsForPeriod(final String startDate, final String endDate,
 			final String projectRegex) throws IOException, URISyntaxException {
+		// Setup Parsers
+		JsonParser jsonParser = new JsonParser();
+		Gson gsonParser = new GsonBuilder().create();
 		List<SonarProject> projects = getProjectsFilteredByName(projectRegex);
 		DateMidnight startDateMidnight = new DateMidnight(formatter.parseMillis(startDate));
 		DateMidnight endDateMidnight = new DateMidnight(formatter.parseMillis(endDate));
 		Interval period = new Interval(startDateMidnight, endDateMidnight);
 		for (SonarProject sonarProject : projects) {
-			sonarDao.getStatsForDateWindow(authenticationHelper.createAuthenticationCredentials(), period,
-					sonarProject.getKey());
+			String rawResults = sonarDao.getStatsForDateWindow(authenticationHelper.createAuthenticationCredentials(),
+					period, sonarProject.getKey());
+			JsonElement rootElement = jsonParser.parse(rawResults);
+			JsonArray rootArray = rootElement.getAsJsonArray();
+			for (JsonElement jsonElement : rootArray) {
+				DatedSonarMetric parsedResults = gsonParser.fromJson(jsonElement, DatedSonarMetric.class);
+				sonarProject.setDatedMetricsMaps(translateToDatedMetricsMap(parsedResults));
+			}
 		}
 
-		return null;
+		return projects;
 	}
 
-	public SonarMetrics getStatisticsForPeriod(final Interval period) {
-
+	private Map<DateTime, Map<String, SonarMetric>> translateToDatedMetricsMap(final DatedSonarMetric parsedResults) {
+		Map<DateTime, Map<String, SonarMetric>> results = new HashMap<>();
+		// Get List Of Metric Names
+		List<Col> metricNames = parsedResults.getCols();
+		// Get List of "Cells" (actually key value pairs, key is date, value is
+		// list of metrics.
+		List<Cell> cells = parsedResults.getCells();
+		for (Cell cell : cells) {
+			DateTime statsInstance = sonarTimeFormatter.parseDateTime(cell.getD());
+			List<Double> statsValues = cell.getV();
+			if (statsValues.size() != metricNames.size()) {
+				LOGGER.error("Metrics Names And Values Arrays Do NOT Match In Size");
+				break;
+			}
+			Map<String, SonarMetric> statisticsMap = new HashMap<>();
+			for (int i = 0; i < statsValues.size(); i++) {
+				String value = "";
+				if (statsValues.get(i) != null) {
+					statsValues.get(i).toString();
+				}
+				SonarMetric metric = new SonarMetric(metricNames.get(i).getMetric(), value, value);
+				statisticsMap.put(metric.getKey(), metric);
+			}
+			results.put(statsInstance, statisticsMap);
+		}
+		return results;
 	}
 }
