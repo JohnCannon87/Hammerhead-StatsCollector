@@ -2,7 +2,6 @@ package com.statscollector.gerrit.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -28,7 +27,7 @@ public class GerritReviewController {
 	private GerritStatisticsService statisticsService;
 
 	@RequestMapping(value = "/refreshCache")
-	public void refreshCache() throws IOException, URISyntaxException, InterruptedException, ExecutionException {
+	public void refreshCache() throws Exception {
 		LOGGER.info("Manual Cache Refresh Triggered");
 		statisticsService.getReviewStatisticsScheduledTask();
 	}
@@ -69,7 +68,7 @@ public class GerritReviewController {
 
 	@RequestMapping(value = "/{changeStatus}/all", produces = "application/json")
 	public GerritReviewStats mergedReview(@PathVariable final String changeStatus) throws IOException,
-	URISyntaxException {
+			URISyntaxException {
 		try {
 			return getReviewStatistics(changeStatus, null, null, null);
 		} catch (Exception e) {

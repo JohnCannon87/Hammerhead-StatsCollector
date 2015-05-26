@@ -1,6 +1,7 @@
 package com.statscollector.application.authentication;
 
 import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -20,14 +21,33 @@ public abstract class AbstractAuthenticationHelper {
 	private boolean credsProviderCreated = false;
 
 	public CredentialsProvider createAuthenticationCredentials() {
-		if (!credsProviderCreated) {
+		if (!credsProviderCreated || credentialsHaveChanged(credsProvider)) {
 			WebConfig config = getConfig();
 			credsProvider = new BasicCredentialsProvider();
-			credsProvider.setCredentials(new AuthScope(config.getHost(), config.getHostPort()),
+			credsProvider.setCredentials(AuthScope.ANY,
 					new UsernamePasswordCredentials(config.getUsername(), config.getPassword()));
 			credsProviderCreated = true;
 		}
 		return credsProvider;
+	}
+
+	private boolean credentialsHaveChanged(final CredentialsProvider credsProvider2) {
+		if (null == credsProvider2) {
+			return true;
+		} else {
+			WebConfig config = getConfig();
+			Credentials credentials = credsProvider2.getCredentials(new AuthScope(config.getHost(), config
+					.getHostPort()));
+			if (null == credentials) {
+				// No credentials found auth scope must have
+				// changed.
+				return true;
+			} else {
+				boolean passwordSame = credentials.getPassword().equals(config.getPassword());
+				boolean usernameSame = credentials.getUserPrincipal().getName().equals(config.getUsername());
+				return !passwordSame || !usernameSame;
+			}
+		}
 	}
 
 	protected abstract WebConfig getConfig();

@@ -1,8 +1,5 @@
 package com.statscollector.gerrit.dao;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -24,7 +21,7 @@ public class GerritDaoTest {
 	public void setUp() throws Exception {
 		credsProvider = new BasicCredentialsProvider();
 		credsProvider.setCredentials(new AuthScope("nreojp.git", 8080), new UsernamePasswordCredentials("jcannon",
-				"testpassword"));
+				"wigCY0osQ15cuDYco05ABn0WnvV3uetTNyr+sYVF0Q"));
 		gerritConfig = Mockito.mock(GerritConfig.class);
 		Mockito.when(gerritConfig.getHost()).thenReturn("nreojp.git");
 		Mockito.when(gerritConfig.getHostPort()).thenReturn(8080);
@@ -32,19 +29,19 @@ public class GerritDaoTest {
 	}
 
 	@Test
-	public void testGetAllAbandonedChanges() throws IOException, URISyntaxException {
+	public void testGetAllAbandonedChanges() throws Exception {
 		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.ABANDONED.toString());
 		System.out.println(testResult);
 	}
 
 	@Test
-	public void testGetAllMergedChanges() throws IOException, URISyntaxException {
+	public void testGetAllMergedChanges() throws Exception {
 		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.MERGED.toString());
 		System.out.println(testResult);
 	}
 
 	@Test
-	public void testGetAllOpenChanges() throws IOException, URISyntaxException {
+	public void testGetAllOpenChanges() throws Exception {
 		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.OPEN.toString());
 		System.out.println(testResult);
 	}

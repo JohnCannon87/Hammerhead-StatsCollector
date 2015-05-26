@@ -76,7 +76,7 @@ public class GerritService {
 
 	final static Logger LOGGER = Logger.getLogger(GerritService.class);
 
-	public List<GerritChange> getAllChanges(final String changeStatus) throws IOException, URISyntaxException {
+	public List<GerritChange> getAllChanges(final String changeStatus) throws Exception {
 		JsonParser jsonParser = new JsonParser();
 		String allOpenChangesUnparsed = gerritDao.getAllChanges(authenticationHelper.createAuthenticationCredentials(),
 				changeStatus);
