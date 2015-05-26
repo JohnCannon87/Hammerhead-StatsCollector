@@ -62,7 +62,7 @@
 			</div>
 		</div>
 	</div>
-	<div ng-controller="SonarStatsCtrl" class="col-sm-12">
+	<div ng-controller="SonarStatsCtrl" class="col-sm-12 hidden">
 	<div class="col-sm-4">
 			<h3>Sonar stats for server {{sonarHostname}} are:</h3>
 			<ul class="list-group">

@@ -34,6 +34,11 @@ task createDist (){
         from "src/main/resources"
         into "../dist"
         include 'GerritStatistics.properties'
+    }    
+    copy {
+        from "src/main/resources"
+        into "../dist"
+        include 'SonarStatistics.properties'
     }
 }
 
