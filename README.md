@@ -9,7 +9,7 @@ Usage
 
 * Copy the contents of the "dist" folder to a directory on the machine you wish to run the application on.
 * Alter the .sh or .bat script to specify the port you wish the web interface to run on.
-* Open up http://localhost:<YOUR-PORT> (default is 8080)
+* Open up http://localhost:YOUR-PORT (default is 8080)
 * Go to the config tab at the top and entry your Gerrit server details (See below for help setting the thread limits)
 * Setup on a browser to show  the data ! (currently manual refresh is required)
 
@@ -39,3 +39,9 @@ Stats Collector uses the following projects:
 * [Powermock](https://code.google.com/p/powermock/)
 * [JSTL](https://jstl.java.net/)
 
+Setting Thread Limits
+---------------------
+The thread limit setting in the Gerrit config decides how many items each thread can process when pulling back details from Gerrit.
+For example if you have 6000 changes in gerrit and have the thread limit set to 2000 (default) the app will run up 3 threads to process the information each time it is cached.
+As each of these threads creates a HTTP connection to your Gerrit box every 15 minutes if you have the limit set low (as in the example above setting it to 200 would result in 30 threads) then you can overwhelm the gerrit server resulting in missing stats as the connections fail.
+Ensure you check the logs to see if any errors occur the first time you collect stats, any errors should be reported back to the UI in the connection status alert.
