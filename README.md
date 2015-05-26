@@ -9,6 +9,7 @@ Usage
 
 * Copy the contents of the "dist" folder to a directory on the machine you wish to run the application on.
 * Alter the .sh or .bat script to specify the port you wish the web interface to run on.
+* Set your initial parameters in the GerritStatistics.properties file.
 * Open up http://localhost:YOUR-PORT (default is 8080)
 * Go to the config tab at the top and entry your Gerrit server details (See below for help setting the thread limits)
 * Setup on a browser to show  the data ! (currently manual refresh is required)
