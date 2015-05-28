@@ -21,7 +21,7 @@ public class GerritDaoTest {
 	public void setUp() throws Exception {
 		credsProvider = new BasicCredentialsProvider();
 		credsProvider.setCredentials(new AuthScope("nreojp.git", 8080), new UsernamePasswordCredentials("jcannon",
-				"wigCY0osQ15cuDYco05ABn0WnvV3uetTNyr+sYVF0Q"));
+				"t9MYEr/hErZpRkGgTGocPzTaxb0ob7Odls6YaaHMVA"));
 		gerritConfig = Mockito.mock(GerritConfig.class);
 		Mockito.when(gerritConfig.getHost()).thenReturn("nreojp.git");
 		Mockito.when(gerritConfig.getHostPort()).thenReturn(8080);

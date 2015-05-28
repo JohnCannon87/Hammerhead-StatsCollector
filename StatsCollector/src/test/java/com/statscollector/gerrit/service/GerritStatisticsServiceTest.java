@@ -12,9 +12,6 @@ import com.statscollector.gerrit.authentication.GerritAuthenticationHelper;
 import com.statscollector.gerrit.config.GerritConfig;
 import com.statscollector.gerrit.dao.GerritDao;
 import com.statscollector.gerrit.model.GerritReviewStats;
-import com.statscollector.gerrit.service.GerritService;
-import com.statscollector.gerrit.service.GerritStatisticsHelper;
-import com.statscollector.gerrit.service.GerritStatisticsService;
 
 public class GerritStatisticsServiceTest {
 
@@ -39,12 +36,13 @@ public class GerritStatisticsServiceTest {
 		gerritStatisticsService.setGerritService(statisticsService);
 		gerritStatisticsService.setGerritStatisticsHelper(gerritStatisticsHelper);
 	}
-	
+
 	@Test
-	public void testGetReviewStatistics() throws IOException, URISyntaxException{
+	public void testGetReviewStatistics() throws IOException, URISyntaxException {
 		DateTime startDate = new DateTime(0);
 		DateTime endDate = new DateTime().plusYears(100);
-		GerritReviewStats reviewStatistics = gerritStatisticsService.getReviewStatistics("open", ".*", startDate, endDate);
+		GerritReviewStats reviewStatistics = gerritStatisticsService.getReviewStatistics("open", ".*", startDate,
+				endDate);
 	}
-	
+
 }

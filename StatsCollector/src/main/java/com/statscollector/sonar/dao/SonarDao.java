@@ -16,6 +16,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormatter;
@@ -52,6 +53,8 @@ public class SonarDao extends AbstractWebDao {
 	@Autowired
 	private SonarConfig sonarConfig;
 
+	final static Logger LOGGER = Logger.getLogger(SonarDao.class);
+
 	/**
 	 * I Return a String containing all changes for all projects, that have the
 	 * provided status, I require a username and password passed in as a
@@ -81,11 +84,11 @@ public class SonarDao extends AbstractWebDao {
 				resultString = EntityUtils.toString(httpEntity);
 				EntityUtils.consume(httpEntity);
 			} catch (Exception e) {
-				System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
+				LOGGER.error("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
 				throw e;
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
+			LOGGER.error("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
 			throw e;
 		}
 		return resultString;
@@ -127,11 +130,11 @@ public class SonarDao extends AbstractWebDao {
 				resultString = EntityUtils.toString(httpEntity);
 				EntityUtils.consume(httpEntity);
 			} catch (Exception e) {
-				System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
+				LOGGER.error("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
 				throw e;
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
+			LOGGER.error("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
 			throw e;
 		}
 		return resultString;

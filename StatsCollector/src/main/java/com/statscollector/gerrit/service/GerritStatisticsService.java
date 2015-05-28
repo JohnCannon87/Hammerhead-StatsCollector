@@ -110,90 +110,97 @@ public class GerritStatisticsService {
 	 * Every 15 minutes I run multiple threads to pull back all the gerrit
 	 * details, I split based on gerritConfig.ThreadSplitSize, which is
 	 * configurable in the UI.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Scheduled(fixedRate = 4500000)
 	public void getReviewStatisticsScheduledTask() throws Exception {
 		LOGGER.info("Is Refresh In Progress ?: " + refreshInProgress);
-		if (!refreshInProgress) {
-			refreshInProgress = true;
-			for (String changeStatus : CHANGE_STATUSES) {
-				long start = System.currentTimeMillis();
-				List<GerritChange> noPeerReviewList = new ArrayList<>();
-				List<GerritChange> onePeerReviewList = new ArrayList<>();
-				List<GerritChange> twoPlusPeerReviewList = new ArrayList<>();
-				List<GerritChange> collabrativeDevelopmentList = new ArrayList<>();
-				LOGGER.info("Getting Changes For Status: " + changeStatus);
+		try {
+			if (!refreshInProgress) {
+				refreshInProgress = true;
+				for (String changeStatus : CHANGE_STATUSES) {
+					long start = System.currentTimeMillis();
+					List<GerritChange> noPeerReviewList = new ArrayList<>();
+					List<GerritChange> onePeerReviewList = new ArrayList<>();
+					List<GerritChange> twoPlusPeerReviewList = new ArrayList<>();
+					List<GerritChange> collabrativeDevelopmentList = new ArrayList<>();
+					LOGGER.info("Getting Changes For Status: " + changeStatus);
 
-				List<GerritChange> changes = gerritService.getAllChanges(changeStatus);
+					List<GerritChange> changes = gerritService.getAllChanges(changeStatus);
 
-				Integer threadSplitSize = gerritConfig.getThreadSplitSize();
+					Integer threadSplitSize = gerritConfig.getThreadSplitSize();
 
-				if (changes.size() < threadSplitSize) {
+					if (changes.size() < threadSplitSize) {
 
-					GerritReviewStatsResult result = null;
-					try {
-						gerritStatisticsHelper.populateReviewStats(changeStatus, noPeerReviewList, onePeerReviewList,
-								twoPlusPeerReviewList, collabrativeDevelopmentList, changes);
-						result = new GerritReviewStatsResult(true, changes);
-					} catch (Exception e) {
-						LOGGER.info("CAUGHT EXCEPTION");
-						result = new GerritReviewStatsResult(false, e, changes);
-					}
-
-					GerritReviewStats gerritReviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
-					gerritReviewStats.setError(!result.getSuccess());
-					if (!result.getSuccess()) {
-						gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Error Thrown During Processing: "
-								+ result.getError().getMessage());
-					} else {
-						gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK");
-					}
-					gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : 1 Thread");
-				} else {
-					List<Future<GerritReviewStatsResult>> asyncResults = new ArrayList<>();
-					List<List<GerritChange>> partitionedLists = Lists.partition(changes, threadSplitSize);
-					for (List<GerritChange> list : partitionedLists) {
-						asyncResults.add(gerritStatisticsHelper.populateReviewStatsAsync(changeStatus,
-								noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList,
-								collabrativeDevelopmentList, list));
-					}
-					// Wait for all threads to complete.
-					for (Future<GerritReviewStatsResult> asyncResult : asyncResults) {
-						while (!asyncResult.isDone()) {
+						GerritReviewStatsResult result = null;
+						try {
+							gerritStatisticsHelper.populateReviewStats(changeStatus, noPeerReviewList,
+									onePeerReviewList, twoPlusPeerReviewList, collabrativeDevelopmentList, changes);
+							result = new GerritReviewStatsResult(true, changes);
+						} catch (Exception e) {
+							LOGGER.info("CAUGHT EXCEPTION");
+							result = new GerritReviewStatsResult(false, e, changes);
 						}
-					}
-					// Process Thread Responses
-					GerritReviewStats gerritReviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
-					for (Future<GerritReviewStatsResult> asyncResult : asyncResults) {
-						GerritReviewStatsResult result = asyncResult.get();
-						if (result == null) {
+
+						GerritReviewStats gerritReviewStats = gerritStatisticsHelper.getAllReviewStats().get(
+								changeStatus);
+						gerritReviewStats.setError(!result.getSuccess());
+						if (!result.getSuccess()) {
 							gerritReviewStats.setStatus(gerritReviewStats.getStatus()
-									+ "Error Thrown During Processing: Null Pointer Returned, ");
-							gerritReviewStats
-									.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
-						} else if (!result.getSuccess()) {
-							gerritReviewStats.setStatus(gerritReviewStats.getStatus()
-									+ "Error Thrown During Processing: " + result.getError().getMessage() + ", ");
-							gerritReviewStats
-									.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-											.getSuccess()));
+									+ "Error Thrown During Processing: " + result.getError().getMessage());
 						} else {
-							gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK, ");
-							gerritReviewStats
-									.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-											.getSuccess()));
+							gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK");
 						}
+						gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : 1 Thread");
+					} else {
+						List<Future<GerritReviewStatsResult>> asyncResults = new ArrayList<>();
+						List<List<GerritChange>> partitionedLists = Lists.partition(changes, threadSplitSize);
+						for (List<GerritChange> list : partitionedLists) {
+							asyncResults.add(gerritStatisticsHelper.populateReviewStatsAsync(changeStatus,
+									noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList,
+									collabrativeDevelopmentList, list));
+						}
+						// Wait for all threads to complete.
+						for (Future<GerritReviewStatsResult> asyncResult : asyncResults) {
+							while (!asyncResult.isDone()) {
+							}
+						}
+						// Process Thread Responses
+						GerritReviewStats gerritReviewStats = gerritStatisticsHelper.getAllReviewStats().get(
+								changeStatus);
+						for (Future<GerritReviewStatsResult> asyncResult : asyncResults) {
+							GerritReviewStatsResult result = asyncResult.get();
+							if (result == null) {
+								gerritReviewStats.setStatus(gerritReviewStats.getStatus()
+										+ "Error Thrown During Processing: Null Pointer Returned, ");
+								gerritReviewStats
+										.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
+							} else if (!result.getSuccess()) {
+								gerritReviewStats.setStatus(gerritReviewStats.getStatus()
+										+ "Error Thrown During Processing: " + result.getError().getMessage() + ", ");
+								gerritReviewStats
+										.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+												.getSuccess()));
+							} else {
+								gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK, ");
+								gerritReviewStats
+										.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+												.getSuccess()));
+							}
+						}
+						gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : "
+								+ asyncResults.size() + " Threads");
 					}
-					gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : "
-							+ asyncResults.size() + " Threads");
+					long end = System.currentTimeMillis();
+					LOGGER.info("Got Changes For Status: " + changeStatus + " In: " + (end - start) / 1000 + " Seconds");
 				}
-				long end = System.currentTimeMillis();
-				LOGGER.info("Got Changes For Status: " + changeStatus + " In: " + (end - start) / 1000 + " Seconds");
+				refreshInProgress = false;
+				LOGGER.info("Refresh Completed");
 			}
+		} catch (Exception e) {
+			LOGGER.error("Error Processing Data From Gerrit", e);
 			refreshInProgress = false;
-			LOGGER.info("Refresh Completed");
 		}
 	}
 

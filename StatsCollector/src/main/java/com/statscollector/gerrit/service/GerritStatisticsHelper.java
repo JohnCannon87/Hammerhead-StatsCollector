@@ -37,18 +37,16 @@ public class GerritStatisticsHelper {
 
 	@Autowired
 	private GerritService gerritService;
-	
+
 	@Autowired
 	private GerritConfig gerritConfig;
 
 	final Map<String, List<GerritChange>> allChanges = new ConcurrentHashMap<>();
 
 	final Map<String, GerritReviewStats> allReviewStats = new ConcurrentHashMap<>();
-	
-	final static Logger LOGGER = Logger
-			.getLogger(GerritStatisticsService.class);
-	
-	
+
+	final static Logger LOGGER = Logger.getLogger(GerritStatisticsService.class);
+
 	/**
 	 * I return a copy of the provided List but filtered based on the
 	 * projectNameRegex provided.
@@ -78,37 +76,32 @@ public class GerritStatisticsHelper {
 	}
 
 	@Async
-	public Future<GerritReviewStatsResult> populateReviewStatsAsync(String changeStatus,
-			List<GerritChange> noPeerReviewList,
-			List<GerritChange> onePeerReviewList,
-			List<GerritChange> twoPlusPeerReviewList,
-			List<GerritChange> collabrativeDevelopmentList,
-			List<GerritChange> changes) throws IOException, URISyntaxException {
+	public Future<GerritReviewStatsResult> populateReviewStatsAsync(final String changeStatus,
+			final List<GerritChange> noPeerReviewList, final List<GerritChange> onePeerReviewList,
+			final List<GerritChange> twoPlusPeerReviewList, final List<GerritChange> collabrativeDevelopmentList,
+			final List<GerritChange> changes) throws IOException, URISyntaxException {
 		LOGGER.info("Starting Thread To Process Changes");
 		GerritReviewStatsResult result = null;
-		try{
-			populateReviewStats(changeStatus, noPeerReviewList, onePeerReviewList,
-					twoPlusPeerReviewList, collabrativeDevelopmentList, changes);
+		try {
+			populateReviewStats(changeStatus, noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList,
+					collabrativeDevelopmentList, changes);
 			result = new GerritReviewStatsResult(true, changes);
-		}catch(Exception e){
+		} catch (Exception e) {
 			LOGGER.info("CAUGHT EXCEPTION");
 			result = new GerritReviewStatsResult(false, e, changes);
 		}
 
 		return new AsyncResult<GerritReviewStatsResult>(result);
 	}
-	
-	public void populateReviewStats(String changeStatus,
-			List<GerritChange> noPeerReviewList,
-			List<GerritChange> onePeerReviewList,
-			List<GerritChange> twoPlusPeerReviewList,
-			List<GerritChange> collabrativeDevelopmentList,
-			List<GerritChange> changes) throws IOException, URISyntaxException {
+
+	public void populateReviewStats(final String changeStatus, final List<GerritChange> noPeerReviewList,
+			final List<GerritChange> onePeerReviewList, final List<GerritChange> twoPlusPeerReviewList,
+			final List<GerritChange> collabrativeDevelopmentList, final List<GerritChange> changes) throws Exception {
 		gerritService.populateChangeReviewers(changes);
 		allChanges.put(changeStatus, changes);
 		for (GerritChange gerritChange : changes) {
 			int numberOfReviewers = numberOfReviewers(gerritChange);
-			//LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
+			// LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
 			switch (numberOfReviewers) {
 			case -1:
 				collabrativeDevelopmentList.add(gerritChange);
@@ -124,12 +117,11 @@ public class GerritStatisticsHelper {
 				break;
 			}
 		}
-		
+
 		allReviewStats.put(changeStatus, GerritReviewStats.buildStatsObjectWithValuesAndStatus(noPeerReviewList,
-				onePeerReviewList, twoPlusPeerReviewList,
-				collabrativeDevelopmentList, "", false));
+				onePeerReviewList, twoPlusPeerReviewList, collabrativeDevelopmentList, "", false));
 	}
-	
+
 	/**
 	 * I return the number of reviewers for the provided change, if the change
 	 * has been collaboratively developed I return -1
@@ -138,7 +130,7 @@ public class GerritStatisticsHelper {
 	 * @return
 	 */
 	private int numberOfReviewers(final GerritChange gerritChange) {
-		//LOGGER.info("Calculating changes for change: " + gerritChange);
+		// LOGGER.info("Calculating changes for change: " + gerritChange);
 		String owner = gerritChange.getOwner();
 		Map<String, Integer> reviewers = gerritChange.getReviewers();
 		Set<String> reviewersUsernames = reviewers.keySet();
@@ -163,5 +155,5 @@ public class GerritStatisticsHelper {
 	public Map<String, GerritReviewStats> getAllReviewStats() {
 		return allReviewStats;
 	}
-	
+
 }

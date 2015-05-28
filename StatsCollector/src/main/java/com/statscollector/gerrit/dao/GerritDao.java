@@ -1,6 +1,5 @@
 package com.statscollector.gerrit.dao;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -20,6 +19,7 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -50,6 +50,8 @@ public class GerritDao extends AbstractWebDao {
 	@Autowired
 	private GerritConfig gerritConfig;
 
+	final static Logger LOGGER = Logger.getLogger(GerritDao.class);
+
 	/**
 	 * I Return a String containing all changes for all projects, that have the
 	 * provided status, I require a username and password passed in as a
@@ -66,92 +68,18 @@ public class GerritDao extends AbstractWebDao {
 	 * @throws Exception
 	 */
 	public String getAllChanges(final CredentialsProvider credsProvider, final String changeStatus) throws Exception {
-		String resultString;
-
-		try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build()) {
-			URIBuilder baseURIBuilder = setupBaseURI(ALL_CHANGES_REST_URL);
-			baseURIBuilder.setParameter(QUERY, BASE_STATUS_STRING + changeStatus);
-			URI uri = baseURIBuilder.build();
-			HttpGet httpGet = new HttpGet(uri);
-			try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
-				HttpEntity httpEntity = response.getEntity();
-				resultString = EntityUtils.toString(httpEntity);
-				if (resultString.equals(UNAUTHORIZED)) {
-					resultString = processResponseWithDigestAuthentication(credsProvider, getConfig().getHost(),
-							getConfig().getHostPort(), response, changeStatus);
-				}
-				EntityUtils.consume(httpEntity);
-			} catch (Exception e) {
-				System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
-				throw e;
-			}
-		} catch (Exception e) {
-			System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
-			throw e;
-		}
-		return resultString;
-	}
-
-	private String processResponseWithDigestAuthentication(final CredentialsProvider credsProvider, final String host,
-			final int port, final CloseableHttpResponse notAuthorizedResponse, final String changeStatus)
-					throws Exception {
-		String resultString;
-		HttpHost httpHost = new HttpHost(host, port, "http");
-
-		Map<String, String> authenticationElementsMap = getAuthenticationElements(notAuthorizedResponse);
-		String nonceValue = authenticationElementsMap.get(NONCE_KEY);
-		String realmValue = authenticationElementsMap.get(REALM_KEY);
-
-		DigestScheme digestScheme = new DigestScheme();
-		digestScheme.overrideParamter(REALM_KEY, realmValue);
-		digestScheme.overrideParamter(NONCE_KEY, nonceValue);
-
-		BasicAuthCache authCache = new BasicAuthCache();
-		authCache.put(httpHost, digestScheme);
-
-		HttpClientContext context = HttpClientContext.create();
-		context.setCredentialsProvider(credsProvider);
-		context.setAuthCache(authCache);
-
 		URIBuilder baseURIBuilder = setupBaseURI(ALL_CHANGES_REST_URL);
 		baseURIBuilder.setParameter(QUERY, BASE_STATUS_STRING + changeStatus);
 		URI uri = baseURIBuilder.build();
-		HttpGet httpGet = new HttpGet(uri);
 
-		System.out.println("Http Get: " + httpGet.getRequestLine());
-
-		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
-			try (CloseableHttpResponse response = httpclient.execute(httpHost, httpGet, context)) {
-				HttpEntity httpEntity = response.getEntity();
-				resultString = EntityUtils.toString(httpEntity);
-				if (resultString.equals(UNAUTHORIZED)) {
-					return "Failed to authenticate Digest";
-				}
-				EntityUtils.consume(httpEntity);
-			} catch (Exception e) {
-				System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
-				throw e;
-			}
-		} catch (Exception e) {
-			System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
-			throw e;
-		}
-
-		return null;
+		return makeHttpRequest(credsProvider, uri);
 	}
 
-	private Map<String, String> getAuthenticationElements(final CloseableHttpResponse response) {
-		Header[] authenticationHeaders = response.getHeaders(AUTHENTICATION_HEADER);
-		if (authenticationHeaders.length != 1) {
-			throw new RuntimeException("Cannot handle multiple http authentication headers!");
-		}
-		Header authenticationHeader = authenticationHeaders[0];
-		HeaderElement[] authenticationElements = authenticationHeader.getElements();
-		Map<String, String> authenticationElementsMap = new HashMap<>();
-		for (HeaderElement headerElement : authenticationElements) {
-			authenticationElementsMap.put(headerElement.getName(), headerElement.getValue());
-		}
-		return authenticationElementsMap;
+	public String getDetails(final CredentialsProvider credsProvider, final String changeId) throws Exception {
+		URIBuilder baseURIBuilder = setupBaseURI(ALL_CHANGES_REST_URL + changeId + DETAIL_URL_END);
+		URI uri = baseURIBuilder.build();
+
+		return makeHttpRequest(credsProvider, uri);
 	}
 
 	/**
@@ -168,27 +96,86 @@ public class GerritDao extends AbstractWebDao {
 
 	}
 
-	public String getDetails(final CredentialsProvider credsProvider, final String changeId) throws IOException,
-	URISyntaxException {
-		String resultString;
+	private String makeHttpRequest(final CredentialsProvider credsProvider, final URI uri) throws Exception {
+		try (CloseableHttpClient httpclient = HttpClients.custom().build()) {
 
-		try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build()) {
-			URIBuilder baseURIBuilder = setupBaseURI(ALL_CHANGES_REST_URL + changeId + DETAIL_URL_END);
-			URI uri = baseURIBuilder.build();
 			HttpGet httpGet = new HttpGet(uri);
 			try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
 				HttpEntity httpEntity = response.getEntity();
-				resultString = EntityUtils.toString(httpEntity);
+				String resultString = EntityUtils.toString(httpEntity);
+				if (resultString.equals(UNAUTHORIZED)) {
+					resultString = processResponseWithDigestAuthentication(credsProvider, getConfig().getHost(),
+							getConfig().getHostPort(), response, uri);
+				}
 				EntityUtils.consume(httpEntity);
+				return resultString;
 			} catch (Exception e) {
-				System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
+				LOGGER.error("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
 				throw e;
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
+			LOGGER.error("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
 			throw e;
 		}
-		return resultString;
+	}
+
+	private String processResponseWithDigestAuthentication(final CredentialsProvider credsProvider, final String host,
+			final int port, final CloseableHttpResponse notAuthorizedResponse, final URI uri) throws Exception {
+		HttpHost httpHost = new HttpHost(host, port, "http");
+
+		Map<String, String> authenticationElementsMap = getAuthenticationElements(notAuthorizedResponse);
+		String nonceValue = authenticationElementsMap.get(NONCE_KEY);
+		String realmValue = authenticationElementsMap.get(REALM_KEY);
+
+		DigestScheme digestScheme = new DigestScheme();
+		digestScheme.overrideParamter(REALM_KEY, realmValue);
+		digestScheme.overrideParamter(NONCE_KEY, nonceValue);
+
+		if (realmValue.isEmpty()) {
+			LOGGER.error("WARNING NO REALM VALUE");
+		}
+
+		BasicAuthCache authCache = new BasicAuthCache();
+		authCache.put(httpHost, digestScheme);
+
+		HttpClientContext context = HttpClientContext.create();
+		context.setCredentialsProvider(credsProvider);
+		context.setAuthCache(authCache);
+
+		HttpGet httpGet = new HttpGet(uri);
+
+		try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+			try (CloseableHttpResponse response = httpclient.execute(httpHost, httpGet, context)) {
+				HttpEntity httpEntity = response.getEntity();
+				String resultString = EntityUtils.toString(httpEntity);
+				if (resultString.equals(UNAUTHORIZED)) {
+					LOGGER.error("Failed To Authenticate With Digest Auth, Giving Up !");
+					return "Failed to authenticate Digest";
+				}
+				EntityUtils.consume(httpEntity);
+				return resultString;
+			} catch (Exception e) {
+				LOGGER.error("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
+				throw e;
+			}
+		} catch (Exception e) {
+			LOGGER.error("ERROR THROWN PROCESSING HTTP REQUEST: " + e.getMessage());
+			throw e;
+		}
+	}
+
+	private Map<String, String> getAuthenticationElements(final CloseableHttpResponse response) {
+		Header[] authenticationHeaders = response.getHeaders(AUTHENTICATION_HEADER);
+		if (authenticationHeaders.length != 1) {
+			throw new RuntimeException("Cannot handle multiple http authentication headers!");
+		}
+		Header authenticationHeader = authenticationHeaders[0];
+		HeaderElement[] authenticationElements = authenticationHeader.getElements();
+		Map<String, String> authenticationElementsMap = new HashMap<>();
+		for (HeaderElement headerElement : authenticationElements) {
+			authenticationElementsMap.put(headerElement.getName(), headerElement.getValue());
+		}
+		return authenticationElementsMap;
 	}
 
 	public void setGerritConfig(final GerritConfig gerritConfig) {

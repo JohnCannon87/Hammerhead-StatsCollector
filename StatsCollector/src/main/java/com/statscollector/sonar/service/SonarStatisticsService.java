@@ -55,7 +55,7 @@ public class SonarStatisticsService {
 	final static Logger LOGGER = Logger.getLogger(SonarStatisticsService.class);
 
 	public List<SonarProject> getProjectsFilteredByName(final String projectFilterRegex) throws IOException,
-	URISyntaxException {
+			URISyntaxException {
 		List<SonarProject> toBeFiltered = getAllSonarProjects();
 		FilterProjectNamePredicate filter = new FilterProjectNamePredicate(projectFilterRegex);
 		List<SonarProject> results = filter.filter(toBeFiltered);
@@ -77,7 +77,6 @@ public class SonarStatisticsService {
 		JsonArray jsonListOfProjects = parsedJson.getAsJsonArray();
 		for (JsonElement jsonProjectElement : jsonListOfProjects) {
 			JsonObject jsonProject = jsonProjectElement.getAsJsonObject();
-			System.out.println(jsonProject.get("key"));
 			SonarProject sonarProject = gsonParser.fromJson(jsonProject, SonarProject.class);
 			result.add(sonarProject);
 		}

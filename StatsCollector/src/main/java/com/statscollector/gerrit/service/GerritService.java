@@ -1,8 +1,6 @@
 package com.statscollector.gerrit.service;
 
-import java.io.IOException;
 import java.io.StringReader;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +17,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import com.statscollector.gerrit.authentication.GerritAuthenticationHelper;
 import com.statscollector.gerrit.dao.GerritDao;
@@ -133,7 +130,7 @@ public class GerritService {
 		this.authenticationHelper = authenticationHelper;
 	}
 
-	public void populateChangeReviewers(final List<GerritChange> changes) throws IOException, URISyntaxException {
+	public void populateChangeReviewers(final List<GerritChange> changes) throws Exception {
 		Map<String, GerritChangeDetails> gerritChangeDetails = getGerritChangeDetails(changes);
 		for (GerritChange gerritChange : changes) {
 			GerritChangeDetails changeDetail = gerritChangeDetails.get(gerritChange.getChangeId());
@@ -144,8 +141,7 @@ public class GerritService {
 		}
 	}
 
-	public Map<String, GerritChangeDetails> getGerritChangeDetails(final List<GerritChange> changes)
-			throws JsonSyntaxException, IOException, URISyntaxException {
+	public Map<String, GerritChangeDetails> getGerritChangeDetails(final List<GerritChange> changes) throws Exception {
 		JsonParser jsonParser = new JsonParser();
 		HashMap<String, GerritChangeDetails> result = new HashMap<>();
 		for (GerritChange gerritChange : changes) {
