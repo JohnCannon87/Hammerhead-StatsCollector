@@ -1,5 +1,7 @@
 package com.statscollector.gerrit.dao;
 
+import static org.junit.Assert.assertTrue;
+
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -31,19 +33,34 @@ public class GerritDaoTest {
 	@Test
 	public void testGetAllAbandonedChanges() throws Exception {
 		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.ABANDONED.toString());
-		System.out.println(testResult);
+		verifyResult(testResult);
 	}
 
 	@Test
 	public void testGetAllMergedChanges() throws Exception {
 		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.MERGED.toString());
-		System.out.println(testResult);
+		verifyResult(testResult);
 	}
 
 	@Test
 	public void testGetAllOpenChanges() throws Exception {
 		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.OPEN.toString());
 		System.out.println(testResult);
+		verifyResult(testResult);
+	}
+
+	@Test
+	public void testUnauthorized() throws Exception {
+		credsProvider.setCredentials(new AuthScope("nreojp.git", 8080), new UsernamePasswordCredentials("jcannon",
+				"NotTheRightPassword"));
+		String testResult = statisticsDao.getAllChanges(credsProvider, StatusEnum.OPEN.toString());
+		assertTrue(!testResult.isEmpty());
+		assertTrue(testResult.contains("Failed to authenticate Digest"));
+	}
+
+	private void verifyResult(final String testResult) {
+		assertTrue(!testResult.isEmpty());
+		assertTrue(!testResult.contains("Failed to authenticate Digest"));
 	}
 
 }

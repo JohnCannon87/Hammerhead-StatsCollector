@@ -44,7 +44,7 @@ public class SonarStatisticsServiceTest {
 				"testpassword"));
 		sonarDao = Mockito.mock(SonarDao.class);
 		authenticationHelper = Mockito.mock(SonarAuthenticationHelper.class);
-		Mockito.when(authenticationHelper.createAuthenticationCredentials()).thenReturn(credsProvider);
+		Mockito.when(authenticationHelper.credentialsProvider()).thenReturn(credsProvider);
 		service.setAuthenticationHelper(authenticationHelper);
 		service.setSonarDao(sonarDao);
 	}

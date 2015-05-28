@@ -63,7 +63,7 @@ public class SonarStatisticsService {
 	}
 
 	public List<SonarProject> getAllSonarProjects() throws IOException, URISyntaxException {
-		String allChanges = sonarDao.getLatestStats(authenticationHelper.createAuthenticationCredentials());
+		String allChanges = sonarDao.getLatestStats(authenticationHelper.credentialsProvider());
 		List<SonarProject> result = translateIntoProjectList(allChanges);
 		return result;
 	}
@@ -106,7 +106,7 @@ public class SonarStatisticsService {
 		DateMidnight endDateMidnight = new DateMidnight(formatter.parseMillis(endDate));
 		Interval period = new Interval(startDateMidnight, endDateMidnight);
 		for (SonarProject sonarProject : projects) {
-			String rawResults = sonarDao.getStatsForDateWindow(authenticationHelper.createAuthenticationCredentials(),
+			String rawResults = sonarDao.getStatsForDateWindow(authenticationHelper.credentialsProvider(),
 					period, sonarProject.getKey());
 			JsonElement rootElement = jsonParser.parse(rawResults);
 			JsonArray rootArray = rootElement.getAsJsonArray();

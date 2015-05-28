@@ -167,18 +167,4 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
 		config.setProperty(PROJECT_REGEX_KEY, projectRegex);
 		config.save();
 	}
-
-	public void replaceWith(final GerritConfig newGerritConfig) throws ConfigurationException {
-		this.setHost(newGerritConfig.getHost());
-		this.setHostPort(newGerritConfig.getHostPort());
-		this.setReviewersToIgnore(newGerritConfig.getReviewersToIgnore());
-		this.setTargets(newGerritConfig.getNoPeerReviewTarget(), newGerritConfig.getOnePeerReviewTarget(),
-				newGerritConfig.getTwoPeerReviewTarget(), newGerritConfig.getCollaborativeReviewTarget());
-		this.setUsernameAndPassword(newGerritConfig.getUsername(), newGerritConfig.getPassword());
-		this.setTopicRegex(newGerritConfig.getTopicRegex());
-		this.setThreadSplitSize(newGerritConfig.getThreadSplitSize());
-		this.setStartDateOffset(newGerritConfig.getStartDateOffset());
-		this.setEndDateOffset(newGerritConfig.getEndDateOffset());
-		this.setProjectRegex(newGerritConfig.getProjectRegex());
-	}
 }

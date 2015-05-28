@@ -90,7 +90,7 @@ public class GerritStatisticsHelper {
 			LOGGER.info("CAUGHT EXCEPTION");
 			result = new GerritReviewStatsResult(false, e, changes);
 		}
-
+		LOGGER.info("Thread Finished");
 		return new AsyncResult<GerritReviewStatsResult>(result);
 	}
 
@@ -101,7 +101,6 @@ public class GerritStatisticsHelper {
 		allChanges.put(changeStatus, changes);
 		for (GerritChange gerritChange : changes) {
 			int numberOfReviewers = numberOfReviewers(gerritChange);
-			// LOGGER.info("Number Of Reviewers Found: " + numberOfReviewers);
 			switch (numberOfReviewers) {
 			case -1:
 				collabrativeDevelopmentList.add(gerritChange);
@@ -154,6 +153,14 @@ public class GerritStatisticsHelper {
 
 	public Map<String, GerritReviewStats> getAllReviewStats() {
 		return allReviewStats;
+	}
+
+	public void setGerritService(final GerritService gerritService) {
+		this.gerritService = gerritService;
+	}
+
+	public void setGerritConfig(final GerritConfig gerritConfig) {
+		this.gerritConfig = gerritConfig;
 	}
 
 }

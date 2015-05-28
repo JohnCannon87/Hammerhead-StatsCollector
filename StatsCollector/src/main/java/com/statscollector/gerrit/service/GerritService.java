@@ -75,7 +75,7 @@ public class GerritService {
 
 	public List<GerritChange> getAllChanges(final String changeStatus) throws Exception {
 		JsonParser jsonParser = new JsonParser();
-		String allOpenChangesUnparsed = gerritDao.getAllChanges(authenticationHelper.createAuthenticationCredentials(),
+		String allOpenChangesUnparsed = gerritDao.getAllChanges(authenticationHelper.credentialsProvider(),
 				changeStatus);
 		// LOGGER.info(allOpenChangesUnparsed);
 		JsonElement allOpenChanges = jsonParser.parse(allOpenChangesUnparsed);
@@ -147,7 +147,7 @@ public class GerritService {
 		for (GerritChange gerritChange : changes) {
 			String changeId = gerritChange.getChangeId();
 			JsonReader jsonReader = new JsonReader(new StringReader(gerritDao.getDetails(
-					authenticationHelper.createAuthenticationCredentials(), changeId)));
+					authenticationHelper.credentialsProvider(), changeId)));
 			jsonReader.setLenient(true);
 			try {
 				result.put(changeId, translateToDetails(jsonParser.parse(jsonReader)));

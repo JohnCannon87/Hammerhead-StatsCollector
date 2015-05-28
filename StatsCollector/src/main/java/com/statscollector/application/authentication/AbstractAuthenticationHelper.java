@@ -5,6 +5,7 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.springframework.context.annotation.Bean;
 
 import com.statscollector.application.config.WebConfig;
 
@@ -20,7 +21,8 @@ public abstract class AbstractAuthenticationHelper {
 	private CredentialsProvider credsProvider;
 	private boolean credsProviderCreated = false;
 
-	public CredentialsProvider createAuthenticationCredentials() {
+	@Bean
+	public CredentialsProvider credentialsProvider() {
 		if (!credsProviderCreated || credentialsHaveChanged(credsProvider)) {
 			WebConfig config = getConfig();
 			credsProvider = new BasicCredentialsProvider();
