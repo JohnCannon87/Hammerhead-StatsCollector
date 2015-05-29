@@ -8,7 +8,7 @@ Build Status
 ------------
 [![Build Status](https://travis-ci.org/JohnCannon87/Hammerhead-StatsCollector.svg?branch=master)](https://travis-ci.org/JohnCannon87/Hammerhead-StatsCollector)
 [![Coverage Status](https://coveralls.io/repos/JohnCannon87/Hammerhead-StatsCollector/badge.svg)](https://coveralls.io/r/JohnCannon87/Hammerhead-StatsCollector)
-[!Coverity Status](https://scan.coverity.com/projects/5290/badge.svg)](https://scan.coverity.com/projects/5290)
+[![ Status](https://scan.coverity.com/projects/5290/badge.svg)](https://scan.coverity.com/projects/5290)
 
 Usage
 -----
