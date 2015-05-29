@@ -4,6 +4,10 @@ Simple configurable web application to collect and display statistics from vario
 
 Designed to be displayed on a TV or other visual device to allow software teams to view statistics.
 
+Build Status
+------------
+https://travis-ci.org/JohnCannon87/Hammerhead-StatsCollector.svg?branch=master
+
 Usage
 -----
 
