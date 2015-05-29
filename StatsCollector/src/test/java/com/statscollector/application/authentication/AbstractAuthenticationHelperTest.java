@@ -49,6 +49,7 @@ public class AbstractAuthenticationHelperTest {
 		// Now Change Config
 		String newPassword = "NewPassword";
 		Mockito.when(testConfig.getPassword()).thenReturn(newPassword);
+		credentialsProvider = testHelper.credentialsProvider();
 		Credentials newCredentials = credentialsProvider.getCredentials(AuthScope.ANY);
 		assertEquals(TEST_USERNAME, newCredentials.getUserPrincipal().getName());
 		assertEquals(newPassword, newCredentials.getPassword());
