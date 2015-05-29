@@ -23,6 +23,7 @@ Third Party Libraries
 ---------------------
 
 Stats Collector uses the following projects:
+
 JS
 * [Twitter Bootstrap](http://getbootstrap.com/)
 * [AngularJS](https://angularjs.org/)
