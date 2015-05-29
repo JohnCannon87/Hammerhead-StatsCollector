@@ -44,6 +44,8 @@ public abstract class AbstractAuthenticationHelper {
 				// No credentials found auth scope must have
 				// changed.
 				return true;
+			} else if (null == credentials.getPassword()) {
+				return true;
 			} else {
 				boolean passwordSame = credentials.getPassword().equals(config.getPassword());
 				boolean usernameSame = credentials.getUserPrincipal().getName().equals(config.getUsername());

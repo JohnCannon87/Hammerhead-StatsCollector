@@ -3,9 +3,11 @@ package com.statscollector.application.config;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import com.statscollector.application.authentication.EncryptionHelper;
+
 public abstract class AbstractWebConfig {
 
-	protected final PropertiesConfiguration config;
+	protected PropertiesConfiguration config;
 
 	public AbstractWebConfig() throws ConfigurationException {
 		config = new PropertiesConfiguration(System.getProperty(getConfigFilePathKey(), getDefaultFilePath()));
@@ -52,16 +54,21 @@ public abstract class AbstractWebConfig {
 
 	public void setUsernameAndPassword(final String username, final String password) throws ConfigurationException {
 		config.setProperty(getUsernameKey(), username);
-		config.setProperty(getPasswordKey(), password);
+		config.setProperty(getPasswordKey(), EncryptionHelper.encryptPassword(password));
 		config.save();
 	}
 
 	public String getPassword() {
-		return config.getString(getPasswordKey());
+		return EncryptionHelper.decryptPassword(config.getString(getPasswordKey()));
 	}
 
 	public void setPassword(final String password) throws ConfigurationException {
 		config.setProperty(getPasswordKey(), password);
 		config.save();
 	}
+
+	public void setConfig(final PropertiesConfiguration config) {
+		this.config = config;
+	}
+
 }
