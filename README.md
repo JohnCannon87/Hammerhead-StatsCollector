@@ -23,7 +23,7 @@ Third Party Libraries
 ---------------------
 
 Stats Collector uses the following projects:
-
+JS
 * [Twitter Bootstrap](http://getbootstrap.com/)
 * [AngularJS](https://angularjs.org/)
 * [UIBootstrap](http://angular-ui.github.io/bootstrap/)
@@ -32,6 +32,7 @@ Stats Collector uses the following projects:
 * [FileSaver.js](https://github.com/eligrey/FileSaver.js/)
 * [ng-file-upload](https://github.com/danialfarid/ng-file-upload)
 
+Java
 * [SpringBoot](http://projects.spring.io/spring-boot/)
 * [google-gson](https://github.com/google/gson)
 * [google-guava](https://github.com/google/guava)
