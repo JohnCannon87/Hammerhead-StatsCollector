@@ -32,6 +32,7 @@ JS
 * [angular-chart.js](http://jtblin.github.io/angular-chart.js/)
 * [FileSaver.js](https://github.com/eligrey/FileSaver.js/)
 * [ng-file-upload](https://github.com/danialfarid/ng-file-upload)
+* [cryptoJS](https://code.google.com/p/crypto-js/)
 
 Java
 * [SpringBoot](http://projects.spring.io/spring-boot/)
