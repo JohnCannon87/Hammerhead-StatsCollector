@@ -7,6 +7,7 @@ Designed to be displayed on a TV or other visual device to allow software teams 
 Build Status
 ------------
 [![Build Status](https://travis-ci.org/JohnCannon87/Hammerhead-StatsCollector.svg?branch=master)](https://travis-ci.org/JohnCannon87/Hammerhead-StatsCollector)
+[![Coverage Status](https://coveralls.io/repos/JohnCannon87/Hammerhead-StatsCollector/badge.svg)](https://coveralls.io/r/JohnCannon87/Hammerhead-StatsCollector)
 
 Usage
 -----
