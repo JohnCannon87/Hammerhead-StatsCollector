@@ -16,9 +16,22 @@ Usage
 * Copy the contents of the "dist" folder to a directory on the machine you wish to run the application on.
 * Alter the .sh or .bat script to specify the port you wish the web interface to run on.
 * Set your initial parameters in the GerritStatistics.properties file.
-* Open up http://localhost:YOUR-PORT (default is 8080)
+* Run .bat or .sh file as appropriate.
+* Open up https://localhost:YOUR-PORT (default is 8080)
 * Go to the config tab at the top and entry your Gerrit server details (See below for help setting the thread limits)
 * Setup on a browser to show  the data ! (currently manual refresh is required)
+
+To Change The Default Port
+--------------------------
+
+* Open the .bat or .sh file and update the port in there.
+
+To Create Your Own SSL Key
+--------------------------
+
+* Generate a self signed p12 file (or use a real one)
+* Place it in the same folder as the jar file (replacing keystore.p12)
+* Update the keystore password in application.properties to match the one for your file
 
 Third Party Libraries
 ---------------------
