@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.google.gerrit.extensions.common.ChangeInfo;
 import com.statscollector.gerrit.config.GerritConfig;
-import com.statscollector.gerrit.model.GerritChange;
 import com.statscollector.gerrit.model.GerritReviewStats;
 import com.statscollector.gerrit.model.GerritReviewStatsResult;
 import com.statscollector.gerrit.service.filter.FilterDateUpdatedPredicate;
@@ -41,7 +41,7 @@ public class GerritStatisticsHelper {
 	@Autowired
 	private GerritConfig gerritConfig;
 
-	final Map<String, List<GerritChange>> allChanges = new ConcurrentHashMap<>();
+	final Map<String, List<ChangeInfo>> allChanges = new ConcurrentHashMap<>();
 
 	final Map<String, GerritReviewStats> allReviewStats = new ConcurrentHashMap<>();
 
@@ -55,7 +55,7 @@ public class GerritStatisticsHelper {
 	 * @param projectNameRegex
 	 * @return
 	 */
-	public List<GerritChange> filterChangesBasedOnProjectName(final List<GerritChange> toBeFiltered,
+	public List<ChangeInfo> filterChangesBasedOnProjectName(final List<ChangeInfo> toBeFiltered,
 			final String projectNameRegex) {
 		return Lists.newArrayList(Collections2.filter(toBeFiltered, new FilterProjectNamePredicate(projectNameRegex)));
 	}
@@ -69,7 +69,7 @@ public class GerritStatisticsHelper {
 	 * @param endDate
 	 * @return
 	 */
-	public List<GerritChange> filterChangesBasedOnDateRange(final List<GerritChange> toBeFiltered,
+	public List<ChangeInfo> filterChangesBasedOnDateRange(final List<ChangeInfo> toBeFiltered,
 			final DateTime startDate, final DateTime endDate) {
 		return Lists
 				.newArrayList(Collections2.filter(toBeFiltered, new FilterDateUpdatedPredicate(startDate, endDate)));
@@ -77,9 +77,9 @@ public class GerritStatisticsHelper {
 
 	@Async
 	public Future<GerritReviewStatsResult> populateReviewStatsAsync(final String changeStatus,
-			final List<GerritChange> noPeerReviewList, final List<GerritChange> onePeerReviewList,
-			final List<GerritChange> twoPlusPeerReviewList, final List<GerritChange> collabrativeDevelopmentList,
-			final List<GerritChange> changes) throws IOException, URISyntaxException {
+			final List<ChangeInfo> noPeerReviewList, final List<ChangeInfo> onePeerReviewList,
+			final List<ChangeInfo> twoPlusPeerReviewList, final List<ChangeInfo> collabrativeDevelopmentList,
+			final List<ChangeInfo> changes) throws IOException, URISyntaxException {
 		LOGGER.info("Starting Thread To Process Changes");
 		GerritReviewStatsResult result = null;
 		try {
@@ -94,12 +94,12 @@ public class GerritStatisticsHelper {
 		return new AsyncResult<GerritReviewStatsResult>(result);
 	}
 
-	public void populateReviewStats(final String changeStatus, final List<GerritChange> noPeerReviewList,
-			final List<GerritChange> onePeerReviewList, final List<GerritChange> twoPlusPeerReviewList,
-			final List<GerritChange> collabrativeDevelopmentList, final List<GerritChange> changes) throws Exception {
+	public void populateReviewStats(final String changeStatus, final List<ChangeInfo> noPeerReviewList,
+			final List<ChangeInfo> onePeerReviewList, final List<ChangeInfo> twoPlusPeerReviewList,
+			final List<ChangeInfo> collabrativeDevelopmentList, final List<ChangeInfo> changes) throws Exception {
 		gerritService.populateChangeReviewers(changes);
 		allChanges.put(changeStatus, changes);
-		for (GerritChange gerritChange : changes) {
+		for (ChangeInfo gerritChange : changes) {
 			int numberOfReviewers = numberOfReviewers(gerritChange);
 			switch (numberOfReviewers) {
 			case -1:
@@ -128,9 +128,10 @@ public class GerritStatisticsHelper {
 	 * @param gerritChange
 	 * @return
 	 */
-	private int numberOfReviewers(final GerritChange gerritChange) {
+	private int numberOfReviewers(final ChangeInfo gerritChange) {
 		// LOGGER.info("Calculating changes for change: " + gerritChange);
-		String owner = gerritChange.getOwner();
+		String owner = gerritChange.owner.username;
+
 		Map<String, Integer> reviewers = gerritChange.getReviewers();
 		Set<String> reviewersUsernames = reviewers.keySet();
 		List<String> reviewersList = new ArrayList<>();
@@ -147,7 +148,7 @@ public class GerritStatisticsHelper {
 		return reviewersList.size();
 	}
 
-	public Map<String, List<GerritChange>> getAllChanges() {
+	public Map<String, List<ChangeInfo>> getAllChanges() {
 		return allChanges;
 	}
 

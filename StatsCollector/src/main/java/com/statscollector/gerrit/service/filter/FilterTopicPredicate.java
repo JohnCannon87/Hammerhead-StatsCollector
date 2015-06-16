@@ -5,9 +5,9 @@ import java.util.List;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.statscollector.gerrit.model.GerritChange;
+import com.google.gerrit.extensions.common.ChangeInfo;
 
-public class FilterTopicPredicate implements Predicate<GerritChange>, GerritChangeFilter {
+public class FilterTopicPredicate implements Predicate<ChangeInfo>, GerritChangeFilter {
 
 	private final String topicNameRegex;
 
@@ -17,12 +17,12 @@ public class FilterTopicPredicate implements Predicate<GerritChange>, GerritChan
 	}
 
 	@Override
-	public boolean apply(final GerritChange input) {
-		return !input.getTopic().matches(topicNameRegex);
+	public boolean apply(final ChangeInfo input) {
+		return !input.topic.matches(topicNameRegex);
 	}
 
 	@Override
-	public List<GerritChange> filter(final List<GerritChange> toBeFiltered) {
+	public List<ChangeInfo> filter(final List<ChangeInfo> toBeFiltered) {
 		return Lists.newArrayList(Collections2.filter(toBeFiltered, this));
 	}
 

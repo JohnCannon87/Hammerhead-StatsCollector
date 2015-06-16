@@ -3,17 +3,20 @@ package com.statscollector.gerrit.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gerrit.extensions.common.ChangeInfo;
+
 public class GerritReviewStats {
 
-	private final List<GerritChange> noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList,
-	collabrativeDevelopmentList;
-	
+	private final List<ChangeInfo> noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList,
+			collabrativeDevelopmentList;
+
 	private String status;
 
 	private Boolean error;
-	
-	private GerritReviewStats(final List<GerritChange> noPeerReviewList, final List<GerritChange> onePeerReviewList,
-			final List<GerritChange> twoPlusPeerReviewList, final List<GerritChange> collabrativeDevelopmentList, final String status, final Boolean error) {
+
+	private GerritReviewStats(final List<ChangeInfo> noPeerReviewList, final List<ChangeInfo> onePeerReviewList,
+			final List<ChangeInfo> twoPlusPeerReviewList, final List<ChangeInfo> collabrativeDevelopmentList,
+			final String status, final Boolean error) {
 		super();
 		this.noPeerReviewList = noPeerReviewList;
 		this.onePeerReviewList = onePeerReviewList;
@@ -23,19 +26,19 @@ public class GerritReviewStats {
 		this.error = error;
 	}
 
-	public List<GerritChange> getNoPeerReviewList() {
+	public List<ChangeInfo> getNoPeerReviewList() {
 		return noPeerReviewList;
 	}
 
-	public List<GerritChange> getOnePeerReviewList() {
+	public List<ChangeInfo> getOnePeerReviewList() {
 		return onePeerReviewList;
 	}
 
-	public List<GerritChange> getTwoPlusPeerReviewList() {
+	public List<ChangeInfo> getTwoPlusPeerReviewList() {
 		return twoPlusPeerReviewList;
 	}
 
-	public List<GerritChange> getCollabrativeDevelopmentList() {
+	public List<ChangeInfo> getCollabrativeDevelopmentList() {
 		return collabrativeDevelopmentList;
 	}
 
@@ -74,13 +77,13 @@ public class GerritReviewStats {
 	public int getTotalReviewsCount() {
 		return getNoPeerReviewCount() + getOnePeerReviewCount() + getTwoPlusPeerReviewCount()
 				+ getCollabrativeDevelopmentCount();
-	}	
+	}
 
 	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(final String status) {
 		this.status = status;
 	}
 
@@ -88,21 +91,19 @@ public class GerritReviewStats {
 		return error;
 	}
 
-	public void setError(Boolean error) {
+	public void setError(final Boolean error) {
 		this.error = error;
 	}
 
-	public static GerritReviewStats buildStatsObjectWithValuesAndStatus(
-			List<GerritChange> noPeerReviewList,
-			List<GerritChange> onePeerReviewList,
-			List<GerritChange> twoPlusPeerReviewList,
-			List<GerritChange> collabrativeDevelopmentList, String status, Boolean error) {
-		return new GerritReviewStats(noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList, collabrativeDevelopmentList, status, error);
+	public static GerritReviewStats buildStatsObjectWithValuesAndStatus(final List<ChangeInfo> noPeerReviewList,
+			final List<ChangeInfo> onePeerReviewList, final List<ChangeInfo> twoPlusPeerReviewList,
+			final List<ChangeInfo> collabrativeDevelopmentList, final String status, final Boolean error) {
+		return new GerritReviewStats(noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList,
+				collabrativeDevelopmentList, status, error);
 	}
 
-	public static GerritReviewStats buildEmptyStatsObjectWithStatus(
-			String status, Boolean error) {
-		List<GerritChange> emptyList = new ArrayList<GerritChange>();
+	public static GerritReviewStats buildEmptyStatsObjectWithStatus(final String status, final Boolean error) {
+		List<ChangeInfo> emptyList = new ArrayList<ChangeInfo>();
 		return new GerritReviewStats(emptyList, emptyList, emptyList, emptyList, status, error);
 	}
 

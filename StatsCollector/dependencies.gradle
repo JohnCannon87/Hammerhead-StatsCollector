@@ -14,6 +14,7 @@ dependencies {
 	compile group:'javax.servlet', name:'jstl', version:jstlVersion
 	compile group:'commons-io', name:'commons-io', version:commonsIoVersion
 	compile group:'commons-beanutils', name:'commons-beanutils', version:beanUtils
+	compile group:'com.google.gerrit', name:'gerrit-extension-api', version:gerritExtentionsVersion
 	
 	
 	/* Test Compile dependencies */

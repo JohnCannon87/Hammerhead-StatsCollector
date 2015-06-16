@@ -7,9 +7,9 @@ import org.joda.time.DateTime;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.statscollector.gerrit.model.GerritChange;
+import com.google.gerrit.extensions.common.ChangeInfo;
 
-public class FilterDateUpdatedPredicate implements Predicate<GerritChange>, GerritChangeFilter {
+public class FilterDateUpdatedPredicate implements Predicate<ChangeInfo>, GerritChangeFilter {
 
 	private final DateTime startDate, endDate;
 
@@ -21,13 +21,13 @@ public class FilterDateUpdatedPredicate implements Predicate<GerritChange>, Gerr
 	}
 
 	@Override
-	public boolean apply(final GerritChange input) {
-		DateTime updated = input.getUpdated();
+	public boolean apply(final ChangeInfo input) {
+		DateTime updated = new DateTime(input.updated);
 		return updated.isAfter(startDate) && updated.isBefore(endDate);
 	}
 
 	@Override
-	public List<GerritChange> filter(final List<GerritChange> toBeFiltered) {
+	public List<ChangeInfo> filter(final List<ChangeInfo> toBeFiltered) {
 		return Lists.newArrayList(Collections2.filter(toBeFiltered, this));
 	}
 

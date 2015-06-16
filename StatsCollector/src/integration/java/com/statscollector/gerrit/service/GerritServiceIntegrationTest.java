@@ -11,12 +11,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.google.gerrit.extensions.common.ChangeInfo;
 import com.statscollector.gerrit.authentication.GerritAuthenticationHelper;
 import com.statscollector.gerrit.config.GerritConfig;
 import com.statscollector.gerrit.dao.GerritDao;
 import com.statscollector.gerrit.enums.StatusEnum;
-import com.statscollector.gerrit.model.GerritChange;
-import com.statscollector.gerrit.model.GerritChangeDetails;
 
 public class GerritServiceIntegrationTest {
 
@@ -40,23 +39,23 @@ public class GerritServiceIntegrationTest {
 
 	@Test
 	public void testGetAllChanges() throws Exception {
-		List<GerritChange> allChanges = statisticsService.getAllChanges(StatusEnum.OPEN.toString());
+		List<ChangeInfo> allChanges = statisticsService.getAllChanges(StatusEnum.OPEN.toString());
 		assertNotNull(allChanges);
 		assertTrue(allChanges.size() > 0);
 	}
 
 	@Test
 	public void testGetGerritChangeDetails() throws Exception {
-		List<GerritChange> allChanges = statisticsService.getAllChanges(StatusEnum.OPEN.toString());
+		List<ChangeInfo> allChanges = statisticsService.getAllChanges(StatusEnum.OPEN.toString());
 		assertNotNull(allChanges);
 		assertTrue(allChanges.size() > 0);
-		Map<String, GerritChangeDetails> gerritChangeDetails = statisticsService.getGerritChangeDetails(allChanges);
-		Collection<GerritChangeDetails> values = gerritChangeDetails.values();
+		Map<String, ChangeInfo> gerritChangeDetails = statisticsService.getGerritChangeDetails(allChanges);
+		Collection<ChangeInfo> values = gerritChangeDetails.values();
 		assertNotNull(values);
 		assertTrue(values.size() > 0);
-		for (GerritChangeDetails details : values) {
+		for (ChangeInfo details : values) {
 			assertNotNull(details);
-			assertNotNull(details.getChangeNumber());
+			assertNotNull(details.changeId);
 		}
 	}
 

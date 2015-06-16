@@ -2,20 +2,21 @@ package com.statscollector.gerrit.model;
 
 import java.util.List;
 
+import com.google.gerrit.extensions.common.ChangeInfo;
+
 public class GerritReviewStatsResult {
 
-	private Boolean success;
+	private final Boolean success;
 
-	private Throwable error;
+	private final Throwable error;
 
-	private List<GerritChange> changes;
+	private final List<ChangeInfo> changes;
 
-	public GerritReviewStatsResult(Boolean success, List<GerritChange> changes) {
+	public GerritReviewStatsResult(final Boolean success, final List<ChangeInfo> changes) {
 		this(success, null, changes);
 	}
 
-	public GerritReviewStatsResult(Boolean success, Throwable error,
-			List<GerritChange> changes) {
+	public GerritReviewStatsResult(final Boolean success, final Throwable error, final List<ChangeInfo> changes) {
 		this.success = success;
 		this.error = error;
 		this.changes = changes;
@@ -29,7 +30,7 @@ public class GerritReviewStatsResult {
 		return error;
 	}
 
-	public List<GerritChange> getChanges() {
+	public List<ChangeInfo> getChanges() {
 		return changes;
 	}
 

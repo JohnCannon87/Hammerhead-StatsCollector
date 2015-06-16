@@ -13,15 +13,16 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.statscollector.gerrit.authentication.GerritAuthenticationHelper;
 import com.statscollector.gerrit.dao.GerritDao;
-import com.statscollector.gerrit.model.GerritChange;
-import com.statscollector.gerrit.model.GerritChangeDetails;
 
 /**
  * I'm a service that performs some business logic to access the information
@@ -73,7 +74,7 @@ public class GerritService {
 
 	final static Logger LOGGER = Logger.getLogger(GerritService.class);
 
-	public List<GerritChange> getAllChanges(final String changeStatus) throws Exception {
+	public List<ChangeInfo> getAllChanges(final String changeStatus) throws Exception {
 		JsonParser jsonParser = new JsonParser();
 		String allOpenChangesUnparsed = gerritDao.getAllChanges(authenticationHelper.credentialsProvider(),
 				changeStatus);
@@ -82,8 +83,8 @@ public class GerritService {
 		return translateToChanges(allOpenChanges);
 	}
 
-	private List<GerritChange> translateToChanges(final JsonElement rawJsonElement) {
-		List<GerritChange> results = new ArrayList<GerritChange>();
+	private List<ChangeInfo> translateToChanges(final JsonElement rawJsonElement) {
+		List<ChangeInfo> results = new ArrayList<ChangeInfo>();
 		if (rawJsonElement.isJsonArray()) {
 			JsonArray rawJsonArray = rawJsonElement.getAsJsonArray();
 			for (JsonElement jsonElement : rawJsonArray) {
@@ -96,25 +97,33 @@ public class GerritService {
 		}
 	}
 
-	private GerritChange translateToChange(final JsonElement jsonElement) {
-		if (jsonElement.isJsonObject()) {
-			JsonObject rawJsonObject = jsonElement.getAsJsonObject();
-			String id = rawJsonObject.get(ID_REF).getAsString();
-			String changeId = rawJsonObject.get(CHANGE_ID_REF).getAsString();
-			String project = rawJsonObject.get(PROJECT_REF).getAsString();
-			String owner = rawJsonObject.get(OWNER_REF).getAsJsonObject().get(OWNER_NAME_REF).getAsString();
-			String topic = "";
-			try {
-				topic = rawJsonObject.get(TOPIC_REF).getAsString();
-			} catch (Exception e) {
-				// No Topic Found, Ignore
-			}
-			String branch = rawJsonObject.get(BRANCH_REF).getAsString();
-			DateTime created = parseDateTime(rawJsonObject.get(CREATED_REF).getAsString());
-			DateTime updated = parseDateTime(rawJsonObject.get(UPDATED_REF).getAsString());
-			return new GerritChange(id, changeId, project, owner, created, updated, topic, branch);
-		}
-		return null;
+	private ChangeInfo translateToChange(final JsonElement jsonElement) {
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+		ChangeInfo result = gson.fromJson(jsonElement, ChangeInfo.class);
+		return result;
+		// if (jsonElement.isJsonObject()) {
+		// JsonObject rawJsonObject = jsonElement.getAsJsonObject();
+		// String id = rawJsonObject.get(ID_REF).getAsString();
+		// String changeId = rawJsonObject.get(CHANGE_ID_REF).getAsString();
+		// String project = rawJsonObject.get(PROJECT_REF).getAsString();
+		// String owner =
+		// rawJsonObject.get(OWNER_REF).getAsJsonObject().get(OWNER_NAME_REF).getAsString();
+		// String topic = "";
+		// try {
+		// topic = rawJsonObject.get(TOPIC_REF).getAsString();
+		// } catch (Exception e) {
+		// // No Topic Found, Ignore
+		// }
+		// String branch = rawJsonObject.get(BRANCH_REF).getAsString();
+		// DateTime created =
+		// parseDateTime(rawJsonObject.get(CREATED_REF).getAsString());
+		// DateTime updated =
+		// parseDateTime(rawJsonObject.get(UPDATED_REF).getAsString());
+		// return new GerritChange(id, changeId, project, owner, created,
+		// updated, topic, branch);
+		// }
+		// return null;
 	}
 
 	private DateTime parseDateTime(final String dateTimeString) {
@@ -130,62 +139,26 @@ public class GerritService {
 		this.authenticationHelper = authenticationHelper;
 	}
 
-	public void populateChangeReviewers(final List<GerritChange> changes) throws Exception {
-		Map<String, GerritChangeDetails> gerritChangeDetails = getGerritChangeDetails(changes);
-		for (GerritChange gerritChange : changes) {
-			GerritChangeDetails changeDetail = gerritChangeDetails.get(gerritChange.getChangeId());
-			if (null != changeDetail) {
-				gerritChange.setReviewers(changeDetail.getReviewers());
-				gerritChange.setChangeNumber(changeDetail.getChangeNumber());
-			}
-		}
+	public void populateChangeReviewers(final List<ChangeInfo> changes) throws Exception {
+		Map<String, ChangeInfo> gerritChangeDetails = getGerritChangeDetails(changes);
 	}
 
-	public Map<String, GerritChangeDetails> getGerritChangeDetails(final List<GerritChange> changes) throws Exception {
+	public Map<String, ChangeInfo> getGerritChangeDetails(final List<ChangeInfo> changes) throws Exception {
 		JsonParser jsonParser = new JsonParser();
-		HashMap<String, GerritChangeDetails> result = new HashMap<>();
-		for (GerritChange gerritChange : changes) {
-			String changeId = gerritChange.getChangeId();
+		HashMap<String, ChangeInfo> result = new HashMap<>();
+		for (ChangeInfo gerritChange : changes) {
+			String changeId = gerritChange.changeId;
 			JsonReader jsonReader = new JsonReader(new StringReader(gerritDao.getDetails(
 					authenticationHelper.credentialsProvider(), changeId)));
 			jsonReader.setLenient(true);
 			try {
-				result.put(changeId, translateToDetails(jsonParser.parse(jsonReader)));
+				result.put(changeId, translateToChange(jsonParser.parse(jsonReader)));
 			} catch (Exception e) {
 				// LOGGER.error("Error found in processing changeId: " +
 				// changeId, e);
 			}
 		}
 		return result;
-	}
-
-	private GerritChangeDetails translateToDetails(final JsonElement detailsJson) {
-		GerritChangeDetails gerritChangeDetails = new GerritChangeDetails();
-		JsonElement labelsElement = detailsJson.getAsJsonObject().get(LABELS_REF); // TODO:
-		// Exception
-		// being
-		// thrown
-		// here,
-		// Why
-		// ?
-		JsonElement codeReviewElement = labelsElement.getAsJsonObject().get(CODE_REVIEW_REF);
-		JsonElement allReference = codeReviewElement.getAsJsonObject().get(ALL_REF);
-		if (allReference != null) {
-			JsonArray allArray = allReference.getAsJsonArray();
-			for (JsonElement jsonElement : allArray) {
-				JsonObject review = jsonElement.getAsJsonObject();
-				if (null != review) {
-					String username = review.get(USERNAME_REF).getAsString();
-					Integer reviewValue = null;
-					if (review.get(VALUE_REF) != null) {
-						reviewValue = review.get(VALUE_REF).getAsInt();
-					}
-					gerritChangeDetails.addReviewer(username, reviewValue);
-				}
-			}
-		}
-		gerritChangeDetails.setChangeNumber(detailsJson.getAsJsonObject().get(NUMBER_REF).getAsInt());
-		return gerritChangeDetails;
 	}
 
 }

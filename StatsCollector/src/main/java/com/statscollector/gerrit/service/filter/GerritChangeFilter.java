@@ -2,10 +2,10 @@ package com.statscollector.gerrit.service.filter;
 
 import java.util.List;
 
-import com.statscollector.gerrit.model.GerritChange;
+import com.google.gerrit.extensions.common.ChangeInfo;
 
 public interface GerritChangeFilter {
 
-	public List<GerritChange> filter(List<GerritChange> toBeFiltered);
+	public List<ChangeInfo> filter(List<ChangeInfo> toBeFiltered);
 
 }
