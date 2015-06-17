@@ -3,6 +3,7 @@ package com.statscollector.gerrit.service;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -13,8 +14,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
+import com.google.gerrit.extensions.common.ChangeInfo;
 import com.statscollector.gerrit.config.GerritConfig;
-import com.statscollector.gerrit.model.GerritChange;
 import com.statscollector.gerrit.model.GerritReviewStats;
 import com.statscollector.gerrit.model.GerritReviewStatsResult;
 import com.statscollector.gerrit.service.filter.FilterDateUpdatedPredicate;
@@ -61,7 +62,7 @@ public class GerritStatisticsService {
 	 * @throws IOException
 	 * @throws URISyntaxException
 	 */
-	public List<GerritChange> getChangesBasedOnParameters(final String changeStatus, final String projectFilterRegex,
+	public List<ChangeInfo> getChangesBasedOnParameters(final String changeStatus, final String projectFilterRegex,
 			final DateTime startDate, final DateTime endDate, final String topicNameRegex) throws IOException,
 			URISyntaxException {
 		return filterChanges(gerritStatisticsHelper.getAllChanges().get(changeStatus),
@@ -76,8 +77,8 @@ public class GerritStatisticsService {
 	 * @param filters
 	 * @return
 	 */
-	private List<GerritChange> filterChanges(final List<GerritChange> allChanges, final List<GerritChangeFilter> filters) {
-		List<GerritChange> results = Lists.newArrayList(allChanges);
+	private List<ChangeInfo> filterChanges(final List<ChangeInfo> allChanges, final List<GerritChangeFilter> filters) {
+		List<ChangeInfo> results = Lists.newArrayList(allChanges);
 		for (GerritChangeFilter filter : filters) {
 			results = filter.filter(results);
 		}
@@ -121,13 +122,13 @@ public class GerritStatisticsService {
 				refreshInProgress = true;
 				for (String changeStatus : CHANGE_STATUSES) {
 					long start = System.currentTimeMillis();
-					List<GerritChange> noPeerReviewList = new ArrayList<>();
-					List<GerritChange> onePeerReviewList = new ArrayList<>();
-					List<GerritChange> twoPlusPeerReviewList = new ArrayList<>();
-					List<GerritChange> collabrativeDevelopmentList = new ArrayList<>();
+					List<ChangeInfo> noPeerReviewList = new ArrayList<>();
+					List<ChangeInfo> onePeerReviewList = new ArrayList<>();
+					List<ChangeInfo> twoPlusPeerReviewList = new ArrayList<>();
+					List<ChangeInfo> collabrativeDevelopmentList = new ArrayList<>();
 					LOGGER.info("Getting Changes For Status: " + changeStatus);
 
-					List<GerritChange> changes = gerritService.getAllChanges(changeStatus);
+					List<ChangeInfo> changes = gerritService.getAllChanges(changeStatus);
 
 					Integer threadSplitSize = gerritConfig.getThreadSplitSize();
 
@@ -155,8 +156,13 @@ public class GerritStatisticsService {
 						gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : 1 Thread");
 					} else {
 						List<Future<GerritReviewStatsResult>> asyncResults = new ArrayList<>();
-						List<List<GerritChange>> partitionedLists = Lists.partition(changes, threadSplitSize);
-						for (List<GerritChange> list : partitionedLists) {
+						List<List<ChangeInfo>> partitionedLists;
+						if (threadSplitSize > 0) {
+							partitionedLists = Lists.partition(changes, threadSplitSize);
+						} else {
+							partitionedLists = Arrays.asList(changes);
+						}
+						for (List<ChangeInfo> list : partitionedLists) {
 							asyncResults.add(gerritStatisticsHelper.populateReviewStatsAsync(changeStatus,
 									noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList,
 									collabrativeDevelopmentList, list));
@@ -175,18 +181,18 @@ public class GerritStatisticsService {
 								gerritReviewStats.setStatus(gerritReviewStats.getStatus()
 										+ "Error Thrown During Processing: Null Pointer Returned, ");
 								gerritReviewStats
-										.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
+								.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
 							} else if (!result.getSuccess()) {
 								gerritReviewStats.setStatus(gerritReviewStats.getStatus()
 										+ "Error Thrown During Processing: " + result.getError().getMessage() + ", ");
 								gerritReviewStats
-										.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-												.getSuccess()));
+								.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+										.getSuccess()));
 							} else {
 								gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK, ");
 								gerritReviewStats
-										.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-												.getSuccess()));
+								.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+										.getSuccess()));
 							}
 						}
 						gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : "

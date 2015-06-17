@@ -3,6 +3,7 @@ package com.statscollector.gerrit.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -13,10 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.google.gerrit.extensions.common.ChangeInfo;
 import com.statscollector.gerrit.authentication.GerritAuthenticationHelper;
 import com.statscollector.gerrit.config.GerritConfig;
 import com.statscollector.gerrit.dao.GerritDao;
-import com.statscollector.gerrit.model.GerritChange;
 import com.statscollector.gerrit.model.GerritReviewStatsResult;
 
 public class GerritStatisticsHelperTest {
@@ -47,18 +48,18 @@ public class GerritStatisticsHelperTest {
 
 	@Test
 	public void testFilterChangesBasedOnProjectName() {
-		GerritChange doesMatchInput = Mockito.mock(GerritChange.class);
-		GerritChange doesntMatchInput = Mockito.mock(GerritChange.class);
-		Mockito.when(doesMatchInput.getProject()).thenReturn("test");
-		Mockito.when(doesntMatchInput.getProject()).thenReturn("fail");
-		List<GerritChange> filterList = new ArrayList<GerritChange>();
+		ChangeInfo doesMatchInput = new ChangeInfo();
+		ChangeInfo doesntMatchInput = new ChangeInfo();
+		doesMatchInput.project = "test";
+		doesntMatchInput.project = "fail";
+		List<ChangeInfo> filterList = new ArrayList<ChangeInfo>();
 		filterList.add(doesMatchInput);
 		filterList.add(doesntMatchInput);
 		String testRegex = ".*test.*";
-		List<GerritChange> filterChangesBasedOnProjectName = gerritStatisticsHelper.filterChangesBasedOnProjectName(
+		List<ChangeInfo> filterChangesBasedOnProjectName = gerritStatisticsHelper.filterChangesBasedOnProjectName(
 				filterList, testRegex);
 		assertTrue(1 == filterChangesBasedOnProjectName.size());
-		GerritChange gerritChange = filterChangesBasedOnProjectName.get(0);
+		ChangeInfo gerritChange = filterChangesBasedOnProjectName.get(0);
 		assertEquals(doesMatchInput, gerritChange);
 	}
 
@@ -69,30 +70,30 @@ public class GerritStatisticsHelperTest {
 		DateTime afterFilterDate = new DateTime(0).withYear(2017).withMonthOfYear(1).withDayOfMonth(1);
 		DateTime startDate = new DateTime(0).withYear(2015).withMonthOfYear(1).withDayOfMonth(1);
 		DateTime endDate = new DateTime(0).withYear(2016).withMonthOfYear(1).withDayOfMonth(1);
-		GerritChange afterInput = Mockito.mock(GerritChange.class);
-		GerritChange beforeInput = Mockito.mock(GerritChange.class);
-		GerritChange duringInput = Mockito.mock(GerritChange.class);
-		Mockito.when(afterInput.getUpdated()).thenReturn(afterFilterDate);
-		Mockito.when(beforeInput.getUpdated()).thenReturn(beforeFilterDate);
-		Mockito.when(duringInput.getUpdated()).thenReturn(duringFilterDate);
-		List<GerritChange> filterList = new ArrayList<GerritChange>();
+		ChangeInfo afterInput = new ChangeInfo();
+		ChangeInfo beforeInput = new ChangeInfo();
+		ChangeInfo duringInput = new ChangeInfo();
+		afterInput.updated = new Timestamp(afterFilterDate.getMillis());
+		beforeInput.updated = new Timestamp(beforeFilterDate.getMillis());
+		duringInput.updated = new Timestamp(duringFilterDate.getMillis());
+		List<ChangeInfo> filterList = new ArrayList<ChangeInfo>();
 		filterList.add(afterInput);
 		filterList.add(beforeInput);
 		filterList.add(duringInput);
-		List<GerritChange> filterChangesBasedOnDateRange = gerritStatisticsHelper.filterChangesBasedOnDateRange(
+		List<ChangeInfo> filterChangesBasedOnDateRange = gerritStatisticsHelper.filterChangesBasedOnDateRange(
 				filterList, startDate, endDate);
 		assertTrue(1 == filterChangesBasedOnDateRange.size());
-		GerritChange gerritChange = filterChangesBasedOnDateRange.get(0);
+		ChangeInfo gerritChange = filterChangesBasedOnDateRange.get(0);
 		assertEquals(duringInput, gerritChange);
 	}
 
 	@Test
 	public void testPopulateReviewStatsAsync() throws Exception {
-		List<GerritChange> noPeerReviewList = new ArrayList<>();
-		List<GerritChange> onePeerReviewList = new ArrayList<>();
-		List<GerritChange> twoPlusPeerReviewList = new ArrayList<>();
-		List<GerritChange> collabrativeDevelopmentList = new ArrayList<>();
-		List<GerritChange> changes = createChanges();
+		List<ChangeInfo> noPeerReviewList = new ArrayList<>();
+		List<ChangeInfo> onePeerReviewList = new ArrayList<>();
+		List<ChangeInfo> twoPlusPeerReviewList = new ArrayList<>();
+		List<ChangeInfo> collabrativeDevelopmentList = new ArrayList<>();
+		List<ChangeInfo> changes = createChanges();
 		Mockito.when(gerritDao.getDetails(credentialsProvider, "testChangeId")).thenReturn(jsonDetailsString);
 		Future<GerritReviewStatsResult> populateReviewStatsAsync = gerritStatisticsHelper.populateReviewStatsAsync(
 				"testStatus", noPeerReviewList, onePeerReviewList, twoPlusPeerReviewList, collabrativeDevelopmentList,
@@ -109,11 +110,15 @@ public class GerritStatisticsHelperTest {
 		assertEquals(0, collabrativeDevelopmentList.size());
 	}
 
-	private List<GerritChange> createChanges() {
-		List<GerritChange> result = new ArrayList<>();
-		GerritChange gerritChange = new GerritChange("testId", "testChangeId", "testProj", "testOwner",
-				new DateTime(0), new DateTime(0), "", "develop");
-		result.add(gerritChange);
+	private List<ChangeInfo> createChanges() {
+		List<ChangeInfo> result = new ArrayList<>();
+		ChangeInfo changeInfo = new ChangeInfo();
+		changeInfo.id = "testId";
+		changeInfo.changeId = "testChangeId";
+		changeInfo.project = "testProj";
+		changeInfo.updated = new Timestamp(0);
+		changeInfo.branch = "develop";
+		result.add(changeInfo);
 		return result;
 	}
 

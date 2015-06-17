@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.statscollector.gerrit.model.GerritChange;
+import com.google.gerrit.extensions.common.ChangeInfo;
 
 public class GerritStatisticsServiceTest {
 
@@ -26,20 +27,24 @@ public class GerritStatisticsServiceTest {
 	private final DateTime afterFilterDate = new DateTime(0).withYear(2017).withMonthOfYear(1).withDayOfMonth(1);
 	private final DateTime startDate = new DateTime(0).withYear(2015).withMonthOfYear(1).withDayOfMonth(1);
 	private final DateTime endDate = new DateTime(0).withYear(2016).withMonthOfYear(1).withDayOfMonth(1);
-	private final GerritChange workingChange = new GerritChange("workingId", "workingChangeId", "testProj",
-			"workingOwner", duringFilterDate, duringFilterDate, "", "working");
+	private final ChangeInfo workingChange = new ChangeInfo();
 
 	@Before
 	public void setUp() throws Exception {
+		workingChange.id = "workingId";
+		workingChange.changeId = "workingChangeId";
+		workingChange.project = "testProj";
+		workingChange.updated = new Timestamp(duringFilterDate.getMillis());
+		workingChange.branch = "working";
 		gerritStatisticsService.setGerritStatisticsHelper(gerritStatisticsHelper);
-		Map<String, List<GerritChange>> changes = new HashMap<>();
+		Map<String, List<ChangeInfo>> changes = new HashMap<>();
 		changes.put("testStatus", createChanges());
 		Mockito.when(gerritStatisticsHelper.getAllChanges()).thenReturn(changes);
 	}
 
 	@Test
 	public void testGetChangesBasedOnParameters() throws IOException, URISyntaxException {
-		List<GerritChange> changesBasedOnParameters = gerritStatisticsService.getChangesBasedOnParameters("testStatus",
+		List<ChangeInfo> changesBasedOnParameters = gerritStatisticsService.getChangesBasedOnParameters("testStatus",
 				".*test.*", startDate, endDate, "");
 		assertEquals(1, changesBasedOnParameters.size());
 		assertEquals(workingChange, changesBasedOnParameters.get(0));
@@ -58,17 +63,24 @@ public class GerritStatisticsServiceTest {
 	// startDate, endDate);
 	// }
 
-	private List<GerritChange> createChanges() {
-		List<GerritChange> result = new ArrayList<>();
-		result.add(new GerritChange("testId", "testChangeId", "testProj", "testOwner", beforeFilterDate,
-				beforeFilterDate, "", "develop"));
-		result.add(new GerritChange("testId", "testChangeId", "failProj", "testOwner", duringFilterDate,
-				duringFilterDate, "", "develop"));
+	private List<ChangeInfo> createChanges() {
+		List<ChangeInfo> result = new ArrayList<>();
+		result.add(createChangeInfo("testProj", beforeFilterDate));
+		result.add(createChangeInfo("failProj", duringFilterDate));
 		result.add(workingChange);
-		result.add(new GerritChange("testId", "testChangeId", "testProj", "testOwner", afterFilterDate,
-				afterFilterDate, "", "develop"));
+		result.add(createChangeInfo("testProj", afterFilterDate));
 
 		return result;
+	}
+
+	private ChangeInfo createChangeInfo(final String project, final DateTime dateTime) {
+		ChangeInfo changeInfo = new ChangeInfo();
+		changeInfo.id = "testId";
+		changeInfo.changeId = "testChangeId";
+		changeInfo.project = project;
+		changeInfo.updated = new Timestamp(dateTime.getMillis());
+		changeInfo.branch = "develop";
+		return changeInfo;
 	}
 
 }

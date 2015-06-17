@@ -2,9 +2,7 @@ package com.statscollector.gerrit.service;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -139,20 +137,16 @@ public class GerritService {
 		this.authenticationHelper = authenticationHelper;
 	}
 
-	public void populateChangeReviewers(final List<ChangeInfo> changes) throws Exception {
-		Map<String, ChangeInfo> gerritChangeDetails = getGerritChangeDetails(changes);
-	}
-
-	public Map<String, ChangeInfo> getGerritChangeDetails(final List<ChangeInfo> changes) throws Exception {
+	public List<ChangeInfo> populateChangeReviewers(final List<ChangeInfo> changes) throws Exception {
 		JsonParser jsonParser = new JsonParser();
-		HashMap<String, ChangeInfo> result = new HashMap<>();
+		List<ChangeInfo> result = new ArrayList<>();
 		for (ChangeInfo gerritChange : changes) {
 			String changeId = gerritChange.changeId;
 			JsonReader jsonReader = new JsonReader(new StringReader(gerritDao.getDetails(
 					authenticationHelper.credentialsProvider(), changeId)));
 			jsonReader.setLenient(true);
 			try {
-				result.put(changeId, translateToChange(jsonParser.parse(jsonReader)));
+				result.add(translateToChange(jsonParser.parse(jsonReader)));
 			} catch (Exception e) {
 				// LOGGER.error("Error found in processing changeId: " +
 				// changeId, e);
@@ -160,5 +154,4 @@ public class GerritService {
 		}
 		return result;
 	}
-
 }

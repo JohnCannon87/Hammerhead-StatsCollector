@@ -9,9 +9,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import com.statscollector.gerrit.model.GerritChange;
+import com.google.gerrit.extensions.common.ChangeInfo;
 
 public class FilterTopicPredicateTest {
 
@@ -25,32 +24,32 @@ public class FilterTopicPredicateTest {
 
 	@Test
 	public void testApplyMatches() {
-		GerritChange inputMatches = Mockito.mock(GerritChange.class);
-		Mockito.when(inputMatches.getTopic()).thenReturn("test");
+		ChangeInfo inputMatches = new ChangeInfo();
+		inputMatches.topic = "test";
 		boolean result = filterTopicPredicate.apply(inputMatches);
 		assertFalse(result);
 	}
 
 	@Test
 	public void testApplyDoesntMatch() {
-		GerritChange inputMatches = Mockito.mock(GerritChange.class);
-		Mockito.when(inputMatches.getTopic()).thenReturn("fail");
+		ChangeInfo inputMatches = new ChangeInfo();
+		inputMatches.topic = "fail";
 		boolean result = filterTopicPredicate.apply(inputMatches);
 		assertTrue(result);
 	}
 
 	@Test
 	public void testFilter() {
-		GerritChange doesMatchInput = Mockito.mock(GerritChange.class);
-		GerritChange doesntMatchInput = Mockito.mock(GerritChange.class);
-		Mockito.when(doesMatchInput.getTopic()).thenReturn("test");
-		Mockito.when(doesntMatchInput.getTopic()).thenReturn("fail");
-		List<GerritChange> filterList = new ArrayList<GerritChange>();
+		ChangeInfo doesMatchInput = new ChangeInfo();
+		ChangeInfo doesntMatchInput = new ChangeInfo();
+		doesMatchInput.topic = "test";
+		doesntMatchInput.topic = "fail";
+		List<ChangeInfo> filterList = new ArrayList<ChangeInfo>();
 		filterList.add(doesMatchInput);
 		filterList.add(doesntMatchInput);
-		List<GerritChange> filter = filterTopicPredicate.filter(filterList);
+		List<ChangeInfo> filter = filterTopicPredicate.filter(filterList);
 		assertTrue(1 == filter.size());
-		GerritChange gerritChange = filter.get(0);
+		ChangeInfo gerritChange = filter.get(0);
 		assertEquals(doesntMatchInput, gerritChange);
 	}
 

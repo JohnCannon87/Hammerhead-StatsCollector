@@ -2,10 +2,9 @@ package com.statscollector.gerrit.service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
@@ -18,7 +17,9 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.google.gerrit.extensions.common.ApprovalInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
+import com.google.gerrit.extensions.common.LabelInfo;
 import com.statscollector.gerrit.config.GerritConfig;
 import com.statscollector.gerrit.model.GerritReviewStats;
 import com.statscollector.gerrit.model.GerritReviewStatsResult;
@@ -94,12 +95,13 @@ public class GerritStatisticsHelper {
 		return new AsyncResult<GerritReviewStatsResult>(result);
 	}
 
-	public void populateReviewStats(final String changeStatus, final List<ChangeInfo> noPeerReviewList,
-			final List<ChangeInfo> onePeerReviewList, final List<ChangeInfo> twoPlusPeerReviewList,
-			final List<ChangeInfo> collabrativeDevelopmentList, final List<ChangeInfo> changes) throws Exception {
-		gerritService.populateChangeReviewers(changes);
-		allChanges.put(changeStatus, changes);
-		for (ChangeInfo gerritChange : changes) {
+	public Map<String, GerritReviewStats> populateReviewStats(final String changeStatus,
+			final List<ChangeInfo> noPeerReviewList, final List<ChangeInfo> onePeerReviewList,
+			final List<ChangeInfo> twoPlusPeerReviewList, final List<ChangeInfo> collabrativeDevelopmentList,
+			final List<ChangeInfo> changes) throws Exception {
+		List<ChangeInfo> populatedChanges = gerritService.populateChangeReviewers(changes);
+		allChanges.put(changeStatus, populatedChanges);
+		for (ChangeInfo gerritChange : populatedChanges) {
 			int numberOfReviewers = numberOfReviewers(gerritChange);
 			switch (numberOfReviewers) {
 			case -1:
@@ -119,6 +121,7 @@ public class GerritStatisticsHelper {
 
 		allReviewStats.put(changeStatus, GerritReviewStats.buildStatsObjectWithValuesAndStatus(noPeerReviewList,
 				onePeerReviewList, twoPlusPeerReviewList, collabrativeDevelopmentList, "", false));
+		return allReviewStats;
 	}
 
 	/**
@@ -130,22 +133,42 @@ public class GerritStatisticsHelper {
 	 */
 	private int numberOfReviewers(final ChangeInfo gerritChange) {
 		// LOGGER.info("Calculating changes for change: " + gerritChange);
+		int result = 0;
 		String owner = gerritChange.owner.username;
-
-		Map<String, Integer> reviewers = gerritChange.getReviewers();
-		Set<String> reviewersUsernames = reviewers.keySet();
-		List<String> reviewersList = new ArrayList<>();
-		for (String username : reviewersUsernames) {
-			Integer reviewValue = reviewers.get(username);
-			if (reviewValue != null && reviewValue > 0) {
-				reviewersList.add(username);
+		Map<String, LabelInfo> labels = gerritChange.labels;
+		Collection<LabelInfo> values = labels.values();
+		for (LabelInfo labelInfo : values) {
+			List<ApprovalInfo> allLabels = labelInfo.all;
+			if (null != allLabels) {
+				result = result + getNumberOfHumanReviewers(result, owner, allLabels);
 			}
 		}
-		List<String> reviewersToIgnore = gerritConfig.getReviewersToIgnore();
-		reviewersList.removeAll(reviewersToIgnore);// Get rid of all automated
-		// reviewers etc.
-		reviewersList.remove(owner);// Remove the owner from the review list
-		return reviewersList.size();
+		return result;
+	}
+
+	private int getNumberOfHumanReviewers(final int result, final String owner, final List<ApprovalInfo> allLabels) {
+		for (ApprovalInfo approvalInfo : allLabels) {
+			if (ifReviewerValid(owner, approvalInfo) && isApprovalValueAboveZero(approvalInfo)) {
+				return 1;
+			}
+		}
+		return 0;
+	}
+
+	private boolean ifReviewerValid(final String owner, final ApprovalInfo approvalInfo) {
+		return ifReviewerNotOwner(owner, approvalInfo) && ifReviewerNotExcluded(approvalInfo);
+	}
+
+	private boolean ifReviewerNotExcluded(final ApprovalInfo approvalInfo) {
+		return !gerritConfig.getReviewersToIgnore().contains(approvalInfo.username);
+	}
+
+	private boolean ifReviewerNotOwner(final String owner, final ApprovalInfo approvalInfo) {
+		return !approvalInfo.username.equals(owner);
+	}
+
+	private boolean isApprovalValueAboveZero(final ApprovalInfo approvalInfo) {
+		return approvalInfo.value != null && approvalInfo.value > 1;
 	}
 
 	public Map<String, List<ChangeInfo>> getAllChanges() {

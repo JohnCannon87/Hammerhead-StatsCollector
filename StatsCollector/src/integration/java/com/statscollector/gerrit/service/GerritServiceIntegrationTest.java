@@ -3,9 +3,7 @@ package com.statscollector.gerrit.service;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,11 +47,10 @@ public class GerritServiceIntegrationTest {
 		List<ChangeInfo> allChanges = statisticsService.getAllChanges(StatusEnum.OPEN.toString());
 		assertNotNull(allChanges);
 		assertTrue(allChanges.size() > 0);
-		Map<String, ChangeInfo> gerritChangeDetails = statisticsService.getGerritChangeDetails(allChanges);
-		Collection<ChangeInfo> values = gerritChangeDetails.values();
-		assertNotNull(values);
-		assertTrue(values.size() > 0);
-		for (ChangeInfo details : values) {
+		List<ChangeInfo> populatedChanges = statisticsService.populateChangeReviewers(allChanges);
+		assertNotNull(populatedChanges);
+		assertTrue(populatedChanges.size() > 0);
+		for (ChangeInfo details : populatedChanges) {
 			assertNotNull(details);
 			assertNotNull(details.changeId);
 		}

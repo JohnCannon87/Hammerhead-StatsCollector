@@ -4,15 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import com.statscollector.gerrit.model.GerritChange;
+import com.google.gerrit.extensions.common.ChangeInfo;
 
 public class FilterDateUpdatedPredicateTest {
 
@@ -30,8 +30,8 @@ public class FilterDateUpdatedPredicateTest {
 
 	@Test
 	public void testApplyDuringFilter() {
-		GerritChange testInput = Mockito.mock(GerritChange.class);
-		Mockito.when(testInput.getUpdated()).thenReturn(duringFilterDate);
+		ChangeInfo testInput = new ChangeInfo();
+		testInput.updated = new Timestamp(duringFilterDate.getMillis());
 		boolean result = filterDateUpdatedPredicate.apply(testInput);
 		assertTrue(result);
 
@@ -39,35 +39,35 @@ public class FilterDateUpdatedPredicateTest {
 
 	@Test
 	public void testApplyBeforeFilter() {
-		GerritChange testInput = Mockito.mock(GerritChange.class);
-		Mockito.when(testInput.getUpdated()).thenReturn(beforeFilterDate);
+		ChangeInfo testInput = new ChangeInfo();
+		testInput.updated = new Timestamp(beforeFilterDate.getMillis());
 		boolean result = filterDateUpdatedPredicate.apply(testInput);
 		assertFalse(result);
 	}
 
 	@Test
 	public void testApplyAfterFilter() {
-		GerritChange testInput = Mockito.mock(GerritChange.class);
-		Mockito.when(testInput.getUpdated()).thenReturn(afterFilterDate);
+		ChangeInfo testInput = new ChangeInfo();
+		testInput.updated = new Timestamp(afterFilterDate.getMillis());
 		boolean result = filterDateUpdatedPredicate.apply(testInput);
 		assertFalse(result);
 	}
 
 	@Test
 	public void testFilter() {
-		GerritChange afterInput = Mockito.mock(GerritChange.class);
-		GerritChange beforeInput = Mockito.mock(GerritChange.class);
-		GerritChange duringInput = Mockito.mock(GerritChange.class);
-		Mockito.when(afterInput.getUpdated()).thenReturn(afterFilterDate);
-		Mockito.when(beforeInput.getUpdated()).thenReturn(beforeFilterDate);
-		Mockito.when(duringInput.getUpdated()).thenReturn(duringFilterDate);
-		List<GerritChange> filterList = new ArrayList<GerritChange>();
+		ChangeInfo afterInput = new ChangeInfo();
+		ChangeInfo beforeInput = new ChangeInfo();
+		ChangeInfo duringInput = new ChangeInfo();
+		afterInput.updated = new Timestamp(afterFilterDate.getMillis());
+		beforeInput.updated = new Timestamp(beforeFilterDate.getMillis());
+		duringInput.updated = new Timestamp(duringFilterDate.getMillis());
+		List<ChangeInfo> filterList = new ArrayList<ChangeInfo>();
 		filterList.add(afterInput);
 		filterList.add(beforeInput);
 		filterList.add(duringInput);
-		List<GerritChange> filter = filterDateUpdatedPredicate.filter(filterList);
+		List<ChangeInfo> filter = filterDateUpdatedPredicate.filter(filterList);
 		assertTrue(1 == filter.size());
-		GerritChange gerritChange = filter.get(0);
+		ChangeInfo gerritChange = filter.get(0);
 		assertEquals(duringInput, gerritChange);
 	}
 

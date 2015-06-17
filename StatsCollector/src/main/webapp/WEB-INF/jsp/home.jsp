@@ -22,7 +22,7 @@
 					class="list-group-item"><span class="legendBox" style="background-color:#CC0000"></span>No Peer Reviewers: <span class="badge">{{noPeerReviewers}}</span></li>
 					<div collapse="!isNoPeerCollapsed">
 						<div ng-repeat="review in noPeerReviews">
-							<a href="http://nreojp.git:8080/#/c/{{review.changeNumber}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
+							<a href="http://nreojp.git:8080/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
 				<li ng-class="getOnePeerReviewRowClass(onePeerPercentage)"

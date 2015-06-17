@@ -9,9 +9,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import com.statscollector.gerrit.model.GerritChange;
+import com.google.gerrit.extensions.common.ChangeInfo;
 
 public class FilterProjectNamePredicateTest {
 
@@ -25,32 +24,32 @@ public class FilterProjectNamePredicateTest {
 
 	@Test
 	public void testApplyMatches() {
-		GerritChange inputMatches = Mockito.mock(GerritChange.class);
-		Mockito.when(inputMatches.getProject()).thenReturn("test");
+		ChangeInfo inputMatches = new ChangeInfo();
+		inputMatches.project = "test";
 		boolean result = filterProjectNamePredicate.apply(inputMatches);
 		assertTrue(result);
 	}
 
 	@Test
 	public void testApplyDoesntMatch() {
-		GerritChange inputMatches = Mockito.mock(GerritChange.class);
-		Mockito.when(inputMatches.getProject()).thenReturn("fail");
+		ChangeInfo inputMatches = new ChangeInfo();
+		inputMatches.project = "fail";
 		boolean result = filterProjectNamePredicate.apply(inputMatches);
 		assertFalse(result);
 	}
 
 	@Test
 	public void testFilter() {
-		GerritChange doesMatchInput = Mockito.mock(GerritChange.class);
-		GerritChange doesntMatchInput = Mockito.mock(GerritChange.class);
-		Mockito.when(doesMatchInput.getProject()).thenReturn("test");
-		Mockito.when(doesntMatchInput.getProject()).thenReturn("fail");
-		List<GerritChange> filterList = new ArrayList<GerritChange>();
+		ChangeInfo doesMatchInput = new ChangeInfo();
+		ChangeInfo doesntMatchInput = new ChangeInfo();
+		doesMatchInput.project = "test";
+		doesntMatchInput.project = "fail";
+		List<ChangeInfo> filterList = new ArrayList<ChangeInfo>();
 		filterList.add(doesMatchInput);
 		filterList.add(doesntMatchInput);
-		List<GerritChange> filter = filterProjectNamePredicate.filter(filterList);
+		List<ChangeInfo> filter = filterProjectNamePredicate.filter(filterList);
 		assertTrue(1 == filter.size());
-		GerritChange gerritChange = filter.get(0);
+		ChangeInfo gerritChange = filter.get(0);
 		assertEquals(doesMatchInput, gerritChange);
 	}
 
