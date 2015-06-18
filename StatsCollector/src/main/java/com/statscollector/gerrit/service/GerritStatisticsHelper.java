@@ -2,7 +2,6 @@ package com.statscollector.gerrit.service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +34,8 @@ import com.statscollector.gerrit.service.filter.FilterProjectNamePredicate;
  */
 @Component
 public class GerritStatisticsHelper {
+
+	private static final String CODE_REVIEW = "Code-Review";
 
 	@Autowired
 	private GerritService gerritService;
@@ -136,23 +137,28 @@ public class GerritStatisticsHelper {
 		int result = 0;
 		String owner = gerritChange.owner.username;
 		Map<String, LabelInfo> labels = gerritChange.labels;
-		Collection<LabelInfo> values = labels.values();
-		for (LabelInfo labelInfo : values) {
+		LabelInfo labelInfo = labels.get(CODE_REVIEW);
+		if (null != labelInfo) {
 			List<ApprovalInfo> allLabels = labelInfo.all;
 			if (null != allLabels) {
-				result = result + getNumberOfHumanReviewers(result, owner, allLabels);
+				result = result + getNumberOfHumanReviewers(owner, allLabels);
 			}
 		}
 		return result;
 	}
 
-	private int getNumberOfHumanReviewers(final int result, final String owner, final List<ApprovalInfo> allLabels) {
+	private int getNumberOfHumanReviewers(final String owner, final List<ApprovalInfo> allLabels) {
+		int result = 0;
 		for (ApprovalInfo approvalInfo : allLabels) {
-			if (ifReviewerValid(owner, approvalInfo) && isApprovalValueAboveZero(approvalInfo)) {
-				return 1;
+			if (ifReviewerValid(owner, approvalInfo)) {
+				if (isApprovalValueAboveZero(approvalInfo)) {
+					result++;
+				} else if (isApprovalValueBelowZero(approvalInfo)) {
+					return 0;
+				}
 			}
 		}
-		return 0;
+		return result;
 	}
 
 	private boolean ifReviewerValid(final String owner, final ApprovalInfo approvalInfo) {
@@ -168,7 +174,11 @@ public class GerritStatisticsHelper {
 	}
 
 	private boolean isApprovalValueAboveZero(final ApprovalInfo approvalInfo) {
-		return approvalInfo.value != null && approvalInfo.value > 1;
+		return approvalInfo.value != null && approvalInfo.value > 0;
+	}
+
+	private boolean isApprovalValueBelowZero(final ApprovalInfo approvalInfo) {
+		return approvalInfo.value != null && approvalInfo.value < 0;
 	}
 
 	public Map<String, List<ChangeInfo>> getAllChanges() {

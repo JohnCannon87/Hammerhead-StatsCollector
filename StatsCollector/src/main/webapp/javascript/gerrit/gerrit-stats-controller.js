@@ -66,7 +66,7 @@ function GetGerritStats($http, $scope, $timeout){
 					$scope.collaborativePercentage = response.data.collaborativeReviewPercentage;
 					$scope.noPeerReviews = response.data.noPeerReviewList;
 					$scope.onePeerReviews = response.data.onePeerReviewList;
-					$scope.twoPeerReviews = response.data.twoPeerReviewList;
+					$scope.twoPeerReviews = response.data.twoPlusPeerReviewList;
 					$scope.collabrativeDevelopment = response.data.collabrativeDevelopmentList;
 					
 					if (response.data.error){
