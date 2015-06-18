@@ -1,6 +1,7 @@
 package com.statscollector.gerrit.service;
 
 import java.io.StringReader;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.statscollector.gerrit.authentication.GerritAuthenticationHelper;
 import com.statscollector.gerrit.dao.GerritDao;
+import com.statscollector.gerrit.serialization.TimestampDeserializer;
 
 /**
  * I'm a service that performs some business logic to access the information
@@ -96,7 +98,7 @@ public class GerritService {
 	}
 
 	private ChangeInfo translateToChange(final JsonElement jsonElement) {
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+		Gson gson = new GsonBuilder().registerTypeAdapter(Timestamp.class, new TimestampDeserializer())
 				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		ChangeInfo result = gson.fromJson(jsonElement, ChangeInfo.class);
 		return result;

@@ -25,15 +25,30 @@
 							<a href="http://nreojp.git:8080/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
-				<li ng-class="getOnePeerReviewRowClass(onePeerPercentage)"
+				<li ng-click="isOnePeerCollapsed = !isOnePeerCollapsed" ng-class="getOnePeerReviewRowClass(onePeerPercentage)"
 					class="list-group-item"><span class="legendBox" style="background-color:#009933"></span>One Peer Reviewer: <span class="badge">{{onePeerReviewer}}</span></li>
-				<li ng-class="getTwoPeerReviewRowClass(twoPeerPercentage)"
+					<div collapse="!isOnePeerCollapsed">
+						<div ng-repeat="review in onePeerReviews">
+							<a href="http://nreojp.git:8080/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
+						</div>
+					</div>
+				<li ng-click="isTwoPeerCollapsed = !isTwoPeerCollapsed" ng-class="getTwoPeerReviewRowClass(twoPeerPercentage)"
 					class="list-group-item"><span class="legendBox" style="background-color:#0099FF"></span>Two Peer Reviewers: <span
 					class="badge">{{twoPeerReviewers}}</span></li>
-				<li
+					<div collapse="!isTwoPeerCollapsed">
+						<div ng-repeat="review in twoPeerReviews">
+							<a href="http://nreojp.git:8080/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
+						</div>
+					</div>
+				<li ng-click="isCollabrativeDevelopmentCollapsed = !isCollabrativeDevelopmentCollapsed" 
 					ng-class="getCollabrativeDevelopmentRowClass(collaborativePercentage)"
 					class="list-group-item"><span class="legendBox" style="background-color:#6600FF"></span>Collaborative Development: <span
 					class="badge">{{collabrativeDevelopment}}</span></li>
+					<div collapse="!isCollabrativeDevelopmentCollapsed">
+						<div ng-repeat="review in collabrativeDevelopment">
+							<a href="http://nreojp.git:8080/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
+						</div>
+					</div>
 				<li class="list-group-item">Total Reviews: <span class="badge">{{totalReviews}}</span></li>
 				<li class="list-group-item">
 					<!-- Single button -->
