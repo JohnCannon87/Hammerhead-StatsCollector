@@ -23,8 +23,8 @@ import org.springframework.util.ResourceUtils;
 @SpringBootApplication
 @EnableScheduling
 @EnableAsync
-@ComponentScan({ "com.statscollector.gerrit.service", "com.statscollector.gerrit.dao",
-		"com.statscollector.gerrit.controller", "com.statscollector.gerrit.model",
+@ComponentScan({ "com.statscollector.application", "com.statscollector.gerrit.service",
+	"com.statscollector.gerrit.dao", "com.statscollector.gerrit.controller", "com.statscollector.gerrit.model",
 		"com.statscollector.gerrit.authentication", "com.statscollector.gerrit.config",
 	"com.statscollector.sonar.service", "com.statscollector.sonar.dao", "com.statscollector.sonar.controller",
 	"com.statscollector.sonar.model", "com.statscollector.sonar.authentication", "com.statscollector.sonar.config",
@@ -48,14 +48,6 @@ public class Application extends SpringBootServletInitializer {
 	public static void main(final String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
-
-	// @Bean
-	// public EmbeddedServletContainerFactory servletContainer() {
-	// TomcatEmbeddedServletContainerFactory factory = new
-	// TomcatEmbeddedServletContainerFactory();
-	// factory.setPort(getPortNumber());
-	// return factory;
-	// }
 
 	private int getPortNumber() {
 		String serverPortString = System.getProperty(SERVER_PORT_KEY);

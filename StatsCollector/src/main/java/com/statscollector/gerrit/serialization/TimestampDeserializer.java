@@ -21,7 +21,6 @@ public class TimestampDeserializer implements JsonDeserializer<Timestamp> {
 		date = date.split("\\.")[0];
 
 		SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT_PATTERN);
-		// formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
 
 		try {
 			return new Timestamp(formatter.parse(date).getTime());

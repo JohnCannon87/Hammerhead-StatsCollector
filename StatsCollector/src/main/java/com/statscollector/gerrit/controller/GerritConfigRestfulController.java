@@ -48,13 +48,14 @@ public class GerritConfigRestfulController {
 			@RequestParam(required = true) final Integer threadSplitSize,
 			@RequestParam(required = true) final Integer startDateOffset,
 			@RequestParam(required = true) final Integer endDateOffset,
-			@RequestParam(required = true) final String projectRegex) {
+			@RequestParam(required = true) final String projectRegex,
+			@RequestParam(required = true) final String projectName) {
 		try {
 			LOGGER.info("Changing Gerrit Host To: " + host);
 			gerritConfig.setHost(host);
 			LOGGER.info("Changing Gerrit Host Port To: " + hostPort);
 			gerritConfig.setHostPort(hostPort);
-			LOGGER.info("Changing Gerrit Username & Password To: " + username + ", " + password);
+			LOGGER.info("Changing Gerrit Username & Password To: " + username + ", " + "Ha Nope");
 			gerritConfig.setUsernameAndPassword(username, password);
 			LOGGER.info("Changing Gerrit Topic To: " + topicRegex);
 			gerritConfig.setTopicRegex(topicRegex);
@@ -66,6 +67,8 @@ public class GerritConfigRestfulController {
 			gerritConfig.setEndDateOffset(endDateOffset);
 			LOGGER.info("Changing Project Regex To: " + projectRegex);
 			gerritConfig.setProjectRegex(projectRegex);
+			LOGGER.info("Changing Project Name To: " + projectName);
+			gerritConfig.setProjectName(projectName);
 		} catch (ConfigurationException e) {
 			return gerritConfig;
 		}

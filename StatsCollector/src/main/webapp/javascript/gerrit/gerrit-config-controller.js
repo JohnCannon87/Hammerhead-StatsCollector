@@ -13,6 +13,7 @@ function UpdateGerritConfig(data, $scope){
 	$scope.onePeerReviewTarget = data.onePeerReviewTarget;
 	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
 	$scope.collaborativeReviewTarget = data.collaborativeReviewTarget;
+	$scope.projectName = data.projectName;
 }
 
 function GerritConfig($http, $scope, $log, $q, Gerrit, Upload) {
@@ -102,6 +103,7 @@ function GerritConfig($http, $scope, $log, $q, Gerrit, Upload) {
 				+'&startDateOffset='+$scope.gerritStartDateOffset
 				+'&endDateOffset='+$scope.gerritEndDateOffset
 				+'&projectRegex='+$scope.gerritProjectRegex
+				+'&projectName='+$scope.gerritProjectName
 				)
 		.success(function(data){
 			console.log(data);

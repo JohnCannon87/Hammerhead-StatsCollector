@@ -43,7 +43,7 @@
 				<li ng-click="isCollabrativeDevelopmentCollapsed = !isCollabrativeDevelopmentCollapsed" 
 					ng-class="getCollabrativeDevelopmentRowClass(collaborativePercentage)"
 					class="list-group-item"><span class="legendBox" style="background-color:#6600FF"></span>Collaborative Development: <span
-					class="badge">{{collabrativeDevelopment}}</span></li>
+					class="badge">{{collabrativeDevelopments}}</span></li>
 					<div collapse="!isCollabrativeDevelopmentCollapsed">
 						<div ng-repeat="review in collabrativeDevelopment">
 							<a href="http://nreojp.git:8080/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							

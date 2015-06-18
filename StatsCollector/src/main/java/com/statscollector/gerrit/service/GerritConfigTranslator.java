@@ -29,6 +29,7 @@ public class GerritConfigTranslator {
 	private static final String USERNAME_KEY = "username";
 	private static final String REVIEWERS_TO_IGNORE_KEY = "reviewersToIgnore";
 	private static final String CONFIG_VERSION_KEY = "configVersion";
+	private static final String PROJECT_NAME_KEY = "projectName";
 
 	public GerritConfig updateConfigFromFile(final MultipartFile file, final GerritConfig gerritConfig)
 			throws IOException, ConfigurationException {
@@ -57,6 +58,7 @@ public class GerritConfigTranslator {
 				Float.valueOf(rootObject.get(COLLABORATIVE_REVIEW_TARGET_KEY).getAsString()));
 		gerritConfig.setUsernameAndPassword(rootObject.get(USERNAME_KEY).getAsString(), rootObject.get(PASSWORD_KEY)
 				.getAsString());
+		gerritConfig.setProjectName(rootObject.get(PROJECT_NAME_KEY).getAsString());
 		return gerritConfig;
 	}
 

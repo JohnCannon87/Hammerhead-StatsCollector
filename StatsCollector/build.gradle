@@ -38,22 +38,12 @@ war {
     version =  '1.0'
 }
 
-task createDist (){
+task createDist (dependsOn: 'build'){
 	build
 	copy {
         from "build/libs"
         into "../dist"
         include 'StatsCollector-1.0.war'
-    }
-    copy {
-        from "src/main/resources"
-        into "../dist"
-        include 'GerritStatistics.properties'
-    }    
-    copy {
-        from "src/main/resources"
-        into "../dist"
-        include 'SonarStatistics.properties'
     }
 }
 

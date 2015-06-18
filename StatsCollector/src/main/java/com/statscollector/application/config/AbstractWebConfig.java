@@ -9,6 +9,8 @@ public abstract class AbstractWebConfig {
 
 	protected PropertiesConfiguration config;
 
+	private final String PROJECT_NAME_KEY = "project.name";
+
 	public AbstractWebConfig() throws ConfigurationException {
 		config = new PropertiesConfiguration(System.getProperty(getConfigFilePathKey(), getDefaultFilePath()));
 	}
@@ -24,6 +26,15 @@ public abstract class AbstractWebConfig {
 	protected abstract String getUsernameKey();
 
 	protected abstract String getPasswordKey();
+
+	public String getProjectName() {
+		return config.getString(PROJECT_NAME_KEY);
+	}
+
+	public void setProjectName(final String projectName) throws ConfigurationException {
+		config.setProperty(PROJECT_NAME_KEY, projectName);
+		config.save();
+	}
 
 	public String getHost() {
 		return config.getString(getHostKey());
