@@ -14,6 +14,7 @@ function UpdateGerritConfig(data, $scope) {
 	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
 	$scope.collaborativeReviewTarget = data.collaborativeReviewTarget;
 	$scope.configLoaded = true;
+	$scope.gerritProjectName = data.projectName;
 }
 
 function GetReviewRowClassTarget(value, target) {

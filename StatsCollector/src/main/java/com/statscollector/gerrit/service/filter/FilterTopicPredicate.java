@@ -18,7 +18,12 @@ public class FilterTopicPredicate implements Predicate<ChangeInfo>, GerritChange
 
 	@Override
 	public boolean apply(final ChangeInfo input) {
-		return !input.topic.matches(topicNameRegex);
+		if (null != input.topic) {
+			return !input.topic.matches(topicNameRegex);
+		} else {
+			return true;
+		}
+
 	}
 
 	@Override

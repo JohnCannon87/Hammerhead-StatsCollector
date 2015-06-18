@@ -13,7 +13,7 @@ function UpdateGerritConfig(data, $scope){
 	$scope.onePeerReviewTarget = data.onePeerReviewTarget;
 	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
 	$scope.collaborativeReviewTarget = data.collaborativeReviewTarget;
-	$scope.projectName = data.projectName;
+	$scope.gerritProjectName = data.projectName;
 }
 
 function GerritConfig($http, $scope, $log, $q, Gerrit, Upload) {

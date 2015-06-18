@@ -22,14 +22,14 @@
 					class="list-group-item"><span class="legendBox" style="background-color:#CC0000"></span>No Peer Reviewers: <span class="badge">{{noPeerReviewers}}</span></li>
 					<div collapse="!isNoPeerCollapsed">
 						<div ng-repeat="review in noPeerReviews">
-							<a href="http://nreojp.git:8080/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
+							<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
 				<li ng-click="isOnePeerCollapsed = !isOnePeerCollapsed" ng-class="getOnePeerReviewRowClass(onePeerPercentage)"
 					class="list-group-item"><span class="legendBox" style="background-color:#009933"></span>One Peer Reviewer: <span class="badge">{{onePeerReviewer}}</span></li>
 					<div collapse="!isOnePeerCollapsed">
 						<div ng-repeat="review in onePeerReviews">
-							<a href="http://nreojp.git:8080/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
+							<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
 				<li ng-click="isTwoPeerCollapsed = !isTwoPeerCollapsed" ng-class="getTwoPeerReviewRowClass(twoPeerPercentage)"
@@ -37,7 +37,7 @@
 					class="badge">{{twoPeerReviewers}}</span></li>
 					<div collapse="!isTwoPeerCollapsed">
 						<div ng-repeat="review in twoPeerReviews">
-							<a href="http://nreojp.git:8080/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
+							<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
 				<li ng-click="isCollabrativeDevelopmentCollapsed = !isCollabrativeDevelopmentCollapsed" 
@@ -46,7 +46,7 @@
 					class="badge">{{collabrativeDevelopments}}</span></li>
 					<div collapse="!isCollabrativeDevelopmentCollapsed">
 						<div ng-repeat="review in collabrativeDevelopment">
-							<a href="http://nreojp.git:8080/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
+							<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
 				<li class="list-group-item">Total Reviews: <span class="badge">{{totalReviews}}</span></li>
