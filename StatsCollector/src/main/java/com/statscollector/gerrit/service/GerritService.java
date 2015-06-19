@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -102,33 +99,6 @@ public class GerritService {
 				.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
 		ChangeInfo result = gson.fromJson(jsonElement, ChangeInfo.class);
 		return result;
-		// if (jsonElement.isJsonObject()) {
-		// JsonObject rawJsonObject = jsonElement.getAsJsonObject();
-		// String id = rawJsonObject.get(ID_REF).getAsString();
-		// String changeId = rawJsonObject.get(CHANGE_ID_REF).getAsString();
-		// String project = rawJsonObject.get(PROJECT_REF).getAsString();
-		// String owner =
-		// rawJsonObject.get(OWNER_REF).getAsJsonObject().get(OWNER_NAME_REF).getAsString();
-		// String topic = "";
-		// try {
-		// topic = rawJsonObject.get(TOPIC_REF).getAsString();
-		// } catch (Exception e) {
-		// // No Topic Found, Ignore
-		// }
-		// String branch = rawJsonObject.get(BRANCH_REF).getAsString();
-		// DateTime created =
-		// parseDateTime(rawJsonObject.get(CREATED_REF).getAsString());
-		// DateTime updated =
-		// parseDateTime(rawJsonObject.get(UPDATED_REF).getAsString());
-		// return new GerritChange(id, changeId, project, owner, created,
-		// updated, topic, branch);
-		// }
-		// return null;
-	}
-
-	private DateTime parseDateTime(final String dateTimeString) {
-		DateTimeFormatter pattern = DateTimeFormat.forPattern(DATE_TIME_PATTERN);
-		return pattern.parseDateTime(dateTimeString.split("\\.")[0]);
 	}
 
 	public void setStatisticsDao(final GerritDao statisticsDao) {

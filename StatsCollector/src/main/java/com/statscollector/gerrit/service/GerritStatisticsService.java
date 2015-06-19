@@ -52,24 +52,6 @@ public class GerritStatisticsService {
 	private boolean refreshInProgress = false;
 
 	/**
-	 * I return a list of changes with unwanted changes filtered out based on
-	 * the provided parameters.
-	 *
-	 * @param projectFilterRegex
-	 * @param startDate
-	 * @param endDate
-	 * @return
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	public List<ChangeInfo> getChangesBasedOnParameters(final String changeStatus, final String projectFilterRegex,
-			final DateTime startDate, final DateTime endDate, final String topicNameRegex) throws IOException,
-			URISyntaxException {
-		return filterChanges(gerritStatisticsHelper.getAllChanges().get(changeStatus),
-				getFilters(projectFilterRegex, startDate, endDate, topicNameRegex));
-	}
-
-	/**
 	 * I act upon the provided list of GerritChangeFilters to remove all
 	 * unwanted GerritChanges.
 	 *
@@ -181,18 +163,18 @@ public class GerritStatisticsService {
 								gerritReviewStats.setStatus(gerritReviewStats.getStatus()
 										+ "Error Thrown During Processing: Null Pointer Returned, ");
 								gerritReviewStats
-								.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
+										.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
 							} else if (!result.getSuccess()) {
 								gerritReviewStats.setStatus(gerritReviewStats.getStatus()
 										+ "Error Thrown During Processing: " + result.getError().getMessage() + ", ");
 								gerritReviewStats
-								.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-										.getSuccess()));
+										.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+												.getSuccess()));
 							} else {
 								gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK, ");
 								gerritReviewStats
-								.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-										.getSuccess()));
+										.setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+												.getSuccess()));
 							}
 						}
 						gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : "

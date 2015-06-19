@@ -1,4 +1,4 @@
-function UpdateGerritConfig(data, $scope) {
+function UpdateGerritConfig(data, $scope, $location) {
 	$scope.gerritHostname = data.host;
 	$scope.gerritHostPort = data.hostPort;
 	$scope.reviewersToIgnore = data.reviewersToIgnore;
@@ -8,13 +8,24 @@ function UpdateGerritConfig(data, $scope) {
 	$scope.gerritThreadSplitSize = data.threadSplitSize;
 	$scope.gerritStartDateOffset = data.startDateOffset;
 	$scope.gerritEndDateOffset = data.endDateOffset;
-	$scope.gerritProjectRegex = data.projectRegex;
 	$scope.noPeerReviewsTarget = data.noPeerReviewTarget;
 	$scope.onePeerReviewTarget = data.onePeerReviewTarget;
 	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
 	$scope.collaborativeReviewTarget = data.collaborativeReviewTarget;
 	$scope.configLoaded = true;
 	$scope.gerritProjectName = data.projectName;
+	$scope.gerritProjectRegex = data.projectRegex;
+	
+	//Override from URL Param For multiple projects.
+	if(typeof $location !== "undefined"){
+		if(typeof $location.search().projectRegex !== "undefined"){
+			$scope.gerritProjectRegex = $location.search().projectRegex
+		}
+		if(typeof $location.search().projectName !== "undefined"){
+			$scope.gerritProjectName = $location.search().projectName
+		}
+	}
+	
 }
 
 function GetReviewRowClassTarget(value, target) {
@@ -105,7 +116,7 @@ function GetGerritStats($http, $scope, $timeout){
 	}
 }
 
-function GerritStats($http, $scope, $timeout, $log, $q, Gerrit) {
+function GerritStats($http, $scope, $timeout, $location, $log, $q, Gerrit) {
 	$scope.metrics = new Array();
 	$scope.gerritStatus = 'merged';
 	if($scope.configLoaded === undefined){
@@ -156,7 +167,7 @@ function GerritStats($http, $scope, $timeout, $log, $q, Gerrit) {
 	};
 
 	Gerrit.configInfo().then(function(response) {
-		UpdateGerritConfig(response.data, $scope);
+		UpdateGerritConfig(response.data, $scope, $location);
 	});
 	
 	$scope.closeAlert = function() {
@@ -194,5 +205,5 @@ function GerritStats($http, $scope, $timeout, $log, $q, Gerrit) {
 	
 };
 
-appGerritStatsModule.controller('GerritStatsCtrl', [ '$http', '$scope', '$timeout', '$log',
-		'$q', 'Gerrit', GerritStats ]);
+appGerritStatsModule.controller('GerritStatsCtrl', [ '$http', '$scope', '$timeout', '$location',
+		'$q', '$log', 'Gerrit', GerritStats ]);

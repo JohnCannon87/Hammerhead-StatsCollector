@@ -8,22 +8,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.google.gerrit.extensions.common.ApprovalInfo;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.google.gerrit.extensions.common.LabelInfo;
 import com.statscollector.gerrit.config.GerritConfig;
 import com.statscollector.gerrit.model.GerritReviewStats;
 import com.statscollector.gerrit.model.GerritReviewStatsResult;
-import com.statscollector.gerrit.service.filter.FilterDateUpdatedPredicate;
-import com.statscollector.gerrit.service.filter.FilterProjectNamePredicate;
 
 /**
  * I'm a class that takes a list of changes from Gerrit and performs some
@@ -48,34 +43,6 @@ public class GerritStatisticsHelper {
 	final Map<String, GerritReviewStats> allReviewStats = new ConcurrentHashMap<>();
 
 	final static Logger LOGGER = Logger.getLogger(GerritStatisticsService.class);
-
-	/**
-	 * I return a copy of the provided List but filtered based on the
-	 * projectNameRegex provided.
-	 *
-	 * @param toBeFiltered
-	 * @param projectNameRegex
-	 * @return
-	 */
-	public List<ChangeInfo> filterChangesBasedOnProjectName(final List<ChangeInfo> toBeFiltered,
-			final String projectNameRegex) {
-		return Lists.newArrayList(Collections2.filter(toBeFiltered, new FilterProjectNamePredicate(projectNameRegex)));
-	}
-
-	/**
-	 * I return a copy of the provided List but filtered based on the start and
-	 * end dates provided
-	 *
-	 * @param toBeFiltered
-	 * @param startDate
-	 * @param endDate
-	 * @return
-	 */
-	public List<ChangeInfo> filterChangesBasedOnDateRange(final List<ChangeInfo> toBeFiltered,
-			final DateTime startDate, final DateTime endDate) {
-		return Lists
-				.newArrayList(Collections2.filter(toBeFiltered, new FilterDateUpdatedPredicate(startDate, endDate)));
-	}
 
 	@Async
 	public Future<GerritReviewStatsResult> populateReviewStatsAsync(final String changeStatus,

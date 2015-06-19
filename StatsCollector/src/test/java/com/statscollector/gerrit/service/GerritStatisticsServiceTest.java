@@ -1,9 +1,5 @@
 package com.statscollector.gerrit.service;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +8,6 @@ import java.util.Map;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
-import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.gerrit.extensions.common.ChangeInfo;
@@ -40,14 +35,6 @@ public class GerritStatisticsServiceTest {
 		Map<String, List<ChangeInfo>> changes = new HashMap<>();
 		changes.put("testStatus", createChanges());
 		Mockito.when(gerritStatisticsHelper.getAllChanges()).thenReturn(changes);
-	}
-
-	@Test
-	public void testGetChangesBasedOnParameters() throws IOException, URISyntaxException {
-		List<ChangeInfo> changesBasedOnParameters = gerritStatisticsService.getChangesBasedOnParameters("testStatus",
-				".*test.*", startDate, endDate, "");
-		assertEquals(1, changesBasedOnParameters.size());
-		assertEquals(workingChange, changesBasedOnParameters.get(0));
 	}
 
 	// @Test

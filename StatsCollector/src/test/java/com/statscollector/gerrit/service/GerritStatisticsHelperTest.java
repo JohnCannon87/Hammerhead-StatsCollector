@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 import org.apache.http.client.CredentialsProvider;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -44,47 +43,6 @@ public class GerritStatisticsHelperTest {
 		List<String> reviewersToIgnore = new ArrayList();
 		reviewersToIgnore.add("Jenkins Test");
 		Mockito.when(gerritConfig.getReviewersToIgnore()).thenReturn(reviewersToIgnore);
-	}
-
-	@Test
-	public void testFilterChangesBasedOnProjectName() {
-		ChangeInfo doesMatchInput = new ChangeInfo();
-		ChangeInfo doesntMatchInput = new ChangeInfo();
-		doesMatchInput.project = "test";
-		doesntMatchInput.project = "fail";
-		List<ChangeInfo> filterList = new ArrayList<ChangeInfo>();
-		filterList.add(doesMatchInput);
-		filterList.add(doesntMatchInput);
-		String testRegex = ".*test.*";
-		List<ChangeInfo> filterChangesBasedOnProjectName = gerritStatisticsHelper.filterChangesBasedOnProjectName(
-				filterList, testRegex);
-		assertTrue(1 == filterChangesBasedOnProjectName.size());
-		ChangeInfo gerritChange = filterChangesBasedOnProjectName.get(0);
-		assertEquals(doesMatchInput, gerritChange);
-	}
-
-	@Test
-	public void testFilterChangesBasedOnDateRange() {
-		DateTime beforeFilterDate = new DateTime(0).withYear(2014).withMonthOfYear(1).withDayOfMonth(1);
-		DateTime duringFilterDate = new DateTime(0).withYear(2015).withMonthOfYear(6).withDayOfMonth(1);
-		DateTime afterFilterDate = new DateTime(0).withYear(2017).withMonthOfYear(1).withDayOfMonth(1);
-		DateTime startDate = new DateTime(0).withYear(2015).withMonthOfYear(1).withDayOfMonth(1);
-		DateTime endDate = new DateTime(0).withYear(2016).withMonthOfYear(1).withDayOfMonth(1);
-		ChangeInfo afterInput = new ChangeInfo();
-		ChangeInfo beforeInput = new ChangeInfo();
-		ChangeInfo duringInput = new ChangeInfo();
-		afterInput.updated = new Timestamp(afterFilterDate.getMillis());
-		beforeInput.updated = new Timestamp(beforeFilterDate.getMillis());
-		duringInput.updated = new Timestamp(duringFilterDate.getMillis());
-		List<ChangeInfo> filterList = new ArrayList<ChangeInfo>();
-		filterList.add(afterInput);
-		filterList.add(beforeInput);
-		filterList.add(duringInput);
-		List<ChangeInfo> filterChangesBasedOnDateRange = gerritStatisticsHelper.filterChangesBasedOnDateRange(
-				filterList, startDate, endDate);
-		assertTrue(1 == filterChangesBasedOnDateRange.size());
-		ChangeInfo gerritChange = filterChangesBasedOnDateRange.get(0);
-		assertEquals(duringInput, gerritChange);
 	}
 
 	@Test

@@ -23,13 +23,13 @@ public class SonarStatsController {
 
 	@RequestMapping(value = "/refreshCache")
 	public void refreshCache() throws IOException, URISyntaxException, InterruptedException, ExecutionException {
-		LOGGER.info("Manual Cache Refresh Triggered");
-		sonarStatisticsService.getStatisticsScheduledTask();
+		// LOGGER.info("Manual Cache Refresh Triggered");
+		// sonarStatisticsService.getStatisticsScheduledTask();
 	}
 
 	@RequestMapping(value = "/allStatistics")
 	public SonarStatistics allStatistics() throws IOException, URISyntaxException {
-		LOGGER.info("Getting Sonar Statistics");
+		// LOGGER.info("Getting Sonar Statistics");
 		return null;
 	}
 

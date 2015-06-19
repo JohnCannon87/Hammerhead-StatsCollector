@@ -11,10 +11,10 @@
 <%@include file="common/charting.jsp"%>
 <%@include file="common/configPages.jsp"%>
 </head>
-<body>
+<body ng-controller="GerritStatsCtrl" >
 	<%@include file="common/navbar.jsp"%>
 
-	<div ng-controller="GerritStatsCtrl" class="col-sm-12">
+	<div class="col-sm-12">
 		<div class="col-sm-4">
 			<h3>Gerrit stats for server {{gerritHostname}} are:</h3>
 			<ul class="list-group">
