@@ -5,9 +5,9 @@
 			</div>
 			<div>
 				<ul class="nav navbar-nav">
-					<li><a href="/home">Home</a></li>
-					<li><a href="/gerrit/config/view">Gerrit Config</a></li>
-					<li class="hidden"><a href="/sonar/config/view">Sonar Config</a></li>
+					<li><a href="/home" target="_self">Home</a></li>
+					<li><a href="/gerrit/config/view" target="_self">Gerrit Config</a></li>
+					<li class="hidden"><a href="/sonar/config/view" target="_self">Sonar Config</a></li>
 				</ul>
 			</div>
 		</div>
