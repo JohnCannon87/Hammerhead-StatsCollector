@@ -33,6 +33,7 @@ public class Application extends SpringBootServletInitializer {
 
 	@Value("${keystore.file}")
 	private String keystoreFile;
+
 	@Value("${keystore.pass}")
 	private String keystorePass;
 
@@ -86,7 +87,6 @@ public class Application extends SpringBootServletInitializer {
 							proto.setKeystoreFile(absoluteKeystoreFile);
 							proto.setKeystorePass(keystorePass);
 							proto.setKeystoreType("PKCS12");
-							proto.setKeyAlias("tomcat");
 						}
 					});
 				}
