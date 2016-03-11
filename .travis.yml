@@ -1,5 +1,5 @@
 language: java
-jdk: openjdk7
+jdk: openjdk8
 before_install: "cd StatsCollector"
 after_success:
 - gradle cobertura coveralls
