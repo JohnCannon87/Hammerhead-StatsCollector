@@ -126,7 +126,7 @@ function GerritStats($http, $scope, $timeout, $location, $log, $q, Gerrit) {
 	$scope.gerritChartOptions = {
 
 		      // Sets the chart to be responsive
-		      responsive: false,
+		      responsive: true,
 
 		      // Boolean - Whether we should show a stroke on each segment
 		      segmentShowStroke : true,
@@ -178,7 +178,7 @@ function GerritStats($http, $scope, $timeout, $location, $log, $q, Gerrit) {
 	
 	$scope.$watch('configLoaded', function(){GetGerritStats($http, $scope, $timeout)}, true);
 		
-	$scope.manuallyRefreshData = function(){
+	$scope.manuallyRefreshGerritData = function(){
 		$http.get('/gerrit/review/refreshCache').then(function(){GetGerritStats($http, $scope, $timeout);});		
 	}
 	

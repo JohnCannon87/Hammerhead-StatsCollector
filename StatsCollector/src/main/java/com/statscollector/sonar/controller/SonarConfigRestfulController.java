@@ -23,34 +23,35 @@ import com.statscollector.sonar.service.SonarConfigTranslator;
 @RequestMapping("/sonar/config")
 public class SonarConfigRestfulController {
 
-	final static Logger LOGGER = Logger.getLogger(SonarConfigRestfulController.class);
+    final static Logger LOGGER = Logger.getLogger(SonarConfigRestfulController.class);
 
-	@Autowired
-	private SonarConfig sonarConfig;
+    @Autowired
+    private SonarConfig sonarConfig;
 
-	@Autowired
-	private SonarConfigTranslator sonarConfigTranslator;
+    @Autowired
+    private SonarConfigTranslator sonarConfigTranslator;
 
-	@RequestMapping(value = "/info", produces = "application/json")
-	@ResponseBody
-	public SonarConfig sonarInfo() {
-		return sonarConfig;
-	}
+    @RequestMapping(value = "/info", produces = "application/json")
+    @ResponseBody
+    public SonarConfig sonarInfo() {
+        return sonarConfig;
+    }
 
-	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public @ResponseBody SonarConfig handleFileUpload(@RequestParam("file") final MultipartFile file)
-			throws IOException, ConfigurationException {
-		LOGGER.info("Uploaded File: " + file.getName());
-		return sonarConfigTranslator.updateConfigFromFile(file, sonarConfig);
-	}
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public @ResponseBody SonarConfig handleFileUpload(@RequestParam("file") final MultipartFile file)
+            throws IOException, ConfigurationException {
+        LOGGER.info("Uploaded File: " + file.getName());
+        return sonarConfigTranslator.updateConfigFromFile(file, sonarConfig);
+    }
 
-	@RequestMapping(method = RequestMethod.POST, value = "/changeConfig", produces = "application/json", consumes = "application/json")
-	@ResponseBody
-	public SonarConfig changeConfig(@RequestBody final String json) {
-		Gson gson = new GsonBuilder().create();
-		TempSonarConfig newSonarConfig = gson.fromJson(json, TempSonarConfig.class);
-		sonarConfig.replaceWith(newSonarConfig);
-		return sonarConfig;
-	}
+    @RequestMapping(method = RequestMethod.POST, value = "/changeConfig", produces = "application/json", consumes = "application/json")
+    @ResponseBody
+    public SonarConfig changeConfig(@RequestBody final String json) throws ConfigurationException {
+        Gson gson = new GsonBuilder().create();
+        TempSonarConfig newSonarConfig = gson.fromJson(json, TempSonarConfig.class);
+        sonarConfig.replaceWith(newSonarConfig);
+        sonarConfig.setUsernameAndPassword(newSonarConfig.getUsername(), newSonarConfig.getPassword());
+        return sonarConfig;
+    }
 
 }
