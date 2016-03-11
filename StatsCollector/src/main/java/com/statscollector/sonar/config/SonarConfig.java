@@ -15,7 +15,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
      */
     private static final String HOST_KEY = "sonar.host";
     private static final String HOST_PORT_KEY = "sonar.hostPort";
-    private static final String CONFIG_FILE_PATH_KEY = "configFile.path";
+    private static final String CONFIG_FILE_PATH_KEY = "sonarConfigFile.path";
     private static final String DEFAULT_FILE_PATH = "SonarStatistics.properties";
     private static final String USERNAME_KEY = "sonar.username";
     private static final String PASSWORD_KEY = "sonar.password";
