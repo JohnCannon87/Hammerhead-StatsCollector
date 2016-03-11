@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -66,11 +67,19 @@ public class SonarStatisticsService {
 
     private static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
 
-    private Map<Interval, Map<String, SonarMetric>> condensedMetrics;
+    private static final String ZERO_POINT_ZERO = "0.0";
+
+    private Map<Interval, Map<SonarProject, Map<String, SonarMetric>>> metricsByProjectAndDate;
 
     public List<SonarProject> getProjectsFilteredByName(final String projectFilterRegex) throws IOException,
-    URISyntaxException {
-        List<SonarProject> toBeFiltered = getAllSonarProjects();
+            URISyntaxException {
+        return getProjectsFilteredByName(getAllSonarProjects(), projectFilterRegex);
+    }
+
+    public List<SonarProject> getProjectsFilteredByName(final Collection<SonarProject> projects,
+            final String projectFilterRegex) throws IOException,
+            URISyntaxException {
+        List<SonarProject> toBeFiltered = new ArrayList<>(projects);
         FilterProjectNamePredicate filter = new FilterProjectNamePredicate(projectFilterRegex);
         List<SonarProject> results = filter.filter(toBeFiltered);
         return results;
@@ -120,10 +129,8 @@ public class SonarStatisticsService {
                             endPeriod,
                             sonarConfig.getProjectRegex());
                     List<Interval> periodsList = createPeriodsList(startPeriod, endPeriod);
-                    Map<Interval, Map<SonarProject, Map<String, SonarMetric>>> metricsByProjectAndDate = sortMetricsIntoMaps(
+                    metricsByProjectAndDate = sortMetricsIntoMaps(
                             periodsList, statisticsForPeriod);
-                    condensedMetrics =
-                            condenseMetricsForAllProjectsIntoOne(metricsByProjectAndDate);
                 } catch(IOException | URISyntaxException e) {
                     LOGGER.error("Error in processing Sonar Stats", e);
                 }
@@ -138,23 +145,31 @@ public class SonarStatisticsService {
     }
 
     private Map<Interval, Map<String, SonarMetric>> condenseMetricsForAllProjectsIntoOne(
-            final Map<Interval, Map<SonarProject, Map<String, SonarMetric>>> metricsByProjectAndDate) {
+            final Map<Interval, Map<SonarProject, Map<String, SonarMetric>>> metricsByProjectAndDate,
+            final String projectFilterRegex) throws IOException, URISyntaxException {
         Map<Interval, Map<String, SonarMetric>> result = new HashMap<>();
         List<Interval> intervals = new ArrayList<>();
-        intervals.addAll(metricsByProjectAndDate.keySet());
-        Collections.sort(intervals, (final Interval i1, final Interval i2) -> i1.getStart().compareTo(i2.getStart()));
-        for(Interval interval : intervals) {
-            Map<SonarProject, Map<String, SonarMetric>> projectMetrics = metricsByProjectAndDate.get(interval);
-            Map<String, SonarMetric> metrics = condenseMetricsForProjects(projectMetrics);
-            result.put(interval, metrics);
+        if(null != metricsByProjectAndDate) {
+            intervals.addAll(metricsByProjectAndDate.keySet());
+            Collections.sort(intervals, (final Interval i1, final Interval i2) -> i1.getStart()
+                    .compareTo(i2.getStart()));
+            for(Interval interval : intervals) {
+                Map<SonarProject, Map<String, SonarMetric>> projectMetrics = metricsByProjectAndDate.get(interval);
+                Map<String, SonarMetric> metrics = condenseMetricsForProjects(projectMetrics, projectFilterRegex);
+                result.put(interval, metrics);
+            }
         }
         return result;
     }
 
     private Map<String, SonarMetric> condenseMetricsForProjects(
-            final Map<SonarProject, Map<String, SonarMetric>> projectMetrics) {
+            final Map<SonarProject, Map<String, SonarMetric>> projectMetrics, final String projectFilterRegex)
+                    throws IOException, URISyntaxException {
         Map<String, SonarMetric> result = new HashMap<>();
-        Set<SonarProject> projects = projectMetrics.keySet();
+        Set<SonarProject> projectsSet = projectMetrics.keySet();
+
+        List<SonarProject> projects = getProjectsFilteredByName(projectsSet, projectFilterRegex);
+
         for(SonarProject sonarProject : projects) {
             Map<String, SonarMetric> metrics = projectMetrics.get(sonarProject);
             if(metrics != null) {
@@ -234,7 +249,7 @@ public class SonarStatisticsService {
         while(month.isBefore(endPeriod)) {
             Interval interval = new Interval(month.dayOfMonth().withMinimumValue().millisOfDay().withMinimumValue(),
                     month.dayOfMonth()
-                    .withMaximumValue().millisOfDay().withMaximumValue());
+                            .withMaximumValue().millisOfDay().withMaximumValue());
             result.add(interval);
             month = month.plusMonths(1);
         }
@@ -246,7 +261,7 @@ public class SonarStatisticsService {
         // Setup Parsers
         JsonParser jsonParser = new JsonParser();
         Gson gsonParser = new GsonBuilder().create();
-        List<SonarProject> projects = getProjectsFilteredByName(projectRegex);
+        List<SonarProject> projects = getAllSonarProjects();
         DateMidnight startDateMidnight = new DateMidnight(startDate);
         DateMidnight endDateMidnight = new DateMidnight(endDate);
         Interval period = new Interval(startDateMidnight, endDateMidnight);
@@ -292,7 +307,16 @@ public class SonarStatisticsService {
         return results;
     }
 
-    public Map<DateTime, SonarStatistics> getAllStatistics() {
+    public Map<DateTime, SonarStatistics> getAllStatistics(String projectRegex) throws IOException,
+            URISyntaxException {
+
+        if(null == projectRegex || projectRegex.isEmpty()) {
+            projectRegex = sonarConfig.getProjectRegex();
+        }
+
+        Map<Interval, Map<String, SonarMetric>> condensedMetrics =
+                condenseMetricsForAllProjectsIntoOne(metricsByProjectAndDate, projectRegex);
+
         List<Interval> intervals = new ArrayList<>();
         intervals.addAll(condensedMetrics.keySet());
         Collections.sort(intervals, (final Interval i1, final Interval i2) -> i1.getStart().compareTo(i2.getStart()));
@@ -308,7 +332,15 @@ public class SonarStatisticsService {
         return result;
     }
 
-    public SonarStatistics getLatestStatistics() {
+    public SonarStatistics getLatestStatistics(String projectRegex) throws IOException, URISyntaxException {
+
+        if(null == projectRegex || projectRegex.isEmpty()) {
+            projectRegex = sonarConfig.getProjectRegex();
+        }
+
+        Map<Interval, Map<String, SonarMetric>> condensedMetrics =
+                condenseMetricsForAllProjectsIntoOne(metricsByProjectAndDate, projectRegex);
+
         List<Interval> intervals = new ArrayList<>();
         intervals.addAll(condensedMetrics.keySet());
         Collections.sort(intervals, (final Interval i1, final Interval i2) -> i1.getStart().compareTo(i2.getStart()));
@@ -322,7 +354,7 @@ public class SonarStatisticsService {
      * @param map
      * @return
      */
-    protected SonarStatistics calculateSonarStatistics(final Map<String, SonarMetric> map) {
+    private SonarStatistics calculateSonarStatistics(final Map<String, SonarMetric> map) {
         if(map.isEmpty()) {
             return null;
         }
@@ -340,6 +372,13 @@ public class SonarStatisticsService {
 
         return calculateSonarStatistics(linesOfCode, complexity, numberOfFiles, numberOfMethods, blockerViolations,
                 criticalViolations, majorViolations, minorViolations, infoViolations, linesToCover, uncoveredLines);
+    }
+
+    private SonarStatistics fillEmptyMetrics() {
+        return new SonarStatistics(ZERO_POINT_ZERO, ZERO_POINT_ZERO, ZERO_POINT_ZERO, ZERO_POINT_ZERO,
+                ZERO_POINT_ZERO, sonarConfig.getMethodComplexityTarget(),
+                sonarConfig.getFileComplexityTarget(), sonarConfig.getRulesComplianceTarget(),
+                sonarConfig.getTestCoverageTarget());
     }
 
     private SonarStatistics calculateSonarStatistics(final SonarMetric linesOfCode, final SonarMetric complexity,
@@ -362,9 +401,9 @@ public class SonarStatisticsService {
             final SonarMetric majorViolations, final SonarMetric minorViolations, final SonarMetric infoViolations,
             final SonarMetric linesOfCode) {
         BigDecimal weightedBlockerViolationsNumber = new BigDecimal(blockerViolations.getValue())
-                .multiply(new BigDecimal(sonarConfig.getBlockerWeighting()));
+        .multiply(new BigDecimal(sonarConfig.getBlockerWeighting()));
         BigDecimal weightedCriticalViolationsNumber = new BigDecimal(criticalViolations.getValue())
-                .multiply(new BigDecimal(sonarConfig.getCriticalWeighting()));
+        .multiply(new BigDecimal(sonarConfig.getCriticalWeighting()));
         BigDecimal weightedMajorViolationsNumber = new BigDecimal(majorViolations.getValue()).multiply(new BigDecimal(
                 sonarConfig.getMajorWeighting()));
         BigDecimal weightedMinorViolationsNumber = new BigDecimal(minorViolations.getValue()).multiply(new BigDecimal(
@@ -385,6 +424,9 @@ public class SonarStatisticsService {
     }
 
     private String calculateTestCoverage(final SonarMetric uncoveredLines, final SonarMetric linesToCover) {
+        if(null == uncoveredLines || null == linesToCover) {
+            return ZERO_POINT_ZERO;
+        }
         BigDecimal linesToCoverNumber = new BigDecimal(linesToCover.getValue());
         BigDecimal uncoveredLinesNumber = new BigDecimal(uncoveredLines.getValue());
         BigDecimal linesCoveredNumber = linesToCoverNumber.subtract(uncoveredLinesNumber);

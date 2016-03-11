@@ -63,11 +63,7 @@ public class SonarProject {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((datedMetricsMaps == null) ? 0 : datedMetricsMaps.hashCode());
         result = prime * result + ((key == null) ? 0 : key.hashCode());
-        result = prime * result + ((language == null) ? 0 : language.hashCode());
-        result = prime * result + ((metrics == null) ? 0 : metrics.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
     }
 
@@ -83,39 +79,11 @@ public class SonarProject {
             return false;
         }
         SonarProject other = (SonarProject) obj;
-        if(datedMetricsMaps == null) {
-            if(other.datedMetricsMaps != null) {
-                return false;
-            }
-        } else if(!datedMetricsMaps.equals(other.datedMetricsMaps)) {
-            return false;
-        }
         if(key == null) {
             if(other.key != null) {
                 return false;
             }
         } else if(!key.equals(other.key)) {
-            return false;
-        }
-        if(language == null) {
-            if(other.language != null) {
-                return false;
-            }
-        } else if(!language.equals(other.language)) {
-            return false;
-        }
-        if(metrics == null) {
-            if(other.metrics != null) {
-                return false;
-            }
-        } else if(!metrics.equals(other.metrics)) {
-            return false;
-        }
-        if(name == null) {
-            if(other.name != null) {
-                return false;
-            }
-        } else if(!name.equals(other.name)) {
             return false;
         }
         return true;

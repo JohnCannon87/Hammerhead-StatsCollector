@@ -1,4 +1,4 @@
-function UpdateSonarConfig(data, $scope){
+function UpdateSonarConfig(data, $scope, $location){
 	$scope.sonarHostname = data.host;
 	$scope.sonarHostPort = data.hostPort;
 	$scope.sonarUsername = data.username;
@@ -8,6 +8,13 @@ function UpdateSonarConfig(data, $scope){
 	$scope.fileComplexityTarget = data.fileComplexityTarget;
 	$scope.testCoverageTarget = data.testCoverageTarget;
 	$scope.rulesComplianceTarget = data.rulesComplianceTarget;
+	
+	//Override from URL Param For multiple projects.
+	if(typeof $location !== "undefined"){
+		if(typeof $location.search().sonarProjectRegex !== "undefined"){
+			$scope.sonarProjectRegex = $location.search().sonarProjectRegex
+		}
+	}
 }
 
 function UpdateSonarStats(data, $scope){
@@ -190,14 +197,14 @@ function GetReviewRowClassLimit(value, target) {
 	}
 }
 
-function SonarStats($http, $scope, $timeout, $log, $q, Sonar) {
+function SonarStats($http, $scope, $timeout, $location, $log, $q, Sonar) {
 	
 	Sonar.configInfo().then(function(response){
-		UpdateSonarConfig(response.data, $scope);
+		UpdateSonarConfig(response.data, $scope, $location);
 	});
 	
 	$scope.manuallyRefreshSonarData = function(){
-		$http.get('/sonar/stats/refreshCache').then(function(){$http.get('/sonar/stats/allStatistics').then(function(response){UpdateSonarStats(response.data, $scope);})});		
+		$http.get('/sonar/stats/refreshCache').then(function(){$http.get('/sonar/stats/statistics/'+$scope.sonarProjectRegex+'/all').then(function(response){UpdateSonarStats(response.data, $scope);})});		
 	}
 	
 	$scope.manuallyRefreshSonarData();
@@ -219,5 +226,5 @@ function SonarStats($http, $scope, $timeout, $log, $q, Sonar) {
 	};
 }
 
-appGerritStatsModule.controller('SonarStatsCtrl', [ '$http', '$scope', '$timeout', '$log',
+appGerritStatsModule.controller('SonarStatsCtrl', [ '$http', '$scope', '$timeout', '$location', '$log',
                                              		'$q', 'Sonar', SonarStats ]);

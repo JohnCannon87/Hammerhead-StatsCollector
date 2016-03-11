@@ -2,16 +2,14 @@ package com.statscollector.sonar.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.statscollector.sonar.model.SonarStatistics;
 import com.statscollector.sonar.service.SonarStatisticsService;
 
 @RestController
@@ -29,16 +27,18 @@ public class SonarStatsController {
         sonarStatisticsService.getStatisticsScheduledTask();
     }
 
-    @RequestMapping(value = "/allStatistics")
-    public Map<DateTime, SonarStatistics> allStatistics() throws IOException, URISyntaxException {
+    @RequestMapping(value = "/statistics/{projectRegex}/{type}")
+    public Object allStatistics(@PathVariable final String projectRegex,
+            @PathVariable final String type) throws IOException,
+            URISyntaxException {
         LOGGER.info("Getting All Sonar Statistics");
-        return sonarStatisticsService.getAllStatistics();
-    }
-
-    @RequestMapping(value = "/latestStatistics")
-    public SonarStatistics latestStatistics() throws IOException, URISyntaxException {
-        LOGGER.info("Getting Latest Sonar Statistics");
-        return sonarStatisticsService.getLatestStatistics();
+        if(type.equals("all")) {
+            return sonarStatisticsService.getAllStatistics(projectRegex);
+        } else if(type.equals("latest")) {
+            return sonarStatisticsService.getLatestStatistics(projectRegex);
+        } else {
+            return null;
+        }
     }
 
 }
