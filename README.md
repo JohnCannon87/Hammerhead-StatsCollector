@@ -19,7 +19,7 @@ Usage
 * Open up https://localhost:YOUR-PORT (default is 8080)
 * Go to the config tab at the top and entry your Gerrit server details (See below for help setting the thread limits)
 * Setup on a browser to show  the data ! (currently manual refresh is required)
-* You can override the default Project Name and Project Regex config items (i.e. if you have multiple projects ont he same gerrit server and want the stats to be seperated) by using the following URL example: https://StatsCollector/home?projectName=TestProj&projectRegex=.*testproj.*
+* You can override the default Project Name and Project Regex config items (i.e. if you have multiple projects ont he same gerrit server and want the stats to be seperated) by using the following URL example: https://StatsCollector/home?projectName=TestProj&projectRegex=.*testproj.*&sonarProjectRegex=.*testProj.*
 
 To Change The Default Port
 --------------------------
@@ -43,7 +43,7 @@ JS
 * [AngularJS](https://angularjs.org/)
 * [UIBootstrap](http://angular-ui.github.io/bootstrap/)
 * [ChartJS](http://www.chartjs.org/)
-* [angular-chart.js](http://jtblin.github.io/angular-chart.js/)
+* [tc-angular-chartjs](https://github.com/carlcraig/tc-angular-chartjs)
 * [FileSaver.js](https://github.com/eligrey/FileSaver.js/)
 * [ng-file-upload](https://github.com/danialfarid/ng-file-upload)
 
