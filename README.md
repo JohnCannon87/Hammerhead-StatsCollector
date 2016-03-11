@@ -18,6 +18,7 @@ Usage
 * Run .bat or .sh file as appropriate.
 * Open up https://localhost:YOUR-PORT (default is 8080)
 * Go to the config tab at the top and entry your Gerrit server details (See below for help setting the thread limits)
+* Go to the config tab at the top and entry your Sonar server details
 * Setup on a browser to show  the data ! (currently manual refresh is required)
 * You can override the default Project Name and Project Regex config items (i.e. if you have multiple projects ont he same gerrit server and want the stats to be seperated) by using the following URL example: https://StatsCollector/home?projectName=TestProj&projectRegex=.*testproj.*&sonarProjectRegex=.*testProj.*
 
