@@ -15,6 +15,30 @@ function UpdateSonarConfig(data, $scope, $location){
 			$scope.sonarProjectRegex = $location.search().sonarProjectRegex
 		}
 	}
+	
+	if(typeof $location !== "undefined"){
+		if(typeof $location.search().sonarFileTarget !== "undefined"){
+			$scope.fileComplexityTarget = $location.search().sonarFileTarget
+		}
+	}
+	
+	if(typeof $location !== "undefined"){
+		if(typeof $location.search().sonarFileTarget !== "undefined"){
+			$scope.methodComplexityTarget = $location.search().sonarMethodTarget
+		}
+	}
+	
+	if(typeof $location !== "undefined"){
+		if(typeof $location.search().sonarFileTarget !== "undefined"){
+			$scope.testCoverageTarget = $location.search().sonarTestTarget
+		}
+	}
+	
+	if(typeof $location !== "undefined"){
+		if(typeof $location.search().sonarFileTarget !== "undefined"){
+			$scope.rulesComplianceTarget = $location.search().sonarRulesTarget
+		}
+	}
 }
 
 function UpdateSonarStats(data, $scope){
@@ -32,13 +56,13 @@ function UpdateSonarStats(data, $scope){
 	for (d in dates){
 		months.push(moment(dates[d]).format('MMMM'));
 		fileComplexity.push(data[dates[d]].fileComplexity);
-		fileComplexityTarget.push(data[dates[d]].fileComplexityTarget);
+		fileComplexityTarget.push($scope.fileComplexityTarget);
 		methodComplexity.push(data[dates[d]].methodComplexity);
-		methodComplexityTarget.push(data[dates[d]].methodComplexityTarget);
+		methodComplexityTarget.push($scope.methodComplexityTarget);
 		testCoverage.push(data[dates[d]].testCoverage);
-		testCoverageTarget.push(data[dates[d]].testCoverageTarget);
+		testCoverageTarget.push($scope.testCoverageTarget);
 		rulesCompliance.push(data[dates[d]].rulesCompliance);
-		rulesComplianceTarget.push(data[dates[d]].rulesComplianceTarget);
+		rulesComplianceTarget.push($scope.rulesComplianceTarget);
 	}
 	
 	

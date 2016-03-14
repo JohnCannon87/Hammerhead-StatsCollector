@@ -72,7 +72,7 @@ public class SonarStatisticsService {
     private Map<Interval, Map<SonarProject, Map<String, SonarMetric>>> metricsByProjectAndDate;
 
     public List<SonarProject> getProjectsFilteredByName(final String projectFilterRegex) throws IOException,
-            URISyntaxException {
+    URISyntaxException {
         return getProjectsFilteredByName(getAllSonarProjects(), projectFilterRegex);
     }
 
@@ -164,7 +164,7 @@ public class SonarStatisticsService {
 
     private Map<String, SonarMetric> condenseMetricsForProjects(
             final Map<SonarProject, Map<String, SonarMetric>> projectMetrics, final String projectFilterRegex)
-                    throws IOException, URISyntaxException {
+            throws IOException, URISyntaxException {
         Map<String, SonarMetric> result = new HashMap<>();
         Set<SonarProject> projectsSet = projectMetrics.keySet();
 
@@ -249,7 +249,7 @@ public class SonarStatisticsService {
         while(month.isBefore(endPeriod)) {
             Interval interval = new Interval(month.dayOfMonth().withMinimumValue().millisOfDay().withMinimumValue(),
                     month.dayOfMonth()
-                            .withMaximumValue().millisOfDay().withMaximumValue());
+                    .withMaximumValue().millisOfDay().withMaximumValue());
             result.add(interval);
             month = month.plusMonths(1);
         }
@@ -308,7 +308,7 @@ public class SonarStatisticsService {
     }
 
     public Map<DateTime, SonarStatistics> getAllStatistics(String projectRegex) throws IOException,
-            URISyntaxException {
+    URISyntaxException {
 
         if(null == projectRegex || projectRegex.isEmpty()) {
             projectRegex = sonarConfig.getProjectRegex();
@@ -374,13 +374,6 @@ public class SonarStatisticsService {
                 criticalViolations, majorViolations, minorViolations, infoViolations, linesToCover, uncoveredLines);
     }
 
-    private SonarStatistics fillEmptyMetrics() {
-        return new SonarStatistics(ZERO_POINT_ZERO, ZERO_POINT_ZERO, ZERO_POINT_ZERO, ZERO_POINT_ZERO,
-                ZERO_POINT_ZERO, sonarConfig.getMethodComplexityTarget(),
-                sonarConfig.getFileComplexityTarget(), sonarConfig.getRulesComplianceTarget(),
-                sonarConfig.getTestCoverageTarget());
-    }
-
     private SonarStatistics calculateSonarStatistics(final SonarMetric linesOfCode, final SonarMetric complexity,
             final SonarMetric numberOfFiles, final SonarMetric numberOfMethods, final SonarMetric blockerViolations,
             final SonarMetric criticalViolations, final SonarMetric majorViolations, final SonarMetric minorViolations,
@@ -392,18 +385,16 @@ public class SonarStatisticsService {
         String testCoverage = calculateTestCoverage(uncoveredLines, linesToCover);
 
         return new SonarStatistics(methodComplexity, fileComplexity, rulesCompliance, testCoverage,
-                new BigDecimal(linesOfCode.getValue()).setScale(0).toString(), sonarConfig.getMethodComplexityTarget(),
-                sonarConfig.getFileComplexityTarget(), sonarConfig.getRulesComplianceTarget(),
-                sonarConfig.getTestCoverageTarget());
+                new BigDecimal(linesOfCode.getValue()).setScale(0).toString());
     }
 
     private String calculateCompliance(final SonarMetric blockerViolations, final SonarMetric criticalViolations,
             final SonarMetric majorViolations, final SonarMetric minorViolations, final SonarMetric infoViolations,
             final SonarMetric linesOfCode) {
         BigDecimal weightedBlockerViolationsNumber = new BigDecimal(blockerViolations.getValue())
-        .multiply(new BigDecimal(sonarConfig.getBlockerWeighting()));
+                .multiply(new BigDecimal(sonarConfig.getBlockerWeighting()));
         BigDecimal weightedCriticalViolationsNumber = new BigDecimal(criticalViolations.getValue())
-        .multiply(new BigDecimal(sonarConfig.getCriticalWeighting()));
+                .multiply(new BigDecimal(sonarConfig.getCriticalWeighting()));
         BigDecimal weightedMajorViolationsNumber = new BigDecimal(majorViolations.getValue()).multiply(new BigDecimal(
                 sonarConfig.getMajorWeighting()));
         BigDecimal weightedMinorViolationsNumber = new BigDecimal(minorViolations.getValue()).multiply(new BigDecimal(
