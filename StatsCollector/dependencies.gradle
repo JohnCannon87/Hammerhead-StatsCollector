@@ -15,6 +15,7 @@ dependencies {
 	compile group:'commons-io', name:'commons-io', version:commonsIoVersion
 	compile group:'commons-beanutils', name:'commons-beanutils', version:beanUtils
 	compile group:'com.google.gerrit', name:'gerrit-extension-api', version:gerritExtentionsVersion
+	compile group:'org.jacoco', name:'jacoco-maven-plugin', version:jacocoVersion
 	
 	
 	/* Test Compile dependencies */

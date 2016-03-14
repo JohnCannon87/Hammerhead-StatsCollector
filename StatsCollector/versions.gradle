@@ -14,4 +14,6 @@ ext {
 	commonsIoVersion='2.4'
 	beanUtils='1.9.2'
 	gerritExtentionsVersion='2.10'
+	jacocoVersion='0.7.5.201505241946'
 }
+
