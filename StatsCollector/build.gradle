@@ -65,6 +65,15 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+check.dependsOn jacocoTestReport
+
 applicationDefaultJvmArgs = [
 
 "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005" ]
