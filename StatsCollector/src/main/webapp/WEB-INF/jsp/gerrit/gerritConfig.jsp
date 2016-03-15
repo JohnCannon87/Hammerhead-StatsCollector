@@ -135,11 +135,6 @@
 							</tr>
 						</tbody>
 					</table>
-				</div>
-			</div>
-			<!-- Target Config -->
-			<div class="col-sm-12">
-				<div class="col-sm-6">
 					<table class="table table-striped">
 						<thead>
 							<tr>
@@ -174,7 +169,6 @@
 						<span class="glyphicon glyphicon-save"></span>  Save Changes
 					</button>
 				</div>
-				<div class="col-sm-6"></div>
 			</div>
 		</div>
 	</div>
