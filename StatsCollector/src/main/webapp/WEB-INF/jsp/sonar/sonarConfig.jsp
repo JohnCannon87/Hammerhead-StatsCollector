@@ -75,6 +75,12 @@
 									placeholder="Projects to include as a regex" />
 							</div>
 						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Fill Target Area:</label>
+							<div class="col-sm-10">
+								<input type="checkbox" ng-model="fillTargetArea"/>
+							</div>
+						</div>
 					</form>
 					<hr>
 					<table class="table table-striped">

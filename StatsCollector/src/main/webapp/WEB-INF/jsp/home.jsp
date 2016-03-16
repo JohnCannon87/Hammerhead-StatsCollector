@@ -69,36 +69,25 @@
 			</div>
 	</div>
 	<div ng-controller="SonarStatsCtrl" class="col-sm-8">
-		<!-- <div class="col-sm-3">
-			<h3>Sonar stats for server {{sonarHostname}} are:</h3>
-			<ul class="list-group">
-				<li class="list-group-item">Method Complexity: <span class="badge">{{methodComplexity}}</span></li>
-				<li class="list-group-item">File Complexity: <span class="badge">{{fileComplexity}}</span></li>
-				<li class="list-group-item">Test Coverage: <span class="badge">{{testCoverage}}</span></li>
-				<li class="list-group-item">Rules Compliance: <span class="badge">{{rulesCompliance}}</span></li>
-				<li class="list-group-item">Total Lines: <span class="badge">{{linesOfCode}}</span></li>								
-			</ul>
-				    <button type="button" class="btn btn-success" ng-click="manuallyRefreshSonarData()"><span class="glyphicon glyphicon-repeat"></span>    Manually Refresh Data Cache</button>
-		</div> -->
 		<div class="col-sm-12">		
 			<div class="col-sm-6">					
 				<div class="panel panel-default">		
 					<div class="list-group-item" ng-class="getFileComplexityClass(fileComplexity)">File Complexity = {{fileComplexity}}</div>
-					<canvas tc-chartjs-line chart-data="fileComplexityChartData" chart-options="lineChartOptions" id="fileComplexityChart"></canvas>
+					<canvas tc-chartjs chart-type="LineAlt" chart-data="fileComplexityChartData" chart-options="lineChartOptionsUpwards" id="fileComplexityChart"></canvas>
 				</div>
 				<div class="panel panel-default">
 					<div class="list-group-item" ng-class="getTestCoverageClass(testCoverage)">Test Coverage = {{testCoverage}}</div>
-					<canvas tc-chartjs-line chart-data="testCoverageChartData" chart-options="lineChartOptions" id="testCoverageChart"></canvas>
+					<canvas tc-chartjs chart-type="LineAlt" chart-data="testCoverageChartData" chart-options="lineChartOptionsDownwards" id="testCoverageChart"></canvas>
 				</div>
 			</div>
 			<div class="col-sm-6">			
 				<div class="panel panel-default">	
 					<div class="list-group-item" ng-class="getMethodComplexityClass(methodComplexity)">Method Complexity = {{methodComplexity}}</div>		
-					<canvas tc-chartjs-line chart-data="methodComplexityChartData" chart-options="lineChartOptions" id="methodComplexityChart"></canvas>
+					<canvas tc-chartjs chart-type="LineAlt" chart-data="methodComplexityChartData" chart-options="lineChartOptionsUpwards" id="methodComplexityChart"></canvas>
 				</div>
 				<div class="panel panel-default">	
 					<div class="list-group-item" ng-class="getRulesComplianceClass(rulesCompliance)">Rules Compliance = {{rulesCompliance}}</div>		
-					<canvas tc-chartjs-line chart-data="rulesComplianceChartData" chart-options="lineChartOptions" id="rulesComplianceChart"></canvas>
+					<canvas tc-chartjs chart-type="LineAlt" chart-data="rulesComplianceChartData" chart-options="lineChartOptionsDownwards" id="rulesComplianceChart"></canvas>
 				</div>
 			</div>
 		</div>

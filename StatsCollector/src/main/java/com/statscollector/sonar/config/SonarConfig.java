@@ -29,6 +29,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
     private static final String MAJOR_WEIGHTING = "sonar.majorWeighting";
     private static final String MINOR_WEIGHTING = "sonar.minorWeighting";
     private static final String INFO_WEIGHTING = "sonar.infoWeighting";
+    private static final String FILL_TARGET_AREA = "sonar.fillTargetArea";
 
     public SonarConfig() throws ConfigurationException {
         super();
@@ -155,6 +156,15 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
 
     public void setInfoWeighting(final String weighting) throws ConfigurationException {
         config.setProperty(INFO_WEIGHTING, weighting);
+        config.save();
+    }
+
+    public Boolean getFillTargetArea() {
+        return config.getBoolean(FILL_TARGET_AREA, false);
+    }
+
+    public void setFillTargetArea(final Boolean fillTargetArea) throws ConfigurationException {
+        config.setProperty(FILL_TARGET_AREA, fillTargetArea);
         config.save();
     }
 

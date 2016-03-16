@@ -8,6 +8,7 @@ function UpdateSonarConfig(data, $scope, $location){
 	$scope.fileComplexityTarget = data.fileComplexityTarget;
 	$scope.testCoverageTarget = data.testCoverageTarget;
 	$scope.rulesComplianceTarget = data.rulesComplianceTarget;
+	$scope.fillTargetArea = data.fillTargetArea;
 	
 	//Override from URL Param For multiple projects.
 	if(typeof $location !== "undefined"){
@@ -73,14 +74,14 @@ function UpdateSonarStats(data, $scope){
 	$scope.testCoverage = latestStats.testCoverage;
 	$scope.rulesCompliance = latestStats.rulesCompliance;
 	$scope.linesOfCode = latestStats.linesOfCode;
-	$scope.lineChartOptions = {
+	$scope.lineChartOptionsUpwards = {
 			animation : true,
 		    scaleShowGridLines : true,
 		    scaleGridLineColor : "rgba(0,0,0,.05)",
 		    scaleGridLineWidth : 1,
 		    scaleShowHorizontalLines: true,
 		    scaleShowVerticalLines: true,
-		    bezierCurve : false,
+		    bezierCurve : true,
 		    pointDot : true,
 		    pointDotRadius : 4,
 		    pointDotStrokeWidth : 1,
@@ -88,6 +89,27 @@ function UpdateSonarStats(data, $scope){
 		    datasetStroke : true,
 		    datasetStrokeWidth : 2,
 		    datasetFill : false,
+		    upwardsFill : $scope.fillTargetArea && true,
+		    downwardsFill : false,
+		    responsive : true		    
+	};
+	$scope.lineChartOptionsDownwards = {
+			animation : true,
+		    scaleShowGridLines : true,
+		    scaleGridLineColor : "rgba(0,0,0,.05)",
+		    scaleGridLineWidth : 1,
+		    scaleShowHorizontalLines: true,
+		    scaleShowVerticalLines: true,
+		    bezierCurve : true,
+		    pointDot : true,
+		    pointDotRadius : 4,
+		    pointDotStrokeWidth : 1,
+		    pointHitDetectionRadius : 20,
+		    datasetStroke : true,
+		    datasetStrokeWidth : 2,
+		    datasetFill : false,
+		    upwardsFill : false,
+		    downwardsFill : $scope.fillTargetArea && true,
 		    responsive : true		    
 	};
 	var fileComplexityChartData = {
@@ -103,7 +125,7 @@ function UpdateSonarStats(data, $scope){
 	             },
 	             {
 	            	 label: "File Complexity Target",
-			            fillColor: "rgba(255,0,0,0.3)",
+			            fillColor: "rgba(255,0,0,0.1)",
 			            strokeColor: "rgba(255,0,0,0.3)",
 			            pointColor: "rgba(255,0,0,0.3)",
 			            pointStrokeColor: "#fff",
@@ -125,7 +147,7 @@ function UpdateSonarStats(data, $scope){
 			             },
 			             {
 			            	 label: "Method Complexity Target",
-					            fillColor: "rgba(255,0,0,0.3)",
+					            fillColor: "rgba(255,0,0,0.1)",
 					            strokeColor: "rgba(255,0,0,0.3)",
 					            pointColor: "rgba(255,0,0,0.3)",
 					            pointStrokeColor: "#fff",
@@ -147,7 +169,7 @@ function UpdateSonarStats(data, $scope){
 			             },
 			             {
 			            	 label: "Test Coverage Target",
-					            fillColor: "rgba(255,0,0,0.3)",
+					            fillColor: "rgba(255,0,0,0.1)",
 					            strokeColor: "rgba(255,0,0,0.3)",
 					            pointColor: "rgba(255,0,0,0.3)",
 					            pointStrokeColor: "#fff",
@@ -169,7 +191,7 @@ function UpdateSonarStats(data, $scope){
 			             },
 			             {
 			            	 label: "Rules Compliance Target",
-					            fillColor: "rgba(255,0,0,0.3)",
+					            fillColor: "rgba(255,0,0,0.1)",
 					            strokeColor: "rgba(255,0,0,0.3)",
 					            pointColor: "rgba(255,0,0,0.3)",
 					            pointStrokeColor: "#fff",
@@ -222,6 +244,47 @@ function GetReviewRowClassLimit(value, target) {
 }
 
 function SonarStats($http, $scope, $timeout, $location, $log, $q, Sonar) {
+	
+	Chart.types.Line.extend({
+        name: "LineAlt",
+        draw: function () {
+            Chart.types.Line.prototype.draw.apply(this, arguments);
+
+            var ctx = this.chart.ctx;
+            var scale = this.scale;
+
+            ctx.save();
+
+            if(this.options.upwardsFill){
+	            ctx.fillStyle = this.datasets[1].fillColor;
+	            ctx.beginPath();
+	            ctx.moveTo(scale.calculateX(0), scale.startPoint);	            
+	            this.datasets[1].points.forEach(function (point) {
+	                ctx.lineTo(scale.calculateX(0), scale.calculateY(point.value));
+	                ctx.lineTo(point.x, point.y);
+	                ctx.lineTo(point.x, scale.startPoint);
+	            });
+	            ctx.closePath();
+	            ctx.fill();
+        	}
+			
+            if(this.options.downwardsFill){
+	            ctx.beginPath();
+	            ctx.fillStyle = this.datasets[1].fillColor;
+	            ctx.moveTo(scale.calculateX(0), scale.endPoint)
+	            this.datasets[1].points.forEach(function (point) {
+	                ctx.lineTo(scale.calculateX(0), scale.calculateY(point.value));
+	                ctx.lineTo(point.x, point.y);
+	                ctx.lineTo(point.x, scale.endPoint);
+	            })
+				ctx.closePath();
+				ctx.fill();
+        	}
+
+            ctx.restore();
+        }
+    });
+
 	
 	Sonar.configInfo().then(function(response){
 		UpdateSonarConfig(response.data, $scope, $location);

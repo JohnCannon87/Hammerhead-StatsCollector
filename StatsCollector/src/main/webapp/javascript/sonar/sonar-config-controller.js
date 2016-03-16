@@ -8,6 +8,7 @@ function UpdateSonarConfig(data, $scope){
 	$scope.fileComplexityTarget = data.fileComplexityTarget;
 	$scope.testCoverageTarget = data.testCoverageTarget;
 	$scope.rulesComplianceTarget = data.rulesComplianceTarget;
+	$scope.fillTargetArea = data.fillTargetArea;
 }
 
 function SonarConfig($http, $scope, $log, $q, Sonar, Upload) {
@@ -78,7 +79,8 @@ function SonarConfig($http, $scope, $log, $q, Sonar, Upload) {
 							"methodComplexityTarget": $scope.methodComplexityTarget,
 							"fileComplexityTarget": $scope.fileComplexityTarget,
 							"testCoverageTarget": $scope.testCoverageTarget,
-							"rulesComplianceTarget": $scope.rulesComplianceTarget							
+							"rulesComplianceTarget": $scope.rulesComplianceTarget,
+							"fillTargetArea": $scope.fillTargetArea						
 						}
 		
 		$http.post('/sonar/config/changeConfig', sonarConfig)
