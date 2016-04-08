@@ -172,6 +172,6 @@
 			</div>
 		</div>
 	</div>
-	<%@include file="../common/footer.jsp"%>
+	<%@include file="../common/footer.jspf"%>
 </body>
 </html>
