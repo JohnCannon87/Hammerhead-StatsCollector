@@ -61,7 +61,7 @@
 				        <li><a ng-click="changeGerritStatus('abandoned')">Set status to abandoned</a></li>
 				      </ul>
 				    </div>
-				    <button type="button" class="btn btn-success" ng-click="manuallyRefreshGerritData()"><span class="glyphicon glyphicon-repeat"></span>    Refresh Data Cache</button>
+				    <button type="button" class="btn btn-success" ng-click="manuallyRefreshGerritData()"><span class="fa fa-refresh"></span>    Refresh Data Cache</button>
 				</li>
 			</ul>
 			<div ng-show="gerritStatsStatus.show">

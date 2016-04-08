@@ -25,4 +25,5 @@
 <script src="/javascript/external/bootstrap/ui-bootstrap-tpls.min.js"></script>
 <script src="/javascript/app.js"></script>
 <link rel="stylesheet" href="/css/external/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="/css/external/font-awesome/css/font-awesome.min.css">
 <link rel="stylesheet" href="/css/app.css">

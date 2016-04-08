@@ -18,14 +18,14 @@
 			<!-- PAGE TITLE -->
 			<div class="page-header col-mid-12">
 				<h1>
-					<span class="glyphicon glyphicon-cog"></span> Sonar Config
+					<span class="fa fa-cogs"></span> Sonar Config
 					<button class="btn btn-primary" ng-click="downloadConfig()">
-						<span class="glyphicon glyphicon-download"></span>  Download
+						<span class="fa fa-download"></span>  Download
 						Config
 					</button>
 					<button class="btn btn-primary" ngf-select="" ng-model="files"
 						ngf-multiple="true" class="ng-pristine ng-valid">
-						<span class="glyphicon glyphicon-upload"></span>  Upload Config
+						<span class="fa fa-upload"></span>  Upload Config
 					</button>
 					</button>
 				</h1>
@@ -33,7 +33,7 @@
 
 			<div class="page-header col-mid-12">
 				<h3>
-					<span class="glyphicon glyphicon-cog"></span> Server Config
+					<span class="fa fa-cogs"></span> Server Config
 				</h3>
 			</div>
 			<div class="col-sm-12">
@@ -114,7 +114,7 @@
 						</tbody>
 					</table>
 					<button class="btn btn-success" ng-click="saveSonarConfig()">
-						<span class="glyphicon glyphicon-save"></span>  Save Changes
+						<span class="fa fa-save"></span>  Save Changes
 					</button>
 				</div>
 			</div>

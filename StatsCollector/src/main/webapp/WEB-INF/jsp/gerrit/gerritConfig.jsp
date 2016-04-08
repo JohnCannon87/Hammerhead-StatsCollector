@@ -18,18 +18,18 @@
 			<!-- PAGE TITLE -->
 			<div class="page-header col-mid-12">
 				<h1>
-					<span class="glyphicon glyphicon-cog"></span> Gerrit Config
+					<span class="fa fa-cogs"></span> Gerrit Config
 					<button class="btn btn-primary" ng-click="downloadConfig()">
-						<span class="glyphicon glyphicon-download"></span>  Download Config
+						<span class="fa fa-download"></span>  Download Config
 					</button>
-					<button class="btn btn-primary" ngf-select="" ng-model="files" ngf-multiple="true" class="ng-pristine ng-valid"><span class="glyphicon glyphicon-upload"></span>  Upload Config</button>						
+					<button class="btn btn-primary" ngf-select="" ng-model="files" ngf-multiple="true" class="ng-pristine ng-valid"><span class="fa fa-upload"></span>  Upload Config</button>						
 					</button>
 				</h1>
 			</div>
 
 			<div class="page-header col-mid-12">
 				<h3>
-					<span class="glyphicon glyphicon-cog"></span> Server Config
+					<span class="fa fa-cogs"></span> Server Config
 				</h3>
 			</div>
 			<div class="col-sm-12">
@@ -108,7 +108,7 @@
 					</form>
 					<hr>
 					<button class="btn btn-success" ng-click="saveGerritConfig()">
-						<span class="glyphicon glyphicon-save"></span>  Save Changes
+						<span class="fa fa-save"></span>  Save Changes
 					</button>
 				</div>
 
@@ -124,14 +124,14 @@
 							<tr ng-repeat="reviewer in reviewersToIgnore">
 								<td>{{reviewer}}</td>
 								<td><button type="button" class=" btn btn-danger"
-										ng-click="removeReviewer(reviewer)">Remove</button></td>
+										ng-click="removeReviewer(reviewer)"><i class="fa fa-times"></i> Remove</button></td>
 							</tr>
 							<tr>
 								<td><input type="text" name="reviewer" class="form-control"
 									placeholder="Enter New Reviewer To Ignore"
 									ng-model="gerritReviewer"></td>
 								<td><button type="button" class=" btn btn-primary"
-										ng-click="addReviewer()">Add Reviewer</button></td>
+										ng-click="addReviewer()"><i class="fa fa-plus"></i> Add Reviewer</button></td>
 							</tr>
 						</tbody>
 					</table>
@@ -166,7 +166,7 @@
 						</tbody>
 					</table>
 					<button class="btn btn-success" ng-click="saveTargetConfig()">
-						<span class="glyphicon glyphicon-save"></span>  Save Changes
+						<span class="fa fa-save"></span>  Save Changes
 					</button>
 				</div>
 			</div>
