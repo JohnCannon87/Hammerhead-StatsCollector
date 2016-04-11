@@ -1,1 +1,1 @@
-var appSonarStatsModule = angular.module('appSonarStats', ['tc.chartjs', 'ui.bootstrap', 'ngFileUpload']);
+var appSonarStatsModule = angular.module('appSonarStats', ['tc.chartjs', 'ui.bootstrap', 'ngFileUpload'])

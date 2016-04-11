@@ -4,12 +4,18 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.statscollector.application.config.AbstractWebConfig;
 import com.statscollector.application.config.WebConfig;
+import com.statscollector.sonar.config.TempSonarConfig;
 
 @Component
+@JsonPropertyOrder({"projectName", "host", "hostPort", "username", "password", "projectRegex", "topicRegex", "threadSplitSize", "startDateOffset", "endDateOffset", "noPeerReviewTarget", "onePeerReviewTarget", "twoPeerReviewTarget", "collaborativeReviewTarget", "reviewersToIgnore"})
 public class GerritConfig extends AbstractWebConfig implements WebConfig {
 
     /**
@@ -68,6 +74,7 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
         return PASSWORD_KEY;
     }
 
+    @JsonProperty(value = "Reviewers To Ignore")
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<String> getReviewersToIgnore() {
         return (List) config.getList(REVIEWERS_TO_IGNORE_KEY);
@@ -98,25 +105,25 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
         config.setProperty(COLLABORATIVE_REVIEW_TARGET_KEY, df.format(collaborativeDevelopmentTarget));
         config.save();
     }
-
+    
+    @JsonProperty(value = "No Peer Review Target", required=true)
     public Float getNoPeerReviewTarget() {
-        return config.getFloat(NO_PEER_REVIEW_TARGET_KEY);
+    	return getFloatWithDefaultValue(NO_PEER_REVIEW_TARGET_KEY, 0.0f);        
     }
 
-    public Float getOnePeerReviewTarget() {
-        return config.getFloat(ONE_PEER_REVIEW_TARGET_KEY);
+    @JsonProperty(value = "One Peer Review Target", required=true)
+	public Float getOnePeerReviewTarget() {
+    	return getFloatWithDefaultValue(ONE_PEER_REVIEW_TARGET_KEY, 0.0f);
     }
 
+    @JsonProperty(value = "Two Peer Review Target", required=true)
     public Float getTwoPeerReviewTarget() {
-        return config.getFloat(TWO_PEER_REVIEW_TARGET_KEY);
+    	return getFloatWithDefaultValue(TWO_PEER_REVIEW_TARGET_KEY, 0.0f);
     }
 
+    @JsonProperty(value = "Collaborative Review Target", required=true)
     public Float getCollaborativeReviewTarget() {
-        return config.getFloat(COLLABORATIVE_REVIEW_TARGET_KEY);
-    }
-
-    public String getConfigVersion() {
-        return config.getString(CONFIG_VERSION_KEY);
+    	return getFloatWithDefaultValue(COLLABORATIVE_REVIEW_TARGET_KEY, 0.0f);
     }
 
     public void setConfigVersion(final String configVersion) throws ConfigurationException {
@@ -124,6 +131,7 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(value = "Topic Regex")
     public String getTopicRegex() {
         return config.getString(TOPIC_REGEX_KEY);
     }
@@ -133,8 +141,9 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(value = "Thread Split Size", required=true)
     public Integer getThreadSplitSize() {
-        return config.getInt(THREAD_SPLIT_SIZE);
+    	return getIntegerWithDefaultValue(THREAD_SPLIT_SIZE, 0);
     }
 
     public void setThreadSplitSize(final Integer threadSplitSize) throws ConfigurationException {
@@ -142,8 +151,9 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(value = "Start Date Offset", required=true)
     public Integer getStartDateOffset() {
-        return config.getInt(START_DATE_KEY);
+    	return getIntegerWithDefaultValue(START_DATE_KEY, 0);
     }
 
     public void setStartDateOffset(final Integer startDateOffset) throws ConfigurationException {
@@ -151,8 +161,9 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(value = "End Date Offset", required=true)
     public Integer getEndDateOffset() {
-        return config.getInt(END_DATE_KEY);
+    	return getIntegerWithDefaultValue(END_DATE_KEY, 0);
     }
 
     public void setEndDateOffset(final Integer endDateOffset) throws ConfigurationException {
@@ -160,6 +171,7 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(value = "Project Regex")
     public String getProjectRegex() {
         return config.getString(PROJECT_REGEX_KEY);
     }
@@ -167,5 +179,9 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
     public void setProjectRegex(final String projectRegex) throws ConfigurationException {
         config.setProperty(PROJECT_REGEX_KEY, projectRegex);
         config.save();
+    }
+
+    public void replaceWith(final TempGerritConfig newGerritConfig) {
+        BeanUtils.copyProperties(newGerritConfig, this);
     }
 }

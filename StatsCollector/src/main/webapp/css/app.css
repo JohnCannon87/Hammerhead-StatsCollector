@@ -7,6 +7,14 @@ body {
   padding-top: 50px;
 }
 
+body {
+  margin: 20px
+}
+
+.formly-field {
+  margin-bottom:16px;
+}
+
 .legendBox {
   width:25px;
   height:25px;

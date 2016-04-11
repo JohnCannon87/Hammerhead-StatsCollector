@@ -15,5 +15,6 @@ ext {
 	beanUtils='1.9.2'
 	gerritExtentionsVersion='2.10'
 	jacocoVersion='0.7.5.201505241946'
+	jsonSchemaVersion='2.7.3'
 }
 

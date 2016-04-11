@@ -16,6 +16,7 @@ dependencies {
 	compile group:'commons-beanutils', name:'commons-beanutils', version:beanUtils
 	compile group:'com.google.gerrit', name:'gerrit-extension-api', version:gerritExtentionsVersion
 	compile group:'org.jacoco', name:'jacoco-maven-plugin', version:jacocoVersion
+	compile group:'com.fasterxml.jackson.module', name:'jackson-module-jsonSchema', version:jsonSchemaVersion
 	
 	
 	/* Test Compile dependencies */

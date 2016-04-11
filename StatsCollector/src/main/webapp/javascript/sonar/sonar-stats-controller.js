@@ -40,6 +40,8 @@ function UpdateSonarConfig(data, $scope, $location){
 			$scope.rulesComplianceTarget = $location.search().sonarRulesTarget
 		}
 	}
+	
+	return data;
 }
 
 function UpdateSonarStats(data, $scope){
