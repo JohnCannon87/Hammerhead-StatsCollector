@@ -1,4 +1,4 @@
-<nav class="navbar navbar-inverse">
+<nav class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container-fluid">
 			<div class="navbar-header" ng-controller="GerritStatsCtrl">
 				<a class="navbar-brand" href="https://github.com/JohnCannon87/StatsCollector"><i class="fa fa-github"></i> {{gerritProjectName}} Statistics Collector</a>
@@ -12,3 +12,4 @@
 			</div>
 		</div>
 	</nav>
+	<br/>

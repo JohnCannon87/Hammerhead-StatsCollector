@@ -49,23 +49,39 @@
 							<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
-				<li class="list-group-item">Total Reviews: <span class="badge">{{totalReviews}}</span></li>
-				<li class="list-group-item">
-				    <div class="btn-group" dropdown is-open="status.isopen">
-				      <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
-				        Stats for status {{gerritStatus}} <span class="caret"></span>
-				      </button>
-				      <ul class="dropdown-menu" role="menu">
-				        <li><a ng-click="changeGerritStatus('merged')">Set status to merged</a></li>
-				        <li><a ng-click="changeGerritStatus('open')">Set status to open</a></li>
-				        <li><a ng-click="changeGerritStatus('abandoned')">Set status to abandoned</a></li>
-				      </ul>
-				    </div>
-				    <button type="button" class="btn btn-success" ng-click="manuallyRefreshGerritData()"><span class="fa fa-refresh"></span>    Refresh Data Cache</button>
-				</li>
+					<li class="list-group-item">Total Reviews: <span class="badge">{{totalReviews}}</span></li>
+				<div ng-hide="true">
+					<li class="list-group-item">
+					    <div class="btn-group" dropdown is-open="status.isopen">
+					      <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+					        Stats for status {{gerritStatus}} <span class="caret"></span>
+					      </button>
+					      <ul class="dropdown-menu" role="menu">
+					        <li><a ng-click="changeGerritStatus('merged')">Set status to merged</a></li>
+					        <li><a ng-click="changeGerritStatus('open')">Set status to open</a></li>
+					        <li><a ng-click="changeGerritStatus('abandoned')">Set status to abandoned</a></li>
+					      </ul>
+					    </div>
+					    <button type="button" class="btn btn-success" ng-click="manuallyRefreshGerritData()"><span class="fa fa-refresh"></span>    Refresh Data Cache</button>
+					</li>
+				</div>
 			</ul>
 			<div ng-show="gerritStatsStatus.show">
 			  <alert type="{{gerritStatsStatus.type}}" close="closeAlert()">{{gerritStatsStatus.msg}}</alert>
+			</div>
+			<div>
+				<div class="col-sm-6">
+					<ul class="list-group">
+						<h4 class="list-group-item active">Authors</h4>
+						<li ng-repeat="author in authors" class="list-group-item">{{author.username}}: <span class="badge">{{author.count}}</span></li>
+					</ul>
+				</div>				
+				<div class="col-sm-6">
+					<ul class="list-group">
+						<h4 class="list-group-item active">Reviewers</h4>
+						<li ng-repeat="reviewer in reviewers" class="list-group-item">{{reviewer.username}}: <span class="badge">{{reviewer.count}}</span></li>
+					</ul>
+				</div>
 			</div>
 	</div>
 	<div ng-controller="SonarStatsCtrl" class="col-sm-8">
@@ -76,7 +92,7 @@
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="fileComplexityChartData" chart-options="lineChartOptionsUpwards" id="fileComplexityChart"></canvas>
 				</div>
 				<div class="panel panel-default">
-					<div class="list-group-item" ng-class="getTestCoverageClass(testCoverage)">Test Coverage = {{testCoverage}}</div>
+					<div class="list-group-item" ng-class="getTestCoverageClass(testCoverage)">Test Coverage = {{testCoverage}}%</div>
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="testCoverageChartData" chart-options="lineChartOptionsDownwards" id="testCoverageChart"></canvas>
 				</div>
 			</div>
@@ -86,7 +102,7 @@
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="methodComplexityChartData" chart-options="lineChartOptionsUpwards" id="methodComplexityChart"></canvas>
 				</div>
 				<div class="panel panel-default">	
-					<div class="list-group-item" ng-class="getRulesComplianceClass(rulesCompliance)">Rules Compliance = {{rulesCompliance}}</div>		
+					<div class="list-group-item" ng-class="getRulesComplianceClass(rulesCompliance)">Rules Compliance = {{rulesCompliance}}%</div>		
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="rulesComplianceChartData" chart-options="lineChartOptionsDownwards" id="rulesComplianceChart"></canvas>
 				</div>
 			</div>

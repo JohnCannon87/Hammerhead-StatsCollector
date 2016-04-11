@@ -52,6 +52,26 @@ function GetReviewRowClassLimit(value, target) {
 	}
 }
 
+function GetGerritAuthorAndReviewerStats($http, $scope, $timeout){
+	if($scope.configLoaded == true){
+		if($scope.gerritProjectRegex !== undefined && $scope.gerritStartDateOffset !== undefined && $scope.gerritEndDateOffset !== undefined){
+			url = '/gerrit/review/authors/'+$scope.gerritStatus+'/'+$scope.gerritProjectRegex+'/'+$scope.gerritStartDateOffset+'/'+$scope.gerritEndDateOffset;
+		}else if($scope.gerritProjectRegex === undefined && $scope.gerritStartDateOffset !== undefined && $scope.gerritEndDateOffset !== undefined){
+			url = '/gerrit/review/authors/'+$scope.gerritStatus+'/'+$scope.gerritStartDateOffset+'/'+$scope.gerritEndDateOffset;
+		}else if($scope.gerritProjectRegex !== undefined && ($scope.gerritStartDateOffset !== undefined || $scope.gerritEndDateOffset !== undefined)){
+			url = '/gerrit/review/authors/'+$scope.gerritStatus+'/'+$scope.gerritProjectRegex;
+		}		
+		$http.get(url)
+		.then(
+				function(response) {
+				$scope.authors = response.data.authorsCountList;
+				$scope.reviewers = response.data.reviewersCountList;
+				console.log($scope.authors);
+				console.log($scope.reviewers);
+				});
+	}
+}
+
 function GetGerritStats($http, $scope, $timeout){	
 	if($scope.configLoaded == true){
 		if($scope.gerritProjectRegex !== undefined && $scope.gerritStartDateOffset !== undefined && $scope.gerritEndDateOffset !== undefined){
@@ -173,13 +193,19 @@ function GerritStats($http, $scope, $timeout, $location, $log, $q, Gerrit) {
 	$scope.closeAlert = function() {
 		$scope.gerritStatsStatus.show = false;
 	}
-
-	$scope.$watch('gerritStatus', function(){GetGerritStats($http, $scope, $timeout)}, true);
 	
-	$scope.$watch('configLoaded', function(){GetGerritStats($http, $scope, $timeout)}, true);
+	$scope.$watch('gerritStatus', function(){
+		GetGerritStats($http, $scope, $timeout);
+		GetGerritAuthorAndReviewerStats($http, $scope, $timeout);
+		}, true);	
+	$scope.$watch('configLoaded', function(){
+		GetGerritStats($http, $scope, $timeout);
+		GetGerritAuthorAndReviewerStats($http, $scope, $timeout);
+		}, true);
 		
 	$scope.manuallyRefreshGerritData = function(){
 		$http.get('/gerrit/review/refreshCache').then(function(){GetGerritStats($http, $scope, $timeout);});		
+		GetGerritAuthorAndReviewerStats($http, $scope, $timeout);
 	}
 	
 	$scope.changeGerritStatus = function(gerritStatus){

@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
@@ -16,8 +17,10 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Lists;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.statscollector.gerrit.config.GerritConfig;
+import com.statscollector.gerrit.model.GerritAuthorsAndReviewersList;
 import com.statscollector.gerrit.model.GerritReviewStats;
 import com.statscollector.gerrit.model.GerritReviewStatsResult;
+import com.statscollector.gerrit.model.GerritUserCount;
 import com.statscollector.gerrit.service.filter.FilterDateUpdatedPredicate;
 import com.statscollector.gerrit.service.filter.FilterProjectNamePredicate;
 import com.statscollector.gerrit.service.filter.FilterTopicPredicate;
@@ -163,18 +166,18 @@ public class GerritStatisticsService {
                                 gerritReviewStats.setStatus(gerritReviewStats.getStatus()
                                         + "Error Thrown During Processing: Null Pointer Returned, ");
                                 gerritReviewStats
-                                        .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
+                                .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
                             } else if(!result.getSuccess()) {
                                 gerritReviewStats.setStatus(gerritReviewStats.getStatus()
                                         + "Error Thrown During Processing: " + result.getError().getMessage() + ", ");
                                 gerritReviewStats
-                                        .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-                                                .getSuccess()));
+                                .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+                                        .getSuccess()));
                             } else {
                                 gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK, ");
                                 gerritReviewStats
-                                        .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-                                                .getSuccess()));
+                                .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+                                        .getSuccess()));
                             }
                         }
                         gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : "
@@ -192,6 +195,16 @@ public class GerritStatisticsService {
         }
     }
 
+    public GerritAuthorsAndReviewersList getCommitAuthors(final String changeStatus, final String projectFilterString,
+            final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
+
+        List<GerritChangeFilter> filters = getFilters(projectFilterString, startDate, endDate,
+                gerritConfig.getTopicRegex());
+
+        GerritReviewStats reviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
+        return buildAuthorsListObject(filters, reviewStats);
+    }
+
     public GerritReviewStats getReviewStatistics(final String changeStatus, final String projectFilterString,
             final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
 
@@ -200,6 +213,26 @@ public class GerritStatisticsService {
 
         GerritReviewStats reviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
         return buildReviewStatsObject(filters, reviewStats);
+    }
+
+    @SuppressWarnings("unchecked")
+    private GerritAuthorsAndReviewersList buildAuthorsListObject(final List<GerritChangeFilter> filters,
+            final GerritReviewStats reviewStats) {
+        if(null != reviewStats) {
+            Map<String, GerritUserCount> mapOfAuthorsAndCounts = gerritStatisticsHelper
+                    .createHashMapOfAuthorsAndCounts(
+                            filterChanges(reviewStats.getOnePeerReviewList(), filters),
+                            filterChanges(reviewStats.getTwoPlusPeerReviewList(), filters),
+                            filterChanges(reviewStats.getCollabrativeDevelopmentList(), filters));
+            Map<String, GerritUserCount> mapOfReviewersAndCounts = gerritStatisticsHelper
+                    .createHashMapOfReviwersAndCounts(
+                            filterChanges(reviewStats.getOnePeerReviewList(), filters),
+                            filterChanges(reviewStats.getTwoPlusPeerReviewList(), filters),
+                            filterChanges(reviewStats.getCollabrativeDevelopmentList(), filters));
+            return new GerritAuthorsAndReviewersList(mapOfAuthorsAndCounts.values(), mapOfReviewersAndCounts.values());
+        } else {
+            return new GerritAuthorsAndReviewersList(new ArrayList<GerritUserCount>(), new ArrayList<GerritUserCount>());
+        }
     }
 
     private GerritReviewStats buildReviewStatsObject(final List<GerritChangeFilter> filters,
