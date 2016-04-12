@@ -12,3 +12,6 @@ hs_err_pid*
 StatsCollector/.gradle/*
 StatsCollector/.settings/*
 StatsCollector/build/*
+StatsCollector/.settings/*
+*.classpath
+*.project
