@@ -1,11 +1,16 @@
 package com.statscollector.sonar.config;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.statscollector.application.config.AbstractTemporaryWebConfig;
 
+@JsonPropertyOrder({ "projectName", "host", "hostPort", "username", "password", "projectRegex",
+        "methodComplexityTarget", "fileComplexityTarget", "rulesComplianceTarget", "testCoverageTarget",
+        "infoWeighting", "minorWeighting", "majorWeighting", "criticalWeighting", "blockerWeighting", "fillTargetArea" })
 public class TempSonarConfig extends AbstractTemporaryWebConfig {
 
     private String projectRegex, methodComplexityTarget, fileComplexityTarget, rulesComplianceTarget,
-    testCoverageTarget;
+            testCoverageTarget, infoWeighting, minorWeighting, majorWeighting, criticalWeighting, blockerWeighting;
     private Boolean fillTargetArea;
 
     public String getProjectRegex() {
@@ -16,6 +21,7 @@ public class TempSonarConfig extends AbstractTemporaryWebConfig {
         this.projectRegex = projectRegex;
     }
 
+    @JsonProperty(required = true)
     public String getMethodComplexityTarget() {
         return methodComplexityTarget;
     }
@@ -24,6 +30,7 @@ public class TempSonarConfig extends AbstractTemporaryWebConfig {
         this.methodComplexityTarget = methodComplexityTarget;
     }
 
+    @JsonProperty(required = true)
     public String getFileComplexityTarget() {
         return fileComplexityTarget;
     }
@@ -32,6 +39,7 @@ public class TempSonarConfig extends AbstractTemporaryWebConfig {
         this.fileComplexityTarget = fileComplexityTarget;
     }
 
+    @JsonProperty(required = true)
     public String getRulesComplianceTarget() {
         return rulesComplianceTarget;
     }
@@ -40,6 +48,7 @@ public class TempSonarConfig extends AbstractTemporaryWebConfig {
         this.rulesComplianceTarget = rulesComplianceTarget;
     }
 
+    @JsonProperty(required = true)
     public String getTestCoverageTarget() {
         return testCoverageTarget;
     }
@@ -48,6 +57,7 @@ public class TempSonarConfig extends AbstractTemporaryWebConfig {
         this.testCoverageTarget = testCoverageTarget;
     }
 
+    @JsonProperty(required = true)
     public Boolean getFillTargetArea() {
         return fillTargetArea;
     }
@@ -56,13 +66,63 @@ public class TempSonarConfig extends AbstractTemporaryWebConfig {
         this.fillTargetArea = fillTargetArea;
     }
 
+    @JsonProperty(required = true)
+    public String getInfoWeighting() {
+        return infoWeighting;
+    }
+
+    public void setInfoWeighting(final String infoWeighting) {
+        this.infoWeighting = infoWeighting;
+    }
+
+    @JsonProperty(required = true)
+    public String getMinorWeighting() {
+        return minorWeighting;
+    }
+
+    public void setMinorWeighting(final String minorWeighting) {
+        this.minorWeighting = minorWeighting;
+    }
+
+    @JsonProperty(required = true)
+    public String getMajorWeighting() {
+        return majorWeighting;
+    }
+
+    public void setMajorWeighting(final String majorWeighting) {
+        this.majorWeighting = majorWeighting;
+    }
+
+    @JsonProperty(required = true)
+    public String getCriticalWeighting() {
+        return criticalWeighting;
+    }
+
+    public void setCriticalWeighting(final String criticalWeighting) {
+        this.criticalWeighting = criticalWeighting;
+    }
+
+    @JsonProperty(required = true)
+    public String getBlockerWeighting() {
+        return blockerWeighting;
+    }
+
+    public void setBlockerWeighting(final String blockerWeighting) {
+        this.blockerWeighting = blockerWeighting;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((blockerWeighting == null) ? 0 : blockerWeighting.hashCode());
+        result = prime * result + ((criticalWeighting == null) ? 0 : criticalWeighting.hashCode());
         result = prime * result + ((fileComplexityTarget == null) ? 0 : fileComplexityTarget.hashCode());
         result = prime * result + ((fillTargetArea == null) ? 0 : fillTargetArea.hashCode());
+        result = prime * result + ((infoWeighting == null) ? 0 : infoWeighting.hashCode());
+        result = prime * result + ((majorWeighting == null) ? 0 : majorWeighting.hashCode());
         result = prime * result + ((methodComplexityTarget == null) ? 0 : methodComplexityTarget.hashCode());
+        result = prime * result + ((minorWeighting == null) ? 0 : minorWeighting.hashCode());
         result = prime * result + ((projectRegex == null) ? 0 : projectRegex.hashCode());
         result = prime * result + ((rulesComplianceTarget == null) ? 0 : rulesComplianceTarget.hashCode());
         result = prime * result + ((testCoverageTarget == null) ? 0 : testCoverageTarget.hashCode());
@@ -81,6 +141,20 @@ public class TempSonarConfig extends AbstractTemporaryWebConfig {
             return false;
         }
         TempSonarConfig other = (TempSonarConfig) obj;
+        if(blockerWeighting == null) {
+            if(other.blockerWeighting != null) {
+                return false;
+            }
+        } else if(!blockerWeighting.equals(other.blockerWeighting)) {
+            return false;
+        }
+        if(criticalWeighting == null) {
+            if(other.criticalWeighting != null) {
+                return false;
+            }
+        } else if(!criticalWeighting.equals(other.criticalWeighting)) {
+            return false;
+        }
         if(fileComplexityTarget == null) {
             if(other.fileComplexityTarget != null) {
                 return false;
@@ -95,11 +169,32 @@ public class TempSonarConfig extends AbstractTemporaryWebConfig {
         } else if(!fillTargetArea.equals(other.fillTargetArea)) {
             return false;
         }
+        if(infoWeighting == null) {
+            if(other.infoWeighting != null) {
+                return false;
+            }
+        } else if(!infoWeighting.equals(other.infoWeighting)) {
+            return false;
+        }
+        if(majorWeighting == null) {
+            if(other.majorWeighting != null) {
+                return false;
+            }
+        } else if(!majorWeighting.equals(other.majorWeighting)) {
+            return false;
+        }
         if(methodComplexityTarget == null) {
             if(other.methodComplexityTarget != null) {
                 return false;
             }
         } else if(!methodComplexityTarget.equals(other.methodComplexityTarget)) {
+            return false;
+        }
+        if(minorWeighting == null) {
+            if(other.minorWeighting != null) {
+                return false;
+            }
+        } else if(!minorWeighting.equals(other.minorWeighting)) {
             return false;
         }
         if(projectRegex == null) {
@@ -130,7 +225,10 @@ public class TempSonarConfig extends AbstractTemporaryWebConfig {
     public String toString() {
         return "TempSonarConfig [projectRegex=" + projectRegex + ", methodComplexityTarget=" + methodComplexityTarget
                 + ", fileComplexityTarget=" + fileComplexityTarget + ", rulesComplianceTarget=" + rulesComplianceTarget
-                + ", testCoverageTarget=" + testCoverageTarget + ", fillTargetArea=" + fillTargetArea + "]";
+                + ", testCoverageTarget=" + testCoverageTarget + ", infoWeighting=" + infoWeighting
+                + ", minorWeighting=" + minorWeighting + ", majorWeighting=" + majorWeighting + ", criticalWeighting="
+                + criticalWeighting + ", blockerWeighting=" + blockerWeighting + ", fillTargetArea=" + fillTargetArea
+                + "]";
     }
 
 }

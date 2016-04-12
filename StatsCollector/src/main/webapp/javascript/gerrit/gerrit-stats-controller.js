@@ -66,8 +66,6 @@ function GetGerritAuthorAndReviewerStats($http, $scope, $timeout){
 				function(response) {
 				$scope.authors = response.data.authorsCountList;
 				$scope.reviewers = response.data.reviewersCountList;
-				console.log($scope.authors);
-				console.log($scope.reviewers);
 				});
 	}
 }

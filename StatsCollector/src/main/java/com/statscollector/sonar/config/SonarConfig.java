@@ -4,10 +4,15 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.statscollector.application.config.AbstractWebConfig;
 import com.statscollector.application.config.WebConfig;
 
 @Component
+@JsonPropertyOrder({ "projectName", "host", "hostPort", "username", "password", "projectRegex",
+        "methodComplexityTarget", "fileComplexityTarget", "rulesComplianceTarget", "testCoverageTarget",
+        "infoWeighting", "minorWeighting", "majorWeighting", "criticalWeighting", "blockerWeighting", "fillTargetArea" })
 public class SonarConfig extends AbstractWebConfig implements WebConfig {
 
     /**
@@ -74,6 +79,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(required = true)
     public String getMethodComplexityTarget() {
         return config.getString(METHOD_COMPLEXITY_TARGET);
     }
@@ -83,6 +89,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(required = true)
     public String getFileComplexityTarget() {
         return config.getString(FILE_COMPLEXITY_TARGET);
     }
@@ -92,6 +99,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(required = true)
     public String getTestCoverageTarget() {
         return config.getString(TEST_COVERAGE_TARGET);
     }
@@ -101,6 +109,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(required = true)
     public String getRulesComplianceTarget() {
         return config.getString(RULES_COMPLIANCE_TARGET);
     }
@@ -110,10 +119,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
-    public String getProjectRegexKey() {
-        return config.getString(PROJECT_REGEX_KEY);
-    }
-
+    @JsonProperty(required = true)
     public String getBlockerWeighting() {
         return config.getString(BLOCKER_WEIGHTING);
     }
@@ -123,6 +129,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(required = true)
     public String getCriticalWeighting() {
         return config.getString(CRITICAL_WEIGHTING);
     }
@@ -132,6 +139,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(required = true)
     public String getMajorWeighting() {
         return config.getString(MAJOR_WEIGHTING);
     }
@@ -141,6 +149,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(required = true)
     public String getMinorWeighting() {
         return config.getString(MINOR_WEIGHTING);
     }
@@ -150,6 +159,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(required = true)
     public String getInfoWeighting() {
         return config.getString(INFO_WEIGHTING);
     }
@@ -159,6 +169,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
+    @JsonProperty(required = true)
     public Boolean getFillTargetArea() {
         return config.getBoolean(FILL_TARGET_AREA, false);
     }

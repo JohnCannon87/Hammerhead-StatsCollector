@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <html ng-app="app">
 <head>
@@ -11,7 +11,7 @@
 <%@include file="../common/charting.jsp"%>
 <%@include file="../common/configPages.jsp"%>
 </head>
-<body ng-controller="GerritConfigCtrl">
+<body ng-controller="GerritConfigCtrl as vm">
 	<%@include file="../common/navbar.jsp"%>
 	<div class="container-fluid">
 		<div class="col-sm-12">
@@ -19,10 +19,14 @@
 			<div class="page-header col-mid-12">
 				<h1>
 					<span class="fa fa-cogs"></span> Gerrit Config
-					<button class="btn btn-primary" ng-click="downloadConfig()">
-						<span class="fa fa-download"></span>  Download Config
+					<button class="btn btn-primary" ng-click="vm.downloadConfig()">
+						<span class="fa fa-download"></span>  Download
+						Config
 					</button>
-					<button class="btn btn-primary" ngf-select="" ng-model="files" ngf-multiple="true" class="ng-pristine ng-valid"><span class="fa fa-upload"></span>  Upload Config</button>						
+					<button class="btn btn-primary" ngf-select="" ng-model="files"
+						ngf-multiple="true" class="ng-pristine ng-valid">
+						<span class="fa fa-upload"></span>  Upload Config
+					</button>
 					</button>
 				</h1>
 			</div>
@@ -34,140 +38,11 @@
 			</div>
 			<div class="col-sm-12">
 				<div class="col-sm-6">
-					<form class="form-horizontal">
-						<div class="form-group">
-							<label class="col-sm-2 control-label">Project Display Name:</label>
-							<div class="col-sm-10">
-								<input type="text" ng-model="gerritProjectName"
-									placeholder="Project Display Name" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">Username:</label>
-							<div class="col-sm-10">
-								<input type="text" ng-model="gerritUsername"
-									placeholder="Gerrit Server Username" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">Password:</label>
-							<div class="col-sm-10">
-								<input type="password" ng-model="gerritPassword"
-									placeholder="Gerrit Server Password" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">Hostname:</label>
-							<div class="col-sm-10">
-								<input type="text" ng-model="gerritHostname"
-									placeholder="Gerrit Server Hostname" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">Host Port:</label>
-							<div class="col-sm-10">
-								<input type="number" ng-model="gerritHostPort"
-									placeholder="Gerrit Server Host Port" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">Topic Filter Regex:</label>
-							<div class="col-sm-10">
-								<input type="text" ng-model="gerritTopicRegex"
-									placeholder="Topics to ignore as a regex (leave blank for none)" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">Gerrit Thread Split Size:</label>
-							<div class="col-sm-10">
-								<input type="number" ng-model="gerritThreadSplitSize"
-									placeholder="Thread size to split Gerrit requests" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">Start Date Offset (Days):</label>
-							<div class="col-sm-10">
-								<input type="number" ng-model="gerritStartDateOffset"
-									placeholder="Start Date Offset In Days" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">End Date Offset (Days):</label>
-							<div class="col-sm-10">
-								<input type="number" ng-model="gerritEndDateOffset"
-									placeholder="End Date Offset In Days" />
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">Project Include Regex:</label>
-							<div class="col-sm-10">
-								<input type="text" ng-model="gerritProjectRegex"
-									placeholder="Projects to include as a regex" />
-							</div>
-						</div>
-					</form>
-					<hr>
-					<button class="btn btn-success" ng-click="saveGerritConfig()">
-						<span class="fa fa-save"></span>  Save Changes
-					</button>
-				</div>
-
-				<div class="col-sm-6">
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th>Name</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="reviewer in reviewersToIgnore">
-								<td>{{reviewer}}</td>
-								<td><button type="button" class=" btn btn-danger"
-										ng-click="removeReviewer(reviewer)"><i class="fa fa-times"></i> Remove</button></td>
-							</tr>
-							<tr>
-								<td><input type="text" name="reviewer" class="form-control"
-									placeholder="Enter New Reviewer To Ignore"
-									ng-model="gerritReviewer"></td>
-								<td><button type="button" class=" btn btn-primary"
-										ng-click="addReviewer()"><i class="fa fa-plus"></i> Add Reviewer</button></td>
-							</tr>
-						</tbody>
-					</table>
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th>Value</th>
-								<th>Target/Limit (%)</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>No Peer Reviews</td>
-								<td><input type="text" ng-model="noPeerReviewsTarget"
-									placeholder="No Peer Reviews Target" /></td>
-							</tr>
-							<tr>
-								<td>One Peer Review</td>
-								<td><input type="text" ng-model="onePeerReviewTarget"
-									placeholder="One Peer Reviews Target" /></td>
-							</tr>
-							<tr>
-								<td>Two Peer Reviews</td>
-								<td><input type="text" ng-model="twoPeerReviewTarget"
-									placeholder="Two Peer Reviews Target" /></td>
-							</tr>
-							<tr>
-								<td>Collaborative Development</td>
-								<td><input type="text" ng-model="collaborativeReviewTarget"
-									placeholder="Collaborative Reviews Target" /></td>
-							</tr>
-						</tbody>
-					</table>
-					<button class="btn btn-success" ng-click="saveTargetConfig()">
-						<span class="fa fa-save"></span>  Save Changes
-					</button>
+					<form ng-submit="vm.onSubmit()" name="vm.form" novalidate>
+				        <formly-form model="vm.model" fields="vm.fields" options="vm.options" form="vm.form">
+				          <button type="submit" class="btn btn-success submit-button" ng-disabled="vm.form.$invalid"><span class="fa fa-save"></span>  Save Changes</button>
+				        </formly-form>
+			      	</form>
 				</div>
 			</div>
 		</div>

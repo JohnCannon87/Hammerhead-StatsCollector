@@ -1,22 +1,9 @@
-function UpdateGerritConfig(data, $scope){
-	$scope.gerritHostname = data.host;
-	$scope.gerritHostPort = data.hostPort;
-	$scope.reviewersToIgnore = data.reviewersToIgnore;
-	$scope.gerritUsername = data.username;
-	$scope.gerritPassword = data.password;
-	$scope.gerritTopicRegex = data.topicRegex;
-	$scope.gerritThreadSplitSize = data.threadSplitSize;
-	$scope.gerritStartDateOffset = data.startDateOffset;
-	$scope.gerritEndDateOffset = data.endDateOffset;
-	$scope.gerritProjectRegex = data.projectRegex;
-	$scope.noPeerReviewsTarget = data.noPeerReviewTarget;
-	$scope.onePeerReviewTarget = data.onePeerReviewTarget;
-	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
-	$scope.collaborativeReviewTarget = data.collaborativeReviewTarget;
-	$scope.gerritProjectName = data.projectName;
+function UpdateGerritConfig(data, vm){
+	vm.model = data;
 }
 
-function GerritConfig($http, $scope, $log, $q, Gerrit, Upload) {
+function GerritConfigCtrl($http, $scope, $log, $q, Gerrit, Upload, getOIMConfig) {
+	var vm = this;
 		
 	$scope.$watch('files', function(files) {
 		$scope.formUpload = false;
@@ -49,7 +36,7 @@ function GerritConfig($http, $scope, $log, $q, Gerrit, Upload) {
 	
 		file.upload.then(function(response) {
 			file.result = response.data;
-			UpdateGerritConfig(response.data, $scope);
+			UpdateGerritConfig(response.data, vm);
 		}, function(response) {
 			if (response.status > 0)
 				$scope.errorMsg = response.status + ': ' + response.data;
@@ -61,14 +48,14 @@ function GerritConfig($http, $scope, $log, $q, Gerrit, Upload) {
 	}
 	
 	Gerrit.configInfo().then(function(response){
-		UpdateGerritConfig(response.data, $scope);
+		UpdateGerritConfig(response.data, vm);
 	});
 	
-	$scope.downloadConfig = function(){
-		$http.get('/gerrit/config/info').then(function(response){
+	function downloadConfig(){
+		$http.get('/sonar/config/info').then(function(response){
 			//Download File Now...
 			var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
-			saveAs(file, 'GerritConfig.json');
+			saveAs(file, 'SonarConfig.json');
 		});		
 	};
 	
@@ -76,7 +63,7 @@ function GerritConfig($http, $scope, $log, $q, Gerrit, Upload) {
 		$http.post('/gerrit/config/addReviewerToIgnore?reviewer='+$scope.gerritReviewer)
 		.success(function(data){
 			console.log(data);			
-			UpdateGerritConfig(data, $scope);
+			UpdateGerritConfig(data, vm);
 		}).error(function(data){
 			console.log(data);
 		});
@@ -86,46 +73,54 @@ function GerritConfig($http, $scope, $log, $q, Gerrit, Upload) {
 		$http.post('/gerrit/config/removeReviewerToIgnore?reviewer='+reviewer)
 		.success(function(data){
 			console.log(data);			
-			UpdateGerritConfig(data, $scope);
+			UpdateGerritConfig(data, vm);
 		}).error(function(data){
 			console.log(data);
 		});
 	};
 	
-	//Form Data Setup
-	$scope.saveGerritConfig = function(){
-		$http.post('/gerrit/config/changeInfo?host='+$scope.gerritHostname
-				+'&hostPort='+$scope.gerritHostPort
-				+'&username='+$scope.gerritUsername
-				+'&password='+$scope.gerritPassword
-				+'&topicRegex='+$scope.gerritTopicRegex
-				+'&threadSplitSize='+$scope.gerritThreadSplitSize
-				+'&startDateOffset='+$scope.gerritStartDateOffset
-				+'&endDateOffset='+$scope.gerritEndDateOffset
-				+'&projectRegex='+$scope.gerritProjectRegex
-				+'&projectName='+$scope.gerritProjectName
-				)
+	function saveConfig(){
+		saveGerritConfig();
+	};
+	
+	function saveGerritConfig(){
+		var gerritConfig = vm.model;		
+		$http.post('/gerrit/config/changeConfig', gerritConfig)
 		.success(function(data){
 			console.log(data);
-			UpdateGerritConfig(data, $scope);
+			UpdateGerritConfig(data, vm);
 		}).error(function(data){
 			console.log(data);
 		});
 	};
 	
-	$scope.saveTargetConfig = function(){
-		$http.post('/gerrit/config/saveTargets?noPeerReviewTarget='+$scope.noPeerReviewsTarget
-				+'&onePeerReviewTarget='+$scope.onePeerReviewTarget
-				+'&twoPeerReviewTarget='+$scope.twoPeerReviewTarget
-				+'&collaborativeDevelopmentTarget='+$scope.collaborativeReviewTarget)
-		.success(function(data){
-			console.log(data);
-			UpdateGerritConfig(data, $scope);
-		}).error(function(data){
-			console.log(data);
+	$http.get('/gerrit/config/info').then(function(response){
+		vm.model = response.data;
+		$http.get('/gerrit/config/schema').then(function(response){
+			vm.fields = getOIMConfig(vm.model, response.data.properties);
 		});
-	}
+	});
+	
+	vm.downloadConfig = downloadConfig;
+	
+    vm.onSubmit = onSubmit;
+
+    vm.model = {
+      awesome: true
+    };
+    
+    vm.options = {
+      formState: {
+        awesomeIsForced: false
+      }
+    };
+        
+ // function definition
+    function onSubmit() {
+    	saveGerritConfig();
+    	saveTargetConfig();
+    };
 	
 };
 
-appGerritStatsModule.controller('GerritConfigCtrl', ['$http', '$scope', '$log', '$q', 'Gerrit', 'Upload', GerritConfig]);
+appGerritStatsModule.controller('GerritConfigCtrl', ['$http', '$scope', '$log', '$q', 'Gerrit', 'Upload', 'getOIMConfig', GerritConfigCtrl]);

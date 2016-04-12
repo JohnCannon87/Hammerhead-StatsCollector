@@ -1,4 +1,4 @@
-angular.module('appSonarStats').service('Sonar', ['$http',
+var app = angular.module('appSonarStats').service('Sonar', ['$http',
 	 function($http) {
 		return ({
 			configInfo: configInfo

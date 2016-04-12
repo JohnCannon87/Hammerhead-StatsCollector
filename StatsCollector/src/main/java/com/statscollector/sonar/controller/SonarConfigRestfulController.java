@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.statscollector.sonar.config.SonarConfig;
@@ -31,6 +35,16 @@ public class SonarConfigRestfulController {
     @Autowired
     private SonarConfigTranslator sonarConfigTranslator;
 
+    @RequestMapping(value = "/schema", produces = "application/json")
+    @ResponseBody
+    public JsonSchema sonarConfigSchema() throws JsonMappingException {
+    	ObjectMapper m = new ObjectMapper();
+    	SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
+    	m.acceptJsonFormatVisitor(SonarConfig.class, visitor);
+    	JsonSchema jsonSchema = visitor.finalSchema();
+		return jsonSchema;    	
+    }
+    
     @RequestMapping(value = "/info", produces = "application/json")
     @ResponseBody
     public SonarConfig sonarInfo() {
@@ -46,9 +60,7 @@ public class SonarConfigRestfulController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/changeConfig", produces = "application/json", consumes = "application/json")
     @ResponseBody
-    public SonarConfig changeConfig(@RequestBody final String json) throws ConfigurationException {
-        Gson gson = new GsonBuilder().create();
-        TempSonarConfig newSonarConfig = gson.fromJson(json, TempSonarConfig.class);
+    public SonarConfig changeConfig(@RequestBody final TempSonarConfig newSonarConfig) throws ConfigurationException {
         sonarConfig.replaceWith(newSonarConfig);
         sonarConfig.setUsernameAndPassword(newSonarConfig.getUsername(), newSonarConfig.getPassword());
         return sonarConfig;
