@@ -93,7 +93,7 @@ app.factory('getOIMConfig', function getOIMConfigDefinition(deepMerge) {
       }
       case 'boolean': {
         typeOptions = {
-          type: 'checkbox',
+          type: 'horizontalCheckbox',
       	  defaultValue: false
         };
         break;
@@ -107,8 +107,15 @@ app.factory('getOIMConfig', function getOIMConfigDefinition(deepMerge) {
       }
       case 'string':
       default:
-        var type = (value && value.length) > 80 ? 'textarea' : 'horizontalInput';
-        typeOptions = {type: type};
+    	  if(key.match(/password/i)){
+  	        typeOptions = {
+  	        		type: 'horizontalInput',
+  	        		templateOptions: {type: 'password'}
+  	        };  
+    	  }else{
+	        var type = (value && value.length) > 80 ? 'textarea' : 'horizontalInput';
+	        typeOptions = {type: type};
+    	  }
     }
     return deepMerge(commonOptions, typeOptions, propMetaData.formlyOptions);
   }

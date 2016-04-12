@@ -96,7 +96,6 @@ function GerritConfigCtrl($http, $scope, $log, $q, Gerrit, Upload, getOIMConfig)
 	
 	$http.get('/gerrit/config/info').then(function(response){
 		vm.model = response.data;
-		console.log(JSON.stringify(vm.fields));
 		$http.get('/gerrit/config/schema').then(function(response){
 			vm.fields = getOIMConfig(vm.model, response.data.properties);
 		});

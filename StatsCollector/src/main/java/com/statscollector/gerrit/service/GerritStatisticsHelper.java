@@ -138,7 +138,7 @@ public class GerritStatisticsHelper {
     }
 
     private boolean ifReviewerNotExcluded(final ApprovalInfo approvalInfo) {
-        return !gerritConfig.getReviewersToIgnore().contains(approvalInfo.username);
+        return !gerritConfig.getReviewersToIgnoreList().contains(approvalInfo.username);
     }
 
     private boolean ifReviewerNotOwner(final String owner, final ApprovalInfo approvalInfo) {
@@ -211,7 +211,7 @@ public class GerritStatisticsHelper {
     }
 
     private String getCorrectNameIsShouldBeUsed(final AccountInfo owner) {
-        if(!gerritConfig.getReviewersToIgnore().contains(owner.username)) {
+        if(!gerritConfig.getReviewersToIgnoreList().contains(owner.username)) {
             if(StringUtils.isEmpty(owner.name)) {
                 return owner.username;
             } else {
@@ -251,7 +251,7 @@ public class GerritStatisticsHelper {
 
     private void addToListIfNotInFilterListAndNotNull(final String username, final String name,
             final List<String> result) {
-        if(!gerritConfig.getReviewersToIgnore().contains(username) && !StringUtils.isEmpty(username)) {
+        if(!gerritConfig.getReviewersToIgnoreList().contains(username) && !StringUtils.isEmpty(username)) {
             if(StringUtils.isEmpty(name)) {
                 result.add(username);
             } else {
