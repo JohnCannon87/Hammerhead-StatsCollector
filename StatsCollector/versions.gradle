@@ -13,7 +13,7 @@ ext {
 	jstlVersion='1.2'
 	commonsIoVersion='2.4'
 	beanUtils='1.9.2'
-	gerritExtentionsVersion='2.10'
+	gerritExtentionsVersion='2.12.2'
 	jacocoVersion='0.7.5.201505241946'
 	jsonSchemaVersion='2.7.3'
 }

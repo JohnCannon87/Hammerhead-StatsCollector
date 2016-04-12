@@ -174,13 +174,11 @@ public class GerritStatisticsHelper {
         Map<String, GerritUserCount> result = new HashMap<String, GerritUserCount>();
         for(List<ChangeInfo> list : reviewLists) {
             for(ChangeInfo changeInfo : list) {
-
-                String name = getCorrectNameIsShouldBeUsed(changeInfo.owner);
-                if(!StringUtils.isEmpty(name)) {
-                    if(result.containsKey(name)) {
-                        result.get(name).incrementCount();
+                if(!StringUtils.isEmpty(changeInfo.owner.username)) {
+                    if(result.containsKey(changeInfo.owner.username)) {
+                        result.get(changeInfo.owner.username).incrementCount();
                     } else {
-                        result.put(name, new GerritUserCount(name));
+                        result.put(changeInfo.owner.username, new GerritUserCount(changeInfo.owner));
                     }
                 }
             }
@@ -196,12 +194,12 @@ public class GerritStatisticsHelper {
                 Map<String, LabelInfo> labels = changeInfo.labels;
                 for(LabelInfo labelInfo : labels.values()) {
                     // Approvers
-                    List<String> names = getAllNonFilteredReviewersForLabels(labelInfo);
-                    for(String name : names) {
-                        if(result.containsKey(name)) {
-                            result.get(name).incrementCount();
+                    List<AccountInfo> users = getAllNonFilteredReviewersForLabels(labelInfo);
+                    for(AccountInfo user : users) {
+                        if(result.containsKey(user.username)) {
+                            result.get(user.username).incrementCount();
                         } else {
-                            result.put(name, new GerritUserCount(name));
+                            result.put(user.username, new GerritUserCount(user));
                         }
                     }
                 }
@@ -210,52 +208,21 @@ public class GerritStatisticsHelper {
         return result;
     }
 
-    private String getCorrectNameIsShouldBeUsed(final AccountInfo owner) {
-        if(!gerritConfig.getReviewersToIgnoreList().contains(owner.username)) {
-            if(StringUtils.isEmpty(owner.name)) {
-                return owner.username;
-            } else {
-                return owner.name;
-            }
-        }
-        return null;
-    }
+    private List<AccountInfo> getAllNonFilteredReviewersForLabels(final LabelInfo labelInfo) {
+        List<AccountInfo> result = new ArrayList<AccountInfo>();
 
-    private List<String> getAllNonFilteredReviewersForLabels(final LabelInfo labelInfo) {
-        List<String> result = new ArrayList<String>();
-
-        addToListIfNotInFilterListAndNotNull(getUsernameFromAccountInfoIfNotNull(labelInfo.approved),
-                getNameFromAccountInfoIfNotNull(labelInfo.approved), result);
-        addToListIfNotInFilterListAndNotNull(getUsernameFromAccountInfoIfNotNull(labelInfo.recommended),
-                getNameFromAccountInfoIfNotNull(labelInfo.recommended), result);
-        addToListIfNotInFilterListAndNotNull(getUsernameFromAccountInfoIfNotNull(labelInfo.disliked),
-                getNameFromAccountInfoIfNotNull(labelInfo.disliked), result);
-        addToListIfNotInFilterListAndNotNull(getUsernameFromAccountInfoIfNotNull(labelInfo.rejected),
-                getNameFromAccountInfoIfNotNull(labelInfo.rejected), result);
+        addToListIfNotInFilterListAndNotNull(labelInfo.approved, result);
+        addToListIfNotInFilterListAndNotNull(labelInfo.recommended, result);
+        addToListIfNotInFilterListAndNotNull(labelInfo.disliked, result);
+        addToListIfNotInFilterListAndNotNull(labelInfo.rejected, result);
         return result;
     }
 
-    private String getUsernameFromAccountInfoIfNotNull(final AccountInfo accountInfo) {
-        if(accountInfo != null) {
-            return accountInfo.username;
-        }
-        return null;
-    }
-
-    private String getNameFromAccountInfoIfNotNull(final AccountInfo accountInfo) {
-        if(accountInfo != null) {
-            return accountInfo.name;
-        }
-        return null;
-    }
-
-    private void addToListIfNotInFilterListAndNotNull(final String username, final String name,
-            final List<String> result) {
-        if(!gerritConfig.getReviewersToIgnoreList().contains(username) && !StringUtils.isEmpty(username)) {
-            if(StringUtils.isEmpty(name)) {
-                result.add(username);
-            } else {
-                result.add(name);
+    private void addToListIfNotInFilterListAndNotNull(final AccountInfo user,
+            final List<AccountInfo> result) {
+        if(null != user) {
+            if(!gerritConfig.getReviewersToIgnoreList().contains(user.username)) {
+                result.add(user);
             }
         }
     }

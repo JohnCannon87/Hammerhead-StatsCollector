@@ -69,17 +69,17 @@
 			<div ng-show="gerritStatsStatus.show">
 			  <alert type="{{gerritStatsStatus.type}}" close="closeAlert()">{{gerritStatsStatus.msg}}</alert>
 			</div>
-			<div>
+			<div class="row no-gutter">
 				<div class="col-sm-6">
 					<ul class="list-group">
 						<h4 class="list-group-item active">Authors</h4>
-						<li ng-repeat="author in authors" class="list-group-item">{{author.username}}: <span class="badge">{{author.count}}</span></li>
+						<li ng-repeat="author in authors" class="list-group-item"><img class = "img-circle" src="{{author.user.avatars[0].url}}" width="25" height="25"/> {{author.user.name}}: <span class="badge">{{author.count}}</span></li>
 					</ul>
 				</div>				
 				<div class="col-sm-6">
 					<ul class="list-group">
 						<h4 class="list-group-item active">Reviewers</h4>
-						<li ng-repeat="reviewer in reviewers" class="list-group-item">{{reviewer.username}}: <span class="badge">{{reviewer.count}}</span></li>
+						<li ng-repeat="reviewer in reviewers" class="list-group-item"><img class = "img-circle" src="{{reviewer.user.avatars[0].url}}" width="25" height="25"/> {{reviewer.user.name}}: <span class="badge">{{reviewer.count}}</span></li>
 					</ul>
 				</div>
 			</div>

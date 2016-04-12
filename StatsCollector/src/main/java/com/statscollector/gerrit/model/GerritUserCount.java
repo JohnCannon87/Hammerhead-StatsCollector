@@ -1,17 +1,19 @@
 package com.statscollector.gerrit.model;
 
+import com.google.gerrit.extensions.common.AccountInfo;
+
 public class GerritUserCount implements Comparable<GerritUserCount> {
 
-    private final String username;
+    private final AccountInfo user;
     private Integer count;
 
-    public GerritUserCount(final String username) {
-        this.username = username;
+    public GerritUserCount(final AccountInfo user) {
+        this.user = user;
         this.count = 1;
     }
 
-    public String getUsername() {
-        return username;
+    public AccountInfo getUser() {
+        return user;
     }
 
     public Integer getCount() {
