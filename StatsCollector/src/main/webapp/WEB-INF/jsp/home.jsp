@@ -14,35 +14,35 @@
 <body>
 	<%@include file="common/navbar.jsp"%>
 
-	<div class="col-sm-3" ng-controller="GerritStatsCtrl" >
+	<div ng-class="GetGerritStatsClass()" ng-controller="GerritStatsCtrl" ng-if="!showGerritStats">
 				<canvas tc-chartjs-pie chart-data="gerritChartData"
 					chart-options="gerritChartOptions"></canvas>
 			<ul class="list-group">
-				<li ng-click="isNoPeerCollapsed = !isNoPeerCollapsed" ng-class="getNoPeerReviewRowClass(noPeerPercentage)"
-					class="list-group-item"><span class="legendBox" style="background-color:#CC0000"></span>No Peer Reviewers: <span class="badge">{{noPeerReviewers}}</span></li>
+				<li ng-show="noPeerReviewers > 0" ng-click="isNoPeerCollapsed = !isNoPeerCollapsed" ng-class="getNoPeerReviewRowClass(noPeerPercentage)"
+					class="list-group-item"><span class="legendBox img-circle" style="background-color:#CC0000"></span>No Peer Reviewers: <span class="badge">{{noPeerReviewers}}</span></li>
 					<div collapse="!isNoPeerCollapsed">
 						<div ng-repeat="review in noPeerReviews">
 							<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
-				<li ng-click="isOnePeerCollapsed = !isOnePeerCollapsed" ng-class="getOnePeerReviewRowClass(onePeerPercentage)"
-					class="list-group-item"><span class="legendBox" style="background-color:#009933"></span>One Peer Reviewer: <span class="badge">{{onePeerReviewer}}</span></li>
+				<li ng-show="onePeerReviewers > 0" ng-click="isOnePeerCollapsed = !isOnePeerCollapsed" ng-class="getOnePeerReviewRowClass(onePeerPercentage)"
+					class="list-group-item"><span class="legendBox img-circle" style="background-color:#009933"></span>One Peer Reviewer: <span class="badge">{{onePeerReviewers}}</span></li>
 					<div collapse="!isOnePeerCollapsed">
 						<div ng-repeat="review in onePeerReviews">
 							<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
-				<li ng-click="isTwoPeerCollapsed = !isTwoPeerCollapsed" ng-class="getTwoPeerReviewRowClass(twoPeerPercentage)"
-					class="list-group-item"><span class="legendBox" style="background-color:#0099FF"></span>Two Peer Reviewers: <span
+				<li ng-show="twoPeerReviewers > 0" ng-click="isTwoPeerCollapsed = !isTwoPeerCollapsed" ng-class="getTwoPeerReviewRowClass(twoPeerPercentage)"
+					class="list-group-item"><span class="legendBox img-circle" style="background-color:#0099FF"></span>Two Peer Reviewers: <span
 					class="badge">{{twoPeerReviewers}}</span></li>
 					<div collapse="!isTwoPeerCollapsed">
 						<div ng-repeat="review in twoPeerReviews">
 							<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.id}}</a>							
 						</div>
 					</div>
-				<li ng-click="isCollabrativeDevelopmentCollapsed = !isCollabrativeDevelopmentCollapsed" 
+				<li ng-show="collabrativeDevelopments > 0" ng-click="isCollabrativeDevelopmentCollapsed = !isCollabrativeDevelopmentCollapsed" 
 					ng-class="getCollabrativeDevelopmentRowClass(collaborativePercentage)"
-					class="list-group-item"><span class="legendBox" style="background-color:#6600FF"></span>Collaborative Development: <span
+					class="list-group-item"><span class="legendBox img-circle" style="background-color:#6600FF"></span>Collaborative Development: <span
 					class="badge">{{collabrativeDevelopments}}</span></li>
 					<div collapse="!isCollabrativeDevelopmentCollapsed">
 						<div ng-repeat="review in collabrativeDevelopment">
@@ -66,9 +66,6 @@
 					</li>
 				</div>
 			</ul>
-			<div ng-show="gerritStatsStatus.show">
-			  <alert type="{{gerritStatsStatus.type}}" close="closeAlert()">{{gerritStatsStatus.msg}}</alert>
-			</div>
 			<div class="row no-gutter">
 				<div class="col-sm-6">
 					<ul class="list-group">
@@ -79,30 +76,30 @@
 				<div class="col-sm-6">
 					<ul class="list-group">
 						<h4 class="list-group-item active">Reviewers</h4>
-						<li ng-repeat="reviewer in reviewers" class="list-group-item"><img class = "img-circle" src="{{reviewer.user.avatars[0].url}}" width="25" height="25"/> {{reviewer.user.name}}: <span class="badge">{{reviewer.count}}</span></li>
+						<li ng-class="{'list-group-item-warning-dim': reviewer.didDoOwnReview == true}" ng-repeat="reviewer in reviewers" class="list-group-item"><img class = "img-circle" src="{{reviewer.user.avatars[0].url}}" width="25" height="25"/> {{reviewer.user.name}}: <span class="badge">{{reviewer.count}}</span></li>
 					</ul>
 				</div>
 			</div>
 	</div>
-	<div ng-controller="SonarStatsCtrl" class="col-sm-8">
-		<div class="col-sm-12">		
-			<div class="col-sm-6">					
+	<div ng-controller="SonarStatsCtrl" ng-class="GetSonarStatsClass()"  ng-if="!showSonarStats">	
+		<div class="col-sm-12 no-pad">	
+			<div class="col-sm-6 no-pad">					
 				<div class="panel panel-default">		
-					<div class="list-group-item" ng-class="getFileComplexityClass(fileComplexity)">File Complexity = {{fileComplexity}}</div>
+					<div class="list-group-item" ng-class="getFileComplexityClass(fileComplexity)"><i class="fa fa-arrow-down text-right" aria-hidden="true"></i> File Complexity = {{fileComplexity}}</div>
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="fileComplexityChartData" chart-options="lineChartOptionsUpwards" id="fileComplexityChart"></canvas>
 				</div>
 				<div class="panel panel-default">
-					<div class="list-group-item" ng-class="getTestCoverageClass(testCoverage)">Test Coverage = {{testCoverage}}%</div>
+					<div class="list-group-item" ng-class="getTestCoverageClass(testCoverage)"><i class="fa fa-arrow-up" aria-hidden="true"></i> Test Coverage = {{testCoverage}}%</div>
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="testCoverageChartData" chart-options="lineChartOptionsDownwards" id="testCoverageChart"></canvas>
 				</div>
 			</div>
-			<div class="col-sm-6">			
+			<div class="col-sm-6 no-pad">			
 				<div class="panel panel-default">	
-					<div class="list-group-item" ng-class="getMethodComplexityClass(methodComplexity)">Method Complexity = {{methodComplexity}}</div>		
+					<div class="list-group-item" ng-class="getMethodComplexityClass(methodComplexity)"><i class="fa fa-arrow-down" aria-hidden="true"></i> Method Complexity = {{methodComplexity}}</div>		
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="methodComplexityChartData" chart-options="lineChartOptionsUpwards" id="methodComplexityChart"></canvas>
 				</div>
 				<div class="panel panel-default">	
-					<div class="list-group-item" ng-class="getRulesComplianceClass(rulesCompliance)">Rules Compliance = {{rulesCompliance}}%</div>		
+					<div class="list-group-item" ng-class="getRulesComplianceClass(rulesCompliance)"><i class="fa fa-arrow-up" aria-hidden="true"></i> Rules Compliance = {{rulesCompliance}}%</div>		
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="rulesComplianceChartData" chart-options="lineChartOptionsDownwards" id="rulesComplianceChart"></canvas>
 				</div>
 			</div>

@@ -166,18 +166,18 @@ public class GerritStatisticsService {
                                 gerritReviewStats.setStatus(gerritReviewStats.getStatus()
                                         + "Error Thrown During Processing: Null Pointer Returned, ");
                                 gerritReviewStats
-                                .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
+                                        .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
                             } else if(!result.getSuccess()) {
                                 gerritReviewStats.setStatus(gerritReviewStats.getStatus()
                                         + "Error Thrown During Processing: " + result.getError().getMessage() + ", ");
                                 gerritReviewStats
-                                .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-                                        .getSuccess()));
+                                        .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+                                                .getSuccess()));
                             } else {
                                 gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK, ");
                                 gerritReviewStats
-                                .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-                                        .getSuccess()));
+                                        .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+                                                .getSuccess()));
                             }
                         }
                         gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : "
@@ -229,9 +229,17 @@ public class GerritStatisticsService {
                             filterChanges(reviewStats.getOnePeerReviewList(), filters),
                             filterChanges(reviewStats.getTwoPlusPeerReviewList(), filters),
                             filterChanges(reviewStats.getCollabrativeDevelopmentList(), filters));
+            affixNoPeerStatus(mapOfReviewersAndCounts, filterChanges(reviewStats.getNoPeerReviewList(), filters));
             return new GerritAuthorsAndReviewersList(mapOfAuthorsAndCounts.values(), mapOfReviewersAndCounts.values());
         } else {
             return new GerritAuthorsAndReviewersList(new ArrayList<GerritUserCount>(), new ArrayList<GerritUserCount>());
+        }
+    }
+
+    private void affixNoPeerStatus(final Map<String, GerritUserCount> mapOfReviewersAndCounts,
+            final List<ChangeInfo> filterChanges) {
+        for(ChangeInfo changeInfo : filterChanges) {
+            mapOfReviewersAndCounts.get(changeInfo.owner.username).setDidDoOwnReview(true);
         }
     }
 

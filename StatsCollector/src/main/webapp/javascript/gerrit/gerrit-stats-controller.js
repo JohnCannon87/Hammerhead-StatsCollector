@@ -1,3 +1,14 @@
+function GetGerritStatsClass($rootScope){
+	if($rootScope.showSonarStats == null){
+		$rootScope.showSonarStats = false;
+	}
+	if($rootScope.showSonarStats){
+		return "col-sm-12 well";		
+	}else{
+		return "col-sm-3 well";
+	}
+}
+
 function UpdateGerritConfig(data, $scope, $location) {
 	$scope.gerritHostname = data.host;
 	$scope.gerritHostPort = data.hostPort;
@@ -28,27 +39,27 @@ function UpdateGerritConfig(data, $scope, $location) {
 	
 }
 
-function GetReviewRowClassTarget(value, target) {
+function GetDimReviewRowClassTarget(value, target) {
 	if (value === undefined) {
-		return "list-group-item list-group-item-info";
+		return "list-group-item list-group-item";
 	} else if (value > target) {
-		return "list-group-item list-group-item-success";
+		return "list-group-item list-group-item-success-dim";
 	} else if (value == target) {
-		return "list-group-item list-group-item-warning";
+		return "list-group-item list-group-item-warning-dim";
 	} else {
-		return "list-group-item list-group-item-danger";
+		return "list-group-item list-group-item-danger-dim";
 	}
 }
 
-function GetReviewRowClassLimit(value, target) {
+function GetDimReviewRowClassLimit(value, target) {
 	if (value === undefined) {
-		return "list-group-item list-group-item-info";
+		return "list-group-item list-group-item";
 	} else if (value > target) {
-		return "list-group-item list-group-item-danger";
+		return "list-group-item list-group-item-danger-dim";
 	} else if (value == target) {
-		return "list-group-item list-group-item-warning";
+		return "list-group-item list-group-item-warning-dim";
 	} else {
-		return "list-group-item list-group-item-success";
+		return "list-group-item list-group-item-success-dim";
 	}
 }
 
@@ -85,7 +96,7 @@ function GetGerritStats($http, $scope, $timeout){
 		.then(
 				function(response) {
 					$scope.noPeerReviewers = response.data.noPeerReviewCount;
-					$scope.onePeerReviewer = response.data.onePeerReviewCount;
+					$scope.onePeerReviewers = response.data.onePeerReviewCount;
 					$scope.twoPeerReviewers = response.data.twoPlusPeerReviewCount;
 					$scope.collabrativeDevelopments = response.data.collabrativeDevelopmentCount;
 					$scope.totalReviews = response.data.totalReviewsCount;
@@ -134,7 +145,7 @@ function GetGerritStats($http, $scope, $timeout){
 	}
 }
 
-function GerritStats($http, $scope, $timeout, $location, $log, $q, Gerrit) {
+function GerritStats($http, $scope, $rootScope, $timeout, $location, $log, $q, Gerrit) {
 	$scope.metrics = new Array();
 	$scope.gerritStatus = 'merged';
 	if($scope.configLoaded === undefined){
@@ -150,7 +161,7 @@ function GerritStats($http, $scope, $timeout, $location, $log, $q, Gerrit) {
 		      segmentShowStroke : true,
 
 		      // String - The colour of each segment stroke
-		      segmentStrokeColor : '#fff',
+		      segmentStrokeColor : 'rgba(255,255,255,0)',
 
 		      // Number - The width of each segment stroke
 		      segmentStrokeWidth : 2,
@@ -211,23 +222,27 @@ function GerritStats($http, $scope, $timeout, $location, $log, $q, Gerrit) {
 	};
 	
 	$scope.getNoPeerReviewRowClass = function(percentage) {
-		return GetReviewRowClassLimit(percentage, $scope.noPeerReviewsTarget);
+		return GetDimReviewRowClassLimit(percentage, $scope.noPeerReviewsTarget);
 	};
 
 	$scope.getOnePeerReviewRowClass = function(percentage) {
-		return GetReviewRowClassTarget(percentage, $scope.onePeerReviewTarget);
+		return GetDimReviewRowClassTarget(percentage, $scope.onePeerReviewTarget);
 	};
 
 	$scope.getTwoPeerReviewRowClass = function(percentage) {
-		return GetReviewRowClassTarget(percentage, $scope.twoPeerReviewTarget);
+		return GetDimReviewRowClassTarget(percentage, $scope.twoPeerReviewTarget);
 	};
 
 	$scope.getCollabrativeDevelopmentRowClass = function(percentage) {
-		return GetReviewRowClassTarget(percentage,
+		return GetDimReviewRowClassTarget(percentage,
 				$scope.collaborativeReviewTarget);
 	};	
 	
+	$rootScope.GetGerritStatsClass = function(){
+		return GetGerritStatsClass($rootScope);
+	};
+	
 };
 
-appGerritStatsModule.controller('GerritStatsCtrl', [ '$http', '$scope', '$timeout', '$location',
+appGerritStatsModule.controller('GerritStatsCtrl', [ '$http', '$scope', '$rootScope', '$timeout', '$location',
 		'$q', '$log', 'Gerrit', GerritStats ]);

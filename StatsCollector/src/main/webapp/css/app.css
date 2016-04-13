@@ -11,6 +11,22 @@ body {
   margin: 20px
 }
 
+.no-pad {
+	padding-left: 5px;
+}
+
+.list-group-item-success-dim {
+	background-color: rgba(98, 196, 98, 0.5);
+}
+
+.list-group-item-warning-dim {
+	background-color: rgba(248, 148, 6, 0.5);
+}
+
+.list-group-item-danger-dim {
+	background-color: rgba(238, 95, 91, 0.5);
+}
+
 .formly-field {
   margin-bottom:16px;
 }
@@ -21,14 +37,4 @@ body {
   display:block;
   float:left;
   margin-right:10px;
-}
-.row.no-gutter {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.row.no-gutter [class*='col-']:not(:first-child),
-.row.no-gutter [class*='col-']:not(:last-child) {
-  padding-right: 0;
-  padding-left: 0;
 }

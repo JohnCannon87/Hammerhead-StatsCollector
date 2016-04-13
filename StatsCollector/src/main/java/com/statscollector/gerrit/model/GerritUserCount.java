@@ -6,6 +6,7 @@ public class GerritUserCount implements Comparable<GerritUserCount> {
 
     private final AccountInfo user;
     private Integer count;
+    private Boolean didDoOwnReview;
 
     public GerritUserCount(final AccountInfo user) {
         this.user = user;
@@ -22,6 +23,14 @@ public class GerritUserCount implements Comparable<GerritUserCount> {
 
     public void incrementCount() {
         count++;
+    }
+
+    public Boolean getDidDoOwnReview() {
+        return didDoOwnReview;
+    }
+
+    public void setDidDoOwnReview(final Boolean didDoOwnReview) {
+        this.didDoOwnReview = didDoOwnReview;
     }
 
     @Override
