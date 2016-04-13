@@ -47,6 +47,7 @@ JS
 * [tc-angular-chartjs](https://github.com/carlcraig/tc-angular-chartjs)
 * [FileSaver.js](https://github.com/eligrey/FileSaver.js/)
 * [ng-file-upload](https://github.com/danialfarid/ng-file-upload)
+* [formly](https://github.com/formly-js/angular-formly)
 
 Java
 * [SpringBoot](http://projects.spring.io/spring-boot/)
@@ -61,6 +62,7 @@ Java
 * [Mockito](https://code.google.com/p/mockito/)
 * [Powermock](https://code.google.com/p/powermock/)
 * [JSTL](https://jstl.java.net/)
+* [Jackson JSON Schema Module](https://github.com/FasterXML/jackson-module-jsonSchema)
 
 Setting Thread Limits
 ---------------------
