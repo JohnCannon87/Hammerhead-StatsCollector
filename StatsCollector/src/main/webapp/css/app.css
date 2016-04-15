@@ -8,7 +8,11 @@ body {
 }
 
 body {
-  margin: 20px
+  margin: 20px;
+}
+
+.no-pad-right {
+	padding-right: 5px;
 }
 
 .no-pad {

@@ -67,13 +67,13 @@
 				</div>
 			</ul>
 			<div class="row no-gutter">
-				<div class="col-sm-6">
+				<div class="col-sm-6 no-pad-right">
 					<ul class="list-group">
 						<h4 class="list-group-item active">Authors</h4>
 						<li ng-repeat="author in authors" class="list-group-item"><img class = "img-circle" src="{{author.user.avatars[0].url}}" width="25" height="25"/> {{author.user.name}}: <span class="badge">{{author.count}}</span></li>
 					</ul>
 				</div>				
-				<div class="col-sm-6">
+				<div class="col-sm-6 no-pad">
 					<ul class="list-group">
 						<h4 class="list-group-item active">Reviewers</h4>
 						<li ng-class="{'list-group-item-warning-dim': reviewer.didDoOwnReview == true}" ng-repeat="reviewer in reviewers" class="list-group-item"><img class = "img-circle" src="{{reviewer.user.avatars[0].url}}" width="25" height="25"/> {{reviewer.user.name}}: <span class="badge">{{reviewer.count}}</span></li>
