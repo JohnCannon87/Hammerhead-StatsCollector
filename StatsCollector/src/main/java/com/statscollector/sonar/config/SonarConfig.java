@@ -12,7 +12,8 @@ import com.statscollector.application.config.WebConfig;
 @Component
 @JsonPropertyOrder({ "projectName", "host", "hostPort", "username", "password", "projectRegex",
         "methodComplexityTarget", "fileComplexityTarget", "rulesComplianceTarget", "testCoverageTarget",
-        "infoWeighting", "minorWeighting", "majorWeighting", "criticalWeighting", "blockerWeighting", "fillTargetArea" })
+        "infoWeighting", "minorWeighting", "majorWeighting", "criticalWeighting", "blockerWeighting",
+        "fillTargetArea" })
 public class SonarConfig extends AbstractWebConfig implements WebConfig {
 
     /**
@@ -169,7 +170,7 @@ public class SonarConfig extends AbstractWebConfig implements WebConfig {
         config.save();
     }
 
-    @JsonProperty(required = true)
+    @JsonProperty()
     public Boolean getFillTargetArea() {
         return config.getBoolean(FILL_TARGET_AREA, false);
     }

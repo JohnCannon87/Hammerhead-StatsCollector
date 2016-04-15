@@ -40,7 +40,7 @@
 				<div class="col-sm-6">
 					<form ng-submit="vm.onSubmit()" name="vm.form" novalidate>
 				        <formly-form model="vm.model" fields="vm.fields" options="vm.options" form="vm.form">
-				          <button type="submit" class="btn btn-success submit-button" ><span class="fa fa-save"></span>  Save Changes</button>
+				          <button type="submit" class="btn btn-success submit-button" ng-disabled="vm.form.$invalid"><span class="fa fa-save"></span>  Save Changes</button>
 				        </formly-form>
 			      	</form>
 				</div>

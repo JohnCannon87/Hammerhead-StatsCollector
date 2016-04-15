@@ -1,5 +1,16 @@
 function SonarConfigCtrl($http, $scope, $log, $q, Sonar, Upload, getOIMConfig) {	
 	var vm = this;
+	vm.downloadConfig = downloadConfig;
+	
+    vm.onSubmit = onSubmit;
+
+    vm.model = {
+    };
+    
+    vm.options = {
+      formState: {
+      }
+    };
 	
 	$scope.$watch('files', function(files) {
 		vm.formUpload = false;
@@ -50,21 +61,7 @@ function SonarConfigCtrl($http, $scope, $log, $q, Sonar, Upload, getOIMConfig) {
 			vm.fields = getOIMConfig(vm.model, response.data.properties);
 		});
 	});
-	
-	vm.downloadConfig = downloadConfig;
-	
-    vm.onSubmit = onSubmit;
-
-    vm.model = {
-      awesome: true
-    };
-    
-    vm.options = {
-      formState: {
-        awesomeIsForced: false
-      }
-    };
-        
+	    
  // function definition
     function onSubmit() {
     	saveSonarConfig();
