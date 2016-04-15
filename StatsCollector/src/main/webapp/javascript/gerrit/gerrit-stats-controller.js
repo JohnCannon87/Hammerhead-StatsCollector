@@ -26,6 +26,8 @@ function UpdateGerritConfig(data, $scope, $location) {
 	$scope.configLoaded = true;
 	$scope.gerritProjectName = data.projectName;
 	$scope.gerritProjectRegex = data.projectRegex;
+	$scope.showGerritHistory = data.showGerritHistory;
+	$scope.showGerritPie = data.showGerritPie;
 	
 	//Override from URL Param For multiple projects.
 	if(typeof $location !== "undefined"){
@@ -108,6 +110,99 @@ function GetGerritStats($http, $scope, $timeout){
 					$scope.onePeerReviews = response.data.onePeerReviewList;
 					$scope.twoPeerReviews = response.data.twoPlusPeerReviewList;
 					$scope.collabrativeDevelopment = response.data.collabrativeDevelopmentList;
+					
+					var changeCountHistory = response.data.changeCountHistory;
+					var days =[];
+					var noPeerReviewCount = [];
+					var onePeerReviewCount = [];
+					var twoPeerReviewCount = [];
+					var collaborativeDevelopmentCount = [];
+					var dates = Object.keys(changeCountHistory).sort();					
+					var maxCount = 0;
+					for (d in dates){
+						days.push(moment(dates[d]).format('MM-DD'));
+						noPeerReviewCount.push(changeCountHistory[dates[d]].noPeerReviewCount);
+						if(maxCount < changeCountHistory[dates[d]].noPeerReviewCount){
+							maxCount = changeCountHistory[dates[d]].noPeerReviewCount;
+						}
+						onePeerReviewCount.push(changeCountHistory[dates[d]].onePeerReviewCount);
+						if(maxCount < changeCountHistory[dates[d]].onePeerReviewCount){
+							maxCount = changeCountHistory[dates[d]].onePeerReviewCount;
+						}
+						twoPeerReviewCount.push(changeCountHistory[dates[d]].twoPeerReviewCount);
+						if(maxCount < changeCountHistory[dates[d]].twoPeerReviewCount){
+							maxCount = changeCountHistory[dates[d]].twoPeerReviewCount;
+						}
+						collaborativeDevelopmentCount.push(changeCountHistory[dates[d]].collaborativeDevelopmentCount);		
+						if(maxCount < changeCountHistory[dates[d]].collaborativeDevelopmentCount){
+							maxCount = changeCountHistory[dates[d]].collaborativeDevelopmentCount;
+						}				
+					}
+
+					var noFillColor = "#CC0000";
+					var noStrokeColor = "#CC0000";
+					var noPointColor = "#CC0000";
+					var noPointStrokeColor = "#CC0000";
+					var noPointHighlightFill = "#CC0000";
+					var noPointHighlightStroke = "#CC0000";
+					var oneFillColor = "#009933";
+					var oneStrokeColor = "#009933";
+					var onePointColor = "#009933";
+					var onePointStrokeColor = "#009933";
+					var onePointHighlightFill = "#009933";
+					var onePointHighlightStroke = "#009933";
+					
+					$scope.lineChartOptionsUpwards = {
+							scaleOverride: true,
+							scaleStartValue: 0,
+							scaleSteps: (maxCount/2)+1,
+							scaleStepWidth: 2,
+							scaleLabel : function(object) {
+								return "  " + object.value;
+							},
+							animation : true,
+							scaleFontColor : "#c8c8c8",
+							scaleShowGridLines : true,
+							scaleGridLineColor : "rgba(255,255,255,.1)",
+							scaleGridLineWidth : 1,
+							scaleShowHorizontalLines : true,
+							scaleShowVerticalLines : true,
+							bezierCurve : true,
+							pointDot : true,
+							pointDotRadius : 2,
+							pointDotStrokeWidth : 1,
+							pointHitDetectionRadius : 15,
+							datasetStroke : true,
+							datasetStrokeWidth : 2,
+							datasetFill : false,
+							responsive : true
+						};
+					
+					var gerritHistoryChartData = {
+							datasets : [ {
+								label : "One Peer Review",
+								fillColor : oneFillColor,
+								strokeColor : oneStrokeColor,
+								pointColor : onePointColor,
+								pointStrokeColor : onePointStrokeColor,
+								pointHighlightFill : onePointHighlightFill,
+								pointHighlightStroke : onePointHighlightStroke
+							},
+							{
+								label : "No Peer Review",
+								fillColor : noFillColor,
+								strokeColor : noStrokeColor,
+								pointColor : noPointColor,
+								pointStrokeColor : noPointStrokeColor,
+								pointHighlightFill : noPointHighlightFill,
+								pointHighlightStroke : noPointHighlightStroke
+							}]
+						};
+					
+					gerritHistoryChartData.labels = days;
+					gerritHistoryChartData.datasets[0].data = onePeerReviewCount;
+					gerritHistoryChartData.datasets[1].data = noPeerReviewCount;
+					$scope.gerritHistoryChartData = gerritHistoryChartData;
 					
 					if (response.data.error){
 						$scope.gerritStatsStatus = { type: 'danger', msg: response.data.status, show: true};

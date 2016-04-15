@@ -17,8 +17,8 @@ import com.statscollector.application.config.WebConfig;
 
 @Component
 @JsonPropertyOrder({ "projectName", "host", "hostPort", "username", "password", "projectRegex", "topicRegex",
-    "threadSplitSize", "startDateOffset", "endDateOffset", "noPeerReviewTarget", "onePeerReviewTarget",
-    "twoPeerReviewTarget", "collaborativeReviewTarget", "reviewersToIgnore" })
+        "threadSplitSize", "startDateOffset", "endDateOffset", "noPeerReviewTarget", "onePeerReviewTarget",
+        "twoPeerReviewTarget", "collaborativeReviewTarget", "reviewersToIgnore", "showGerritHistory", "showGerritPie" })
 public class GerritConfig extends AbstractWebConfig implements WebConfig {
 
     /**
@@ -41,6 +41,8 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
     private static final String START_DATE_KEY = "gerrit.startDateOffset";
     private static final String END_DATE_KEY = "gerrit.endDateOffset";
     private static final String PROJECT_REGEX_KEY = "gerrit.projectRegex";
+    private static final String HISTORY_KEY = "gerrit.showGerritHistory";
+    private static final String PIE_KEY = "gerrit.showGerritPie";
     private final DecimalFormat df = new DecimalFormat("###.##");
 
     public GerritConfig() throws ConfigurationException {
@@ -171,6 +173,24 @@ public class GerritConfig extends AbstractWebConfig implements WebConfig {
 
     public void setProjectRegex(final String projectRegex) throws ConfigurationException {
         config.setProperty(PROJECT_REGEX_KEY, projectRegex);
+        config.save();
+    }
+
+    public boolean getShowGerritHistory() {
+        return config.getBoolean(HISTORY_KEY, false);
+    }
+
+    public void setShowGerritHistory(final boolean showHistory) throws ConfigurationException {
+        config.setProperty(HISTORY_KEY, showHistory);
+        config.save();
+    }
+
+    public boolean getShowGerritPie() {
+        return config.getBoolean(PIE_KEY, false);
+    }
+
+    public void setShowGerritPie(final boolean showPie) throws ConfigurationException {
+        config.setProperty(PIE_KEY, showPie);
         config.save();
     }
 

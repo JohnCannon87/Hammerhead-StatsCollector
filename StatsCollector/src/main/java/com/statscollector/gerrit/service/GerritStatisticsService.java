@@ -18,6 +18,7 @@ import com.google.common.collect.Lists;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.statscollector.gerrit.config.GerritConfig;
 import com.statscollector.gerrit.model.GerritAuthorsAndReviewersList;
+import com.statscollector.gerrit.model.GerritReviewCounts;
 import com.statscollector.gerrit.model.GerritReviewStats;
 import com.statscollector.gerrit.model.GerritReviewStatsResult;
 import com.statscollector.gerrit.model.GerritUserCount;
@@ -166,25 +167,29 @@ public class GerritStatisticsService {
                                 gerritReviewStats.setStatus(gerritReviewStats.getStatus()
                                         + "Error Thrown During Processing: Null Pointer Returned, ");
                                 gerritReviewStats
-                                        .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || true));
+                                        .setError(
+                                                ((gerritReviewStats != null && gerritReviewStats.getError()) || true));
                             } else if(!result.getSuccess()) {
                                 gerritReviewStats.setStatus(gerritReviewStats.getStatus()
                                         + "Error Thrown During Processing: " + result.getError().getMessage() + ", ");
                                 gerritReviewStats
-                                        .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-                                                .getSuccess()));
+                                        .setError(
+                                                ((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+                                                        .getSuccess()));
                             } else {
                                 gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "OK, ");
                                 gerritReviewStats
-                                        .setError(((gerritReviewStats != null && gerritReviewStats.getError()) || !result
-                                                .getSuccess()));
+                                        .setError(
+                                                ((gerritReviewStats != null && gerritReviewStats.getError()) || !result
+                                                        .getSuccess()));
                             }
                         }
                         gerritReviewStats.setStatus(gerritReviewStats.getStatus() + "Cache Processed Using : "
                                 + asyncResults.size() + " Threads");
                     }
                     long end = System.currentTimeMillis();
-                    LOGGER.info("Got Changes For Status: " + changeStatus + " In: " + (end - start) / 1000 + " Seconds");
+                    LOGGER.info(
+                            "Got Changes For Status: " + changeStatus + " In: " + (end - start) / 1000 + " Seconds");
                 }
                 refreshInProgress = false;
                 LOGGER.info("Gerrit Refresh Completed");
@@ -212,7 +217,38 @@ public class GerritStatisticsService {
                 gerritConfig.getTopicRegex());
 
         GerritReviewStats reviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
-        return buildReviewStatsObject(filters, reviewStats);
+        reviewStats = buildReviewStatsObject(filters, reviewStats);
+        return populateReviewStatsWithDateListChanges(reviewStats, startDate, endDate);
+    }
+
+    private GerritReviewStats populateReviewStatsWithDateListChanges(final GerritReviewStats reviewStats,
+            final DateTime startDate,
+            final DateTime endDate) {
+        Map<DateTime, GerritReviewCounts> result = reviewStats.getChangeCountHistory();
+        DateTime keyDate = startDate.withMillisOfDay(0);
+        // Populate Dates locked to midnight Into Map
+        while(keyDate.isBefore(endDate)) {
+            result.put(keyDate, new GerritReviewCounts());
+            keyDate = keyDate.plusDays(1);
+        }
+        for(ChangeInfo changeInfo : reviewStats.getNoPeerReviewList()) {
+            DateTime keyChangeDate = new DateTime(changeInfo.updated).withMillisOfDay(0);
+            result.get(keyChangeDate).incrementNoPeerReviewCount();
+        }
+        for(ChangeInfo changeInfo : reviewStats.getOnePeerReviewList()) {
+            DateTime keyChangeDate = new DateTime(changeInfo.updated).withMillisOfDay(0);
+            result.get(keyChangeDate).incrementOnePeerReviewCount();
+        }
+        for(ChangeInfo changeInfo : reviewStats.getTwoPlusPeerReviewList()) {
+            DateTime keyChangeDate = new DateTime(changeInfo.updated).withMillisOfDay(0);
+            result.get(keyChangeDate).incrementTwoPeerReviewCount();
+        }
+        for(ChangeInfo changeInfo : reviewStats.getCollabrativeDevelopmentList()) {
+            DateTime keyChangeDate = new DateTime(changeInfo.updated).withMillisOfDay(0);
+            result.get(keyChangeDate).incrementCollaborativeDevelopmentCount();
+        }
+        reviewStats.setChangeCountHistory(result);
+        return reviewStats;
     }
 
     @SuppressWarnings("unchecked")
@@ -232,7 +268,8 @@ public class GerritStatisticsService {
             affixNoPeerStatus(mapOfReviewersAndCounts, filterChanges(reviewStats.getNoPeerReviewList(), filters));
             return new GerritAuthorsAndReviewersList(mapOfAuthorsAndCounts.values(), mapOfReviewersAndCounts.values());
         } else {
-            return new GerritAuthorsAndReviewersList(new ArrayList<GerritUserCount>(), new ArrayList<GerritUserCount>());
+            return new GerritAuthorsAndReviewersList(new ArrayList<GerritUserCount>(),
+                    new ArrayList<GerritUserCount>());
         }
     }
 

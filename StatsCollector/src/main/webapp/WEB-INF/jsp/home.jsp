@@ -14,9 +14,11 @@
 <body>
 	<%@include file="common/navbar.jsp"%>
 
-	<div ng-class="GetGerritStatsClass()" ng-controller="GerritStatsCtrl" ng-if="!showGerritStats">
-				<canvas tc-chartjs-pie chart-data="gerritChartData"
-					chart-options="gerritChartOptions"></canvas>
+	<div ng-class="GetGerritStatsClass()" ng-controller="GerritStatsCtrl" ng-if="!showGerritStats">				
+			<div class="panel panel-default">
+				<div ng-show="showGerritHistory"><canvas tc-chartjs chart-type="Line" chart-data="gerritHistoryChartData" chart-options="lineChartOptionsUpwards" id="fileComplexityChart"></canvas></div>
+				<div ng-show="showGerritPie"><canvas tc-chartjs-pie chart-data="gerritChartData" chart-options="gerritChartOptions"></canvas></div>
+			</div>
 			<ul class="list-group">
 				<li ng-show="noPeerReviewers > 0" ng-click="isNoPeerCollapsed = !isNoPeerCollapsed" ng-class="getNoPeerReviewRowClass(noPeerPercentage)"
 					class="list-group-item"><span class="legendBox img-circle" style="background-color:#CC0000"></span>No Peer Reviewers: <span class="badge">{{noPeerReviewers}}</span></li>

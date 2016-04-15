@@ -5,14 +5,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.statscollector.application.config.AbstractTemporaryWebConfig;
 
 @JsonPropertyOrder({ "projectName", "host", "hostPort", "username", "password", "projectRegex", "topicRegex",
-    "threadSplitSize", "startDateOffset", "endDateOffset", "noPeerReviewTarget", "onePeerReviewTarget",
-    "twoPeerReviewTarget", "collaborativeReviewTarget", "reviewersToIgnore" })
+        "threadSplitSize", "startDateOffset", "endDateOffset", "noPeerReviewTarget", "onePeerReviewTarget",
+        "twoPeerReviewTarget", "collaborativeReviewTarget", "reviewersToIgnore", "showGerritHistory", "showGerritPie" })
 public class TempGerritConfig extends AbstractTemporaryWebConfig {
 
     private String projectRegex, topicRegex;
     private Integer threadSplitSize, startDateOffset, endDateOffset;
     private Float noPeerReviewTarget, onePeerReviewTarget, twoPeerReviewTarget, collaborativeReviewTarget;
     private String reviewersToIgnore;
+    private boolean showGerritHistory, showGerritPie;
 
     public String getProjectRegex() {
         return projectRegex;
@@ -99,6 +100,22 @@ public class TempGerritConfig extends AbstractTemporaryWebConfig {
 
     public void setReviewersToIgnore(final String reviewersToIgnore) {
         this.reviewersToIgnore = reviewersToIgnore;
+    }
+
+    public boolean getShowGerritHistory() {
+        return showGerritHistory;
+    }
+
+    public void setShowGerritHistory(final boolean showGerritHistory) {
+        this.showGerritHistory = showGerritHistory;
+    }
+
+    public boolean getShowGerritPie() {
+        return showGerritPie;
+    }
+
+    public void setShowGerritPie(final boolean showGerritPie) {
+        this.showGerritPie = showGerritPie;
     }
 
     @Override
