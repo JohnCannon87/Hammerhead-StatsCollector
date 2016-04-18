@@ -2,9 +2,28 @@ function UpdateGerritConfig(data, vm){
 	vm.model = data;
 }
 
+function TestGerritConnection($scope, $http){
+	$scope.gerritConnectionDetails = "Connecting ...";
+	$scope.gerritConnectionResult = "";
+	$http.get('/gerrit/review/testConnection').then(function(response){
+		$scope.gerritConnectionDetails = response.data.connectionDetails;
+		if(null === response.data.connectionResult){
+			$scope.gerritConnectionResult = "Processing ...";
+			$scope.gerritConnectionResult = response.data.errorResult;
+		}else{
+			$scope.gerritConnectionResult = "Processing ...";
+			$scope.gerritConnectionResult = JSON.stringify(response.data.connectionResult);
+		}				
+	});
+}
+
 function GerritConfigCtrl($http, $scope, $log, $q, Gerrit, Upload, getOIMConfig) {
 	var vm = this;
 		
+	$scope.TestGerritConnection = function(){
+		return TestGerritConnection($scope, $http);
+	}
+	
 	$scope.$watch('files', function(files) {
 		$scope.formUpload = false;
 		if (files != null) {

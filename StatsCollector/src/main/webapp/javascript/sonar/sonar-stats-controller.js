@@ -9,6 +9,13 @@ function GetSonarStatsClass($rootScope){
 	}
 }
 
+function GetSonarStats($http, $scope){
+		$http.get('/sonar/stats/statistics/' + $scope.sonarProjectRegex + '/all').then(
+				function(response) {
+					UpdateSonarStats(response.data, $scope);
+				})
+}
+
 function UpdateSonarConfig(data, $scope, $location) {
 	$scope.sonarHostname = data.host;
 	$scope.sonarHostPort = data.hostPort;
@@ -311,21 +318,13 @@ function SonarStats($http, $scope, $rootScope, $timeout, $location, $log, $q, So
 
 	Sonar.configInfo().then(function(response) {
 		UpdateSonarConfig(response.data, $scope, $location);
+		GetSonarStats($http, $scope);
 	});
 
 	$scope.manuallyRefreshSonarData = function() {
 		$http.get('/sonar/stats/refreshCache').then(
-				function() {
-					$http.get(
-							'/sonar/stats/statistics/'
-									+ $scope.sonarProjectRegex + '/all').then(
-							function(response) {
-								UpdateSonarStats(response.data, $scope);
-							})
-				});
-	}
-
-	$scope.manuallyRefreshSonarData();
+				GetSonarStats($http, $scope));
+	}	
 
 	$scope.getFileComplexityClass = function(value) {
 		return GetReviewRowClassLimit(value, $scope.fileComplexityTarget);

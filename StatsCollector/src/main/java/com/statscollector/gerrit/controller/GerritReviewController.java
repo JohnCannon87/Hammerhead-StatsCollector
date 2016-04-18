@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.statscollector.gerrit.model.ConnectionTestResults;
 import com.statscollector.gerrit.model.GerritAuthorsAndReviewersList;
 import com.statscollector.gerrit.model.GerritReviewStats;
 import com.statscollector.gerrit.model.GerritUserCount;
@@ -35,6 +36,11 @@ public class GerritReviewController {
         statisticsService.getReviewStatisticsScheduledTask();
     }
 
+    @RequestMapping(value = "/testConnection")
+    public ConnectionTestResults testGerritConnection() {
+        return statisticsService.testConnection();
+    }
+
     @RequestMapping(value = "/authors/{changeStatus}/{projectFilterString}/{startDateOffset}/{endDateOffset}", produces = "application/json")
     public GerritAuthorsAndReviewersList authorsList(@PathVariable final String changeStatus,
             @PathVariable final String projectFilterString, @PathVariable final Integer startDateOffset,
@@ -44,7 +50,8 @@ public class GerritReviewController {
                     calculateDateFromOffset(endDateOffset));
         } catch(Exception e) {
             LOGGER.error("Error Producing Authors and Reviewers List", e);
-            return new GerritAuthorsAndReviewersList(new ArrayList<GerritUserCount>(), new ArrayList<GerritUserCount>());
+            return new GerritAuthorsAndReviewersList(new ArrayList<GerritUserCount>(),
+                    new ArrayList<GerritUserCount>());
         }
     }
 

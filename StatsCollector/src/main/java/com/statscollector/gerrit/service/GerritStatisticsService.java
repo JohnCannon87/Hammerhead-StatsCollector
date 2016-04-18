@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Lists;
 import com.google.gerrit.extensions.common.ChangeInfo;
 import com.statscollector.gerrit.config.GerritConfig;
+import com.statscollector.gerrit.model.ConnectionTestResults;
 import com.statscollector.gerrit.model.GerritAuthorsAndReviewersList;
 import com.statscollector.gerrit.model.GerritReviewCounts;
 import com.statscollector.gerrit.model.GerritReviewStats;
@@ -54,6 +55,15 @@ public class GerritStatisticsService {
     private static final String REVIEW_STATS_STATUS_FAILED = "Error No Results Loaded Into Cache";
 
     private boolean refreshInProgress = false;
+
+    /**
+     * I test the Gerrit connection returning the raw response to allow debugging.
+     *
+     * @throws Exception
+     */
+    public ConnectionTestResults testConnection() {
+        return gerritService.testConnection();
+    }
 
     /**
      * I act upon the provided list of GerritChangeFilters to remove all

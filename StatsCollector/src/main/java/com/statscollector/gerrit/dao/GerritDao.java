@@ -52,6 +52,13 @@ public class GerritDao extends AbstractWebDao {
 
     final static Logger LOGGER = Logger.getLogger(GerritDao.class);
 
+    public String testConnection(final CredentialsProvider credentialsProvider) throws Exception {
+        URIBuilder baseURIBuilder = setupBaseURI(ALL_CHANGES_REST_URL);
+        baseURIBuilder.setParameter(QUERY, BASE_STATUS_STRING + "merged");
+        URI uri = baseURIBuilder.build();
+        return makeHttpRequest(credentialsProvider, uri);
+    }
+
     /**
      * I Return a String containing all changes for all projects, that have the
      * provided status, I require a username and password passed in as a
