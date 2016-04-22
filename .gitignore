@@ -18,3 +18,4 @@ StatsCollector/.settings/*
 StatsCollector/.classpath
 StatsCollector/GerritStatistics.json
 StatsCollector/.settings/org.eclipse.jdt.core.prefs
+StatsCollector/SonarStatistics.json
