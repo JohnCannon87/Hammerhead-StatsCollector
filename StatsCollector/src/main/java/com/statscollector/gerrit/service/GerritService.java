@@ -35,38 +35,6 @@ import com.statscollector.gerrit.serialization.TimestampDeserializer;
 @Service
 public class GerritService {
 
-    private static final String ID_REF = "id";
-
-    private static final String CHANGE_ID_REF = "change_id";
-
-    private static final String PROJECT_REF = "project";
-
-    private static final String OWNER_REF = "owner";
-
-    private static final String OWNER_NAME_REF = "name";
-
-    private static final String CREATED_REF = "created";
-
-    private static final String UPDATED_REF = "updated";
-
-    private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
-
-    private static final String LABELS_REF = "labels";
-
-    private static final String CODE_REVIEW_REF = "Code-Review";
-
-    private static final String ALL_REF = "all";
-
-    private static final String USERNAME_REF = "username";
-
-    private static final String VALUE_REF = "value";
-
-    private static final String NUMBER_REF = "_number";
-
-    private static final String TOPIC_REF = "topic";
-
-    private static final String BRANCH_REF = "branch";
-
     @Autowired
     private GerritDao gerritDao;
 
