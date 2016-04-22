@@ -73,7 +73,8 @@ public class SonarDao extends AbstractWebDao {
     public String getLatestStats(final CredentialsProvider credsProvider) throws IOException, URISyntaxException {
         String resultString;
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build()) {
+        try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider)
+                .build()) {
             URIBuilder baseURIBuilder = setupBaseURI(ALL_METRICS_URL);
             baseURIBuilder.addParameters(getLatestStatsParameters());
             URI uri = baseURIBuilder.build();
@@ -119,7 +120,8 @@ public class SonarDao extends AbstractWebDao {
             final String resourceKey) throws IOException, URISyntaxException {
         String resultString;
 
-        try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build()) {
+        try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider)
+                .build()) {
             URIBuilder baseURIBuilder = setupBaseURI(TIME_MACHINE_URL);
             baseURIBuilder.addParameters(getDateWindowParameters(interval, resourceKey));
             URI uri = baseURIBuilder.build();
@@ -179,6 +181,8 @@ public class SonarDao extends AbstractWebDao {
         this.sonarConfig = sonarConfig;
     }
 
-}
+    public String testConnection(final CredentialsProvider credentialsProvider) throws IOException, URISyntaxException {
+        return getLatestStats(credentialsProvider);
+    }
 
-// http://ojpjenkins:9000/api/resources?metrics=function_complexity,file_complexity,ncloc,coverage,violations_density
+}

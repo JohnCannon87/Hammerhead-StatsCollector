@@ -44,6 +44,14 @@
 				        </formly-form>
 			      	</form>
 				</div>
+				<div class="col-sm-6">
+		            <button class="btn btn-primary" ng-click="TestSonarConnection()"><span class="fa fa-server"></span>  Test Sonar Connection (Save Changes First)</button>
+		            <br/>
+					<label for="comment">Connection Details:</label>
+					<input ng-model="sonarConnectionDetails" class="form-control" id="comment"></input>
+					<label for="comment">Test Result:</label>
+					<textarea ng-model="sonarConnectionResult" class="form-control" rows="40" id="comment"></textarea>        
+				</div>
 			</div>
 		</div>
 	</div>

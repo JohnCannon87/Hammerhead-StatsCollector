@@ -45,13 +45,13 @@
 			      	</form>
 				</div>
 				<div class="col-sm-6">
-	            <button class="btn btn-primary" ng-click="TestGerritConnection()"><span class="fa fa-server"></span>  Test Gerrit Connection (Save Changes First)</button>
-	            <br/>
-				<label for="comment">Connection Details:</label>
-				<input ng-model="gerritConnectionDetails" class="form-control" id="comment"></input>
-				<label for="comment">Test Result:</label>
-				<textarea ng-model="gerritConnectionResult" class="form-control" rows="40" id="comment"></textarea>        
-			</div>
+		            <button class="btn btn-primary" ng-click="TestGerritConnection()"><span class="fa fa-server"></span>  Test Gerrit Connection (Save Changes First)</button>
+		            <br/>
+					<label for="comment">Connection Details:</label>
+					<input ng-model="gerritConnectionDetails" class="form-control" id="comment"></input>
+					<label for="comment">Test Result:</label>
+					<textarea ng-model="gerritConnectionResult" class="form-control" rows="40" id="comment"></textarea>        
+				</div>
 			</div>
 			<br/>
 			

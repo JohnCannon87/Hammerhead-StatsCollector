@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.statscollector.gerrit.model.ConnectionTestResults;
 import com.statscollector.sonar.service.SonarStatisticsService;
 
 @RestController
@@ -25,6 +26,11 @@ public class SonarStatsController {
     public void refreshCache() throws IOException, URISyntaxException, InterruptedException, ExecutionException {
         LOGGER.info("Manual Cache Refresh Triggered");
         sonarStatisticsService.getStatisticsScheduledTask();
+    }
+
+    @RequestMapping(value = "/testConnection")
+    public ConnectionTestResults testGerritConnection() {
+        return sonarStatisticsService.testConnection();
     }
 
     @RequestMapping(value = "/statistics/{projectRegex}/{type}")

@@ -1,5 +1,27 @@
+
+
+function TestSonarConnection($scope, $http){
+	$scope.sonarConnectionDetails = "Connecting ...";
+	$scope.sonarConnectionResult = "";
+	$http.get('/sonar/stats/testConnection').then(function(response){
+		$scope.sonarConnectionDetails = response.data.connectionDetails;
+		if(null === response.data.connectionResult){
+			$scope.sonarConnectionResult = "Processing ...";
+			$scope.sonarConnectionResult = response.data.errorResult;
+		}else{
+			$scope.sonarConnectionResult = "Processing ...";
+			$scope.sonarConnectionResult = JSON.stringify(response.data.connectionResult);
+		}				
+	});
+}
+
 function SonarConfigCtrl($http, $scope, $log, $q, Sonar, Upload, getOIMConfig) {	
 	var vm = this;
+	
+	$scope.TestSonarConnection = function(){
+		return TestSonarConnection($scope, $http);
+	}
+	
 	vm.downloadConfig = downloadConfig;
 	
     vm.onSubmit = onSubmit;

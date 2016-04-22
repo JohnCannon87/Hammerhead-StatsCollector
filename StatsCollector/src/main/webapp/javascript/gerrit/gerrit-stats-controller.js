@@ -46,7 +46,7 @@ function GetDimReviewRowClassTarget(value, target) {
 		return "list-group-item list-group-item";
 	} else if (value > target) {
 		return "list-group-item list-group-item-success-dim";
-	} else if (value == target) {
+	} else if (value === target) {
 		return "list-group-item list-group-item-warning-dim";
 	} else {
 		return "list-group-item list-group-item-danger-dim";
@@ -58,7 +58,7 @@ function GetDimReviewRowClassLimit(value, target) {
 		return "list-group-item list-group-item";
 	} else if (value > target) {
 		return "list-group-item list-group-item-danger-dim";
-	} else if (value == target) {
+	} else if (value === target) {
 		return "list-group-item list-group-item-warning-dim";
 	} else {
 		return "list-group-item list-group-item-success-dim";
@@ -84,7 +84,7 @@ function GetGerritAuthorAndReviewerStats($http, $scope, $timeout){
 }
 
 function GetGerritStats($http, $scope, $timeout){	
-	if($scope.configLoaded == true){
+	if($scope.configLoaded){
 		if($scope.gerritProjectRegex !== undefined && $scope.gerritStartDateOffset !== undefined && $scope.gerritEndDateOffset !== undefined){
 			url = '/gerrit/review/'+$scope.gerritStatus+'/'+$scope.gerritProjectRegex+'/'+$scope.gerritStartDateOffset+'/'+$scope.gerritEndDateOffset;
 		}else if($scope.gerritProjectRegex === undefined && $scope.gerritStartDateOffset !== undefined && $scope.gerritEndDateOffset !== undefined){
@@ -241,7 +241,7 @@ function GetGerritStats($http, $scope, $timeout){
 }
 
 function GerritStats($http, $scope, $rootScope, $timeout, $location, $log, $q, Gerrit) {
-	$scope.metrics = new Array();
+	$scope.metrics = [];
 	$scope.gerritStatus = 'merged';
 	if($scope.configLoaded === undefined){
 		$scope.configLoaded = false;

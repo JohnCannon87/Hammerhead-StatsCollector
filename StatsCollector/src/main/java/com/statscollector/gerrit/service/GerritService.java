@@ -75,7 +75,7 @@ public class GerritService {
 
     final static Logger LOGGER = Logger.getLogger(GerritService.class);
 
-    public ConnectionTestResults testConnection() {
+    public ConnectionTestResults<ChangeInfo> testConnection() {
         StringBuilder connectionDetails = new StringBuilder();
         JsonParser jsonParser = new JsonParser();
         Credentials credentials = authenticationHelper.credentialsProvider().getCredentials(AuthScope.ANY);
@@ -87,11 +87,11 @@ public class GerritService {
             connectionResult = gerritDao.testConnection(authenticationHelper.credentialsProvider());
             JsonElement resultJson = jsonParser.parse(connectionResult);
             List<ChangeInfo> result = translateToChanges(resultJson);
-            return new ConnectionTestResults(connectionDetails.toString(), result, null);
+            return new ConnectionTestResults<ChangeInfo>(connectionDetails.toString(), result, null);
         } catch(JsonSyntaxException e) {
-            return new ConnectionTestResults(connectionDetails.toString(), null, connectionResult);
+            return new ConnectionTestResults<ChangeInfo>(connectionDetails.toString(), null, connectionResult);
         } catch(Exception e) {
-            return new ConnectionTestResults(connectionDetails.toString(), null, e.toString());
+            return new ConnectionTestResults<ChangeInfo>(connectionDetails.toString(), null, e.toString());
         }
     }
 

@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
 import org.apache.log4j.Logger;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -28,6 +30,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.statscollector.gerrit.model.ConnectionTestResults;
 import com.statscollector.sonar.authentication.SonarAuthenticationHelper;
 import com.statscollector.sonar.config.SonarConfig;
 import com.statscollector.sonar.dao.Cell;
@@ -72,7 +76,7 @@ public class SonarStatisticsService {
     private Map<Interval, Map<SonarProject, Map<String, SonarMetric>>> metricsByProjectAndDate;
 
     public List<SonarProject> getProjectsFilteredByName(final String projectFilterRegex) throws IOException,
-    URISyntaxException {
+            URISyntaxException {
         return getProjectsFilteredByName(getAllSonarProjects(), projectFilterRegex);
     }
 
@@ -249,7 +253,7 @@ public class SonarStatisticsService {
         while(month.isBefore(endPeriod)) {
             Interval interval = new Interval(month.dayOfMonth().withMinimumValue().millisOfDay().withMinimumValue(),
                     month.dayOfMonth()
-                    .withMaximumValue().millisOfDay().withMaximumValue());
+                            .withMaximumValue().millisOfDay().withMaximumValue());
             result.add(interval);
             month = month.plusMonths(1);
         }
@@ -308,14 +312,14 @@ public class SonarStatisticsService {
     }
 
     public Map<DateTime, SonarStatistics> getAllStatistics(String projectRegex) throws IOException,
-    URISyntaxException {
+            URISyntaxException {
 
         if(null == projectRegex || projectRegex.isEmpty()) {
             projectRegex = sonarConfig.getProjectRegex();
         }
 
-        Map<Interval, Map<String, SonarMetric>> condensedMetrics =
-                condenseMetricsForAllProjectsIntoOne(metricsByProjectAndDate, projectRegex);
+        Map<Interval, Map<String, SonarMetric>> condensedMetrics = condenseMetricsForAllProjectsIntoOne(
+                metricsByProjectAndDate, projectRegex);
 
         List<Interval> intervals = new ArrayList<>();
         intervals.addAll(condensedMetrics.keySet());
@@ -338,8 +342,8 @@ public class SonarStatisticsService {
             projectRegex = sonarConfig.getProjectRegex();
         }
 
-        Map<Interval, Map<String, SonarMetric>> condensedMetrics =
-                condenseMetricsForAllProjectsIntoOne(metricsByProjectAndDate, projectRegex);
+        Map<Interval, Map<String, SonarMetric>> condensedMetrics = condenseMetricsForAllProjectsIntoOne(
+                metricsByProjectAndDate, projectRegex);
 
         List<Interval> intervals = new ArrayList<>();
         intervals.addAll(condensedMetrics.keySet());
@@ -407,8 +411,8 @@ public class SonarStatisticsService {
                 .add(weightedMajorViolationsNumber).add(weightedMinorViolationsNumber)
                 .add(weightedInfoViolationsNumber);
 
-        BigDecimal rulesViolationDecimal =
-                totalWeightedIssues.setScale(4).divide(linesOfCodeNumber.setScale(4), RoundingMode.HALF_UP).setScale(4);
+        BigDecimal rulesViolationDecimal = totalWeightedIssues.setScale(4)
+                .divide(linesOfCodeNumber.setScale(4), RoundingMode.HALF_UP).setScale(4);
         BigDecimal rulesViolationPercentage = ONE_HUNDRED.subtract(rulesViolationDecimal.multiply(ONE_HUNDRED))
                 .setScale(2);
         return rulesViolationPercentage.toString();
@@ -432,5 +436,28 @@ public class SonarStatisticsService {
         BigDecimal methodsNumber = new BigDecimal(numberOfMethods.getValue());
         return complexityNumber.setScale(2).divide(methodsNumber.setScale(2), RoundingMode.HALF_UP).setScale(2)
                 .toString();
+    }
+
+    /**
+     * I test the Sonar connection returning the raw response to allow debugging.
+     *
+     * @throws Exception
+     */
+    public ConnectionTestResults<SonarProject> testConnection() {
+        StringBuilder connectionDetails = new StringBuilder();
+        Credentials credentials = authenticationHelper.credentialsProvider().getCredentials(AuthScope.ANY);
+        connectionDetails.append("Attempting Connection With Username: "
+                + credentials.getUserPrincipal().getName() + " and Password: "
+                + credentials.getPassword());
+        String connectionResult = "";
+        try {
+            connectionResult = sonarDao.testConnection(authenticationHelper.credentialsProvider());
+            List<SonarProject> result = translateIntoProjectList(connectionResult);
+            return new ConnectionTestResults<SonarProject>(connectionDetails.toString(), result, null);
+        } catch(JsonSyntaxException e) {
+            return new ConnectionTestResults<SonarProject>(connectionDetails.toString(), null, connectionResult);
+        } catch(Exception e) {
+            return new ConnectionTestResults<SonarProject>(connectionDetails.toString(), null, e.toString());
+        }
     }
 }
