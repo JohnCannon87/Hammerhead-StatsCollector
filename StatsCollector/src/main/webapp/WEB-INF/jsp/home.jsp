@@ -83,9 +83,8 @@
 				</div>
 			</div>
 	</div>
-	<div ng-controller="SonarStatsCtrl" ng-class="GetSonarStatsClass()"  ng-if="!showSonarStats">	
-		<div class="col-sm-12 no-pad">	
-			<div class="col-sm-6 no-pad">					
+	<div class="col-sm-12 no-pad no-pad-right" ng-controller="SonarStatsCtrl" ng-class="GetSonarStatsClass()"  ng-if="!showSonarStats">
+			<div class="col-sm-6 no-pad no-pad-right">					
 				<div class="panel panel-default">		
 					<div class="list-group-item" ng-class="getFileComplexityClass(fileComplexity)"><i class="fa fa-arrow-down text-right" aria-hidden="true"></i> File Complexity = {{fileComplexity}}</div>
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="fileComplexityChartData" chart-options="lineChartOptionsUpwards" id="fileComplexityChart"></canvas>
@@ -95,7 +94,7 @@
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="testCoverageChartData" chart-options="lineChartOptionsDownwards" id="testCoverageChart"></canvas>
 				</div>
 			</div>
-			<div class="col-sm-6 no-pad">			
+			<div class="col-sm-6 no-pad no-pad-right">			
 				<div class="panel panel-default">	
 					<div class="list-group-item" ng-class="getMethodComplexityClass(methodComplexity)"><i class="fa fa-arrow-down" aria-hidden="true"></i> Method Complexity = {{methodComplexity}}</div>		
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="methodComplexityChartData" chart-options="lineChartOptionsUpwards" id="methodComplexityChart"></canvas>
@@ -105,7 +104,6 @@
 					<canvas tc-chartjs chart-type="LineAlt" chart-data="rulesComplianceChartData" chart-options="lineChartOptionsDownwards" id="rulesComplianceChart"></canvas>
 				</div>
 			</div>
-		</div>
 	</div>
 	<%@include file="common/footer.jspf"%>
 </body>

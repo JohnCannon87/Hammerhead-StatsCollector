@@ -7,6 +7,10 @@ body {
   padding-top: 40px;
 }
 
+.well {
+	margin-bottom: 0px
+}
+
 .no-pad-right {
 	padding-right: 5px;
 }
