@@ -2,6 +2,25 @@ function UpdateGerritConfig(data, vm){
 	vm.model = data;
 }
 
+function ReloadGerritCache($scope, $http){
+	$http.get('/gerrit/review/refreshCache').then(function(response){
+		var alert = {};
+		if(response.data){
+			alert = {
+					type: 'success',
+					msg: 'Statistics Reloaded Successfully !'
+			};
+			$scope.alerts.push(alert);
+		}else{
+			alert = {
+					type: 'danger',
+					msg: 'Error Statistics Not Reloaded !'
+			};
+			$scope.alerts.push(alert);			
+		}		
+	});
+}
+
 function TestGerritConnection($scope, $http){
 	$scope.gerritConnectionDetails = "Connecting ...";
 	$scope.gerritConnectionResult = "";
@@ -19,7 +38,17 @@ function TestGerritConnection($scope, $http){
 
 function GerritConfigCtrl($http, $scope, $log, $q, Gerrit, Upload, getOIMConfig) {
 	var vm = this;
-		
+	
+	$scope.alerts = [];
+	
+	$scope.CloseGerritAlert = function(index) {
+		$scope.alerts.splice(index, 1);
+	}
+	
+	vm.ReloadGerritCache = function(){
+		return ReloadGerritCache($scope, $http);
+	}
+	
 	$scope.TestGerritConnection = function(){
 		return TestGerritConnection($scope, $http);
 	}

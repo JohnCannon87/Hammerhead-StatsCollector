@@ -1,4 +1,21 @@
-
+function ReloadSonarCache($scope, $http){
+	$http.get('/sonar/stats/refreshCache').then(function(response){
+		var alert = {};
+		if(response.data){
+			alert = {
+					type: 'success',
+					msg: 'Statistics Reloaded Successfully !'
+			};
+			$scope.alerts.push(alert);
+		}else{
+			alert = {
+					type: 'danger',
+					msg: 'Error Statistics Not Reloaded !'
+			};
+			$scope.alerts.push(alert);			
+		}		
+	});
+}
 
 function TestSonarConnection($scope, $http){
 	$scope.sonarConnectionDetails = "Connecting ...";
@@ -17,6 +34,16 @@ function TestSonarConnection($scope, $http){
 
 function SonarConfigCtrl($http, $scope, $log, $q, Sonar, Upload, getOIMConfig) {	
 	var vm = this;
+	
+	$scope.alerts = [];
+	
+	$scope.CloseSonarAlert = function(index) {
+		$scope.alerts.splice(index, 1);
+	}
+	
+	vm.ReloadSonarCache = function(){
+		return ReloadSonarCache($scope, $http);
+	}
 	
 	$scope.TestSonarConnection = function(){
 		return TestSonarConnection($scope, $http);

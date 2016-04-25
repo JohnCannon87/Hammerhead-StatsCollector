@@ -31,9 +31,14 @@ public class GerritReviewController {
     private GerritStatisticsService statisticsService;
 
     @RequestMapping(value = "/refreshCache")
-    public void refreshCache() throws Exception {
+    public boolean refreshCache() {
         LOGGER.info("Manual Cache Refresh Triggered");
-        statisticsService.getReviewStatisticsScheduledTask();
+        try {
+            statisticsService.getReviewStatisticsScheduledTask();
+        } catch(Exception e) {
+            return false;
+        }
+        return true;
     }
 
     @RequestMapping(value = "/testConnection")

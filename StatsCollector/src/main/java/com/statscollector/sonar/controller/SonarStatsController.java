@@ -2,7 +2,6 @@ package com.statscollector.sonar.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,14 @@ public class SonarStatsController {
     final static Logger LOGGER = Logger.getLogger(SonarStatsController.class);
 
     @RequestMapping(value = "/refreshCache")
-    public void refreshCache() throws IOException, URISyntaxException, InterruptedException, ExecutionException {
+    public boolean refreshCache() {
         LOGGER.info("Manual Cache Refresh Triggered");
-        sonarStatisticsService.getStatisticsScheduledTask();
+        try {
+            sonarStatisticsService.getStatisticsScheduledTask();
+        } catch(Exception e) {
+            return false;
+        }
+        return true;
     }
 
     @RequestMapping(value = "/testConnection")

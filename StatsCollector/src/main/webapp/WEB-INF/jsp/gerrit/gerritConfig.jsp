@@ -27,8 +27,11 @@
 						ngf-multiple="true" class="ng-pristine ng-valid">
 						<span class="fa fa-upload"></span>  Upload Config
 					</button>
-					</button>
 				</h1>
+				<button class="btn btn-primary" ng-click="vm.ReloadGerritCache()">
+					<span class="fa fa-refresh"></span>  Reload Statistics
+				</button>
+				<alert ng-repeat="alert in alerts" type="{{alert.type}}" close="CloseGerritAlert($index)">{{alert.msg}}</alert>
 			</div>
 
 			<div class="page-header col-mid-12">

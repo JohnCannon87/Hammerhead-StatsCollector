@@ -207,6 +207,7 @@ public class GerritStatisticsService {
         } catch(Exception e) {
             LOGGER.error("Error Processing Data From Gerrit", e);
             refreshInProgress = false;
+            throw e;
         }
     }
 

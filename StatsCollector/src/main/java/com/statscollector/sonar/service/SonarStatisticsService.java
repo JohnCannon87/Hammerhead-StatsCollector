@@ -145,6 +145,7 @@ public class SonarStatisticsService {
         } catch(Exception e) {
             LOGGER.error("Error Processing Data From Sonar", e);
             refreshInProgress = false;
+            throw e;
         }
     }
 
