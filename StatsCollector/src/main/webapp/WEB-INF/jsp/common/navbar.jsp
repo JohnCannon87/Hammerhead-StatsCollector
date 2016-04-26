@@ -1,6 +1,6 @@
 <nav class="navbar navbar-fixed-top">
 		<div class="container-fluid">
-			<div class="navbar-header" ng-controller="GerritStatsCtrl">
+			<div class="navbar-header" ng-controller="StatsCtrl">
 				<a class="navbar-brand" href="https://github.com/JohnCannon87/StatsCollector"><i class="fa fa-github"></i> {{gerritProjectName}} Statistics Collector</a>
 			</div>
 			<div>

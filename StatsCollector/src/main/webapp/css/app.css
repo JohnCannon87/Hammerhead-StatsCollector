@@ -11,7 +11,7 @@ body {
 	margin-bottom: 0px;
 }
 
-.hiddenImg {
+.hidden {
 	display:none;
 }
 
@@ -20,6 +20,14 @@ body {
     white-space:nowrap;
     text-overflow:ellipsis;
     width:100%;
+}
+
+canvas {
+    padding-right: 10px;
+}
+
+.no-pad-bottom {
+	padding-bottom: 5px;
 }
 
 .no-pad-right {

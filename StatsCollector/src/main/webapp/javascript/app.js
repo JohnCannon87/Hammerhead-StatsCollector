@@ -1,4 +1,4 @@
-var app = angular.module('app', ['appGerritStats', 'appSonarStats', 'formly', 'formlyBootstrap'], function config(formlyConfigProvider) {
+var app = angular.module('app', ['appStats', 'appGerritStats', 'appSonarStats', 'formly', 'formlyBootstrap'], function config(formlyConfigProvider) {
 	formlyConfigProvider.setWrapper({
 	      name: 'horizontalBootstrapLabel',
 	      template: [
