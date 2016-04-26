@@ -38,7 +38,7 @@ function TestGerritConnection($scope, $http){
 
 function GerritConfigCtrl($http, $scope, $log, $q, Gerrit, Upload, getOIMConfig) {
 	var vm = this;
-	
+		
 	$scope.alerts = [];
 	
 	$scope.CloseGerritAlert = function(index) {
@@ -99,11 +99,11 @@ function GerritConfigCtrl($http, $scope, $log, $q, Gerrit, Upload, getOIMConfig)
 		UpdateGerritConfig(response.data, vm);
 	});
 	
-	function downloadConfig(){
-		$http.get('/sonar/config/info').then(function(response){
+	function downloadGerritConfig(){
+		$http.get('/gerrit/config/info').then(function(response){
 			//Download File Now...
 			var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});
-			saveAs(file, 'SonarConfig.json');
+			saveAs(file, 'GerritConfig.json');
 		});		
 	};
 	
@@ -148,8 +148,8 @@ function GerritConfigCtrl($http, $scope, $log, $q, Gerrit, Upload, getOIMConfig)
 			vm.fields = getOIMConfig(vm.model, response.data.properties);
 		});
 	});
-	
-	vm.downloadConfig = downloadConfig;
+
+	vm.downloadGerritConfig = downloadGerritConfig;
 	
     vm.onSubmit = onSubmit;
 

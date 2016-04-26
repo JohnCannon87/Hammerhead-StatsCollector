@@ -49,7 +49,7 @@ function SonarConfigCtrl($http, $scope, $log, $q, Sonar, Upload, getOIMConfig) {
 		return TestSonarConnection($scope, $http);
 	}
 	
-	vm.downloadConfig = downloadConfig;
+	vm.downloadSonarConfig = downloadSonarConfig;
 	
     vm.onSubmit = onSubmit;
 
@@ -116,7 +116,7 @@ function SonarConfigCtrl($http, $scope, $log, $q, Sonar, Upload, getOIMConfig) {
     	saveSonarConfig();
     };
     
-    function downloadConfig(){
+    function downloadSonarConfig(){
 		$http.get('/sonar/config/info').then(function(response){
 			//Download File Now...
 			var file = new Blob([JSON.stringify(response.data)], {type: 'application/json'});

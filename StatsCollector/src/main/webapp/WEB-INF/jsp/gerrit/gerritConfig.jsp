@@ -19,7 +19,7 @@
 			<div class="page-header col-mid-12">
 				<h1>
 					<span class="fa fa-cogs"></span> Gerrit Config
-					<button class="btn btn-primary" ng-click="vm.downloadConfig()">
+					<button class="btn btn-primary" ng-click="vm.downloadGerritConfig()">
 						<span class="fa fa-download"></span>  Download
 						Config
 					</button>

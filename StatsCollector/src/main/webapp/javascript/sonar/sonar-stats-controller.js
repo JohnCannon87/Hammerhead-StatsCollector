@@ -65,9 +65,9 @@ function UpdateSonarConfig(data, $scope, $location) {
 function GetReviewRowClassTarget(value, target) {
 	if (value === undefined) {
 		return "list-group-item list-group-item";
-	} else if (value > target) {
+	} else if (Number(value) > Number(target)) {
 		return "list-group-item list-group-item-success";
-	} else if (value == target) {
+	} else if (Number(value) == Number(target)) {
 		return "list-group-item list-group-item-warning";
 	} else {
 		return "list-group-item list-group-item-danger";
@@ -77,9 +77,9 @@ function GetReviewRowClassTarget(value, target) {
 function GetReviewRowClassLimit(value, target) {
 	if (value === undefined) {
 		return "list-group-item list-group-item";
-	} else if (value > target) {
+	} else if (Number(value) > Number(target)) {
 		return "list-group-item list-group-item-danger";
-	} else if (value == target) {
+	} else if (Number(value) == Number(target)) {
 		return "list-group-item list-group-item-warning";
 	} else {
 		return "list-group-item list-group-item-success";

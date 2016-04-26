@@ -9,6 +9,14 @@ function GetGerritStatsClass($rootScope){
 	}
 }
 
+function GetAvatarClass(avatarUrl){
+	if(typeof avatarUrl === "undefined"){
+		return "hiddenImg";
+	}else{
+		return "img-circle";
+	}
+}
+
 function UpdateGerritConfig(data, $scope, $location) {
 	$scope.gerritHostname = data.host;
 	$scope.gerritHostPort = data.hostPort;
@@ -44,9 +52,9 @@ function UpdateGerritConfig(data, $scope, $location) {
 function GetDimReviewRowClassTarget(value, target) {
 	if (value === undefined) {
 		return "list-group-item list-group-item";
-	} else if (value > target) {
+	} else if (Number(value) > Number(target)) {
 		return "list-group-item list-group-item-success-dim";
-	} else if (value === target) {
+	} else if (Number(value) === Number(target)) {
 		return "list-group-item list-group-item-warning-dim";
 	} else {
 		return "list-group-item list-group-item-danger-dim";
@@ -56,9 +64,9 @@ function GetDimReviewRowClassTarget(value, target) {
 function GetDimReviewRowClassLimit(value, target) {
 	if (value === undefined) {
 		return "list-group-item list-group-item";
-	} else if (value > target) {
+	} else if (Number(value) > Number(target)) {
 		return "list-group-item list-group-item-danger-dim";
-	} else if (value === target) {
+	} else if (Number(value) === Number(target)) {
 		return "list-group-item list-group-item-warning-dim";
 	} else {
 		return "list-group-item list-group-item-success-dim";
@@ -104,8 +112,8 @@ function GetGerritStats($http, $scope, $timeout){
 					$scope.totalReviews = response.data.totalReviewsCount;
 					$scope.noPeerPercentage = response.data.noPeerReviewPercentage;
 					$scope.onePeerPercentage = response.data.onePeerReviewPercentage;
-					$scope.twoPeerPercentage = response.data.twoPeerReviewPercentage;
-					$scope.collaborativePercentage = response.data.collaborativeReviewPercentage;
+					$scope.twoPeerPercentage = response.data.twoPlusPeerReviewPercentage;
+					$scope.collaborativePercentage = response.data.collabrativeDevelopmentPercentage;
 					$scope.noPeerReviews = response.data.noPeerReviewList;
 					$scope.onePeerReviews = response.data.onePeerReviewList;
 					$scope.twoPeerReviews = response.data.twoPlusPeerReviewList;
@@ -247,6 +255,8 @@ function GerritStats($http, $scope, $rootScope, $timeout, $location, $log, $q, G
 		$scope.configLoaded = false;
 	}
 	
+	$scope.GetAvatarClass = GetAvatarClass;
+	
 	$scope.gerritChartOptions = {
 
 		      // Sets the chart to be responsive
@@ -320,12 +330,12 @@ function GerritStats($http, $scope, $rootScope, $timeout, $location, $log, $q, G
 		return GetDimReviewRowClassLimit(percentage, $scope.noPeerReviewsTarget);
 	};
 
-	$scope.getOnePeerReviewRowClass = function(percentage) {
-		return GetDimReviewRowClassTarget(percentage, $scope.onePeerReviewTarget);
+	$scope.getOnePeerReviewRowClass = function(percentage, percentage1, percentage2) {
+		return GetDimReviewRowClassTarget(percentage+percentage1+percentage2, $scope.onePeerReviewTarget);
 	};
 
-	$scope.getTwoPeerReviewRowClass = function(percentage) {
-		return GetDimReviewRowClassTarget(percentage, $scope.twoPeerReviewTarget);
+	$scope.getTwoPeerReviewRowClass = function(percentage, percentage1) {
+		return GetDimReviewRowClassTarget(percentage+percentage1, $scope.twoPeerReviewTarget);
 	};
 
 	$scope.getCollabrativeDevelopmentRowClass = function(percentage) {

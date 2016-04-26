@@ -8,7 +8,18 @@ body {
 }
 
 .well {
-	margin-bottom: 0px
+	margin-bottom: 0px;
+}
+
+.hiddenImg {
+	display:none;
+}
+
+.hideOverflow {
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    width:100%;
 }
 
 .no-pad-right {

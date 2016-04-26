@@ -1,5 +1,6 @@
 package com.statscollector.sonar.config;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -13,6 +14,8 @@ import com.statscollector.application.config.AbstractWebConfig;
         "fillTargetArea" })
 public class SonarConfig extends AbstractWebConfig {
 
+    final static Logger LOGGER = Logger.getLogger(SonarConfig.class);
+
     private String projectRegex, methodComplexityTarget, fileComplexityTarget, rulesComplianceTarget,
             testCoverageTarget, infoWeighting, minorWeighting, majorWeighting, criticalWeighting, blockerWeighting;
     private Boolean fillTargetArea;
@@ -20,6 +23,7 @@ public class SonarConfig extends AbstractWebConfig {
     @JsonCreator
     public SonarConfig() {
         projectRegex = ".*";
+        LOGGER.info("Creating SonarConfig");
     }
 
     @JsonProperty(required = true)
@@ -233,7 +237,7 @@ public class SonarConfig extends AbstractWebConfig {
 
     @Override
     public String toString() {
-        return "TempSonarConfig [projectRegex=" + projectRegex + ", methodComplexityTarget=" + methodComplexityTarget
+        return "SonarConfig [projectRegex=" + projectRegex + ", methodComplexityTarget=" + methodComplexityTarget
                 + ", fileComplexityTarget=" + fileComplexityTarget + ", rulesComplianceTarget=" + rulesComplianceTarget
                 + ", testCoverageTarget=" + testCoverageTarget + ", infoWeighting=" + infoWeighting
                 + ", minorWeighting=" + minorWeighting + ", majorWeighting=" + majorWeighting + ", criticalWeighting="

@@ -33,7 +33,7 @@ public class SonarStatsController {
     }
 
     @RequestMapping(value = "/testConnection")
-    public ConnectionTestResults testGerritConnection() {
+    public ConnectionTestResults testSonarConnection() {
         return sonarStatisticsService.testConnection();
     }
 
