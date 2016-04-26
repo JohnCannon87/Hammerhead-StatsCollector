@@ -1,2 +1,4 @@
 #!/bin/sh
-java -jar StatsCollector-1.0.war -DconfigFile.path=GerritStatistics.properties -Dserver.port=8080 >> statsCollector.log &
+kill $(ps aux | grep 'StatsCollector' | awk '{print $2}')
+rm -rf statsCollector.log
+java -jar StatsCollector-1.0.war -Dserver.port=8080 >> statsCollector.log &
