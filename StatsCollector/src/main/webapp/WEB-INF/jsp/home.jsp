@@ -14,7 +14,7 @@
 </head>
 <body ng-controller="StatsCtrl">
 	<%@include file="common/navbar.jsp"%>
-		<div ng-show="!showGerritData" class="col-sm-3 no-pad no-pad-right well">
+		<div ng-if="!showGerritData" class="col-sm-3 no-pad no-pad-right">
 			<div class="panel panel-default">
 				<h1>	
 					<div>
@@ -26,7 +26,7 @@
 				</h1>
 			</div>		
 		</div>
-		<div class="no-pad no-pad-right no-pad-bottom" ng-class="GetGerritStatsClass()" ng-if="!showGerritStats && showGerritData">				
+		<div class="col-sm-3 no-pad no-pad-right no-pad-bottom" ng-if="showGerritData">				
 				<div class="panel panel-default">
 					<div ng-show="showGerritHistory"><canvas tc-chartjs chart-type="Line" chart-data="gerritHistoryChartData" chart-options="lineChartOptionsUpwards" id="fileComplexityChart"></canvas></div>
 					<div ng-show="showGerritPie"><canvas tc-chartjs-pie chart-data="gerritChartData" chart-options="gerritChartOptions"></canvas></div>
@@ -80,8 +80,7 @@
 					</div>
 				</div>
 		</div>
-	<div>
-		<div ng-show="!showSonarData" class="col-sm-9 no-pad no-pad-right well">
+		<div ng-if="!showSonarData" class="col-sm-9 no-pad no-pad-right">
 			<div class="panel panel-default">
 				<h1>	
 					<div>
@@ -93,7 +92,7 @@
 				</h1>
 			</div>		
 		</div>
-		<div class="col-sm-9 no-pad no-pad-right" ng-class="GetSonarStatsClass()"  ng-if="!showSonarStats && showSonarData">
+		<div class="col-sm-9 no-pad no-pad-right" ng-if="showSonarData">
 				<div class="col-sm-6 no-pad no-pad-right">					
 					<div class="panel panel-default">		
 						<div class="list-group-item" ng-class="getFileComplexityClass(fileComplexity)"><i class="fa fa-arrow-down text-right" aria-hidden="true"></i> File Complexity = {{fileComplexity}}</div>
@@ -115,7 +114,6 @@
 					</div>
 				</div>
 		</div>
-	</div>
 	<%@include file="common/footer.jspf"%>
 </body>
 </html>

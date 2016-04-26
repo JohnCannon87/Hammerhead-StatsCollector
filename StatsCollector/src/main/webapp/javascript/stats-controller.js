@@ -7,28 +7,6 @@ var appStatsModule = angular.module('appStats', ['tc.chartjs', 'ui.bootstrap', '
 		});
 });
 
-function GetSonarStatsClass($scope){
-	if($scope.showGerritStats == null){
-		$scope.showGerritStats = false;
-	}
-	if($scope.showGerritStats){
-		return "col-sm-12 well";		
-	}else{
-		return "col-sm-9 well";
-	}
-}
-
-function GetGerritStatsClass($scope) {
-	if ($scope.showSonarStats == null) {
-		$scope.showSonarStats = false;
-	}
-	if ($scope.showSonarStats) {
-		return "col-sm-12 well";
-	} else {
-		return "col-sm-3 well";
-	}
-}
-
 function GetReviewRowClassTarget(value, target) {
 	if (value === undefined) {
 		return "list-group-item list-group-item";
