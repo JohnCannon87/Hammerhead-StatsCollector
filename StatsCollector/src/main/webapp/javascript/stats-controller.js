@@ -332,12 +332,12 @@ function GetGerritStats($http, $scope) {
 							var noPointStrokeColor = "#CC0000";
 							var noPointHighlightFill = "#CC0000";
 							var noPointHighlightStroke = "#CC0000";
-							var oneFillColor = "#009933";
-							var oneStrokeColor = "#009933";
-							var onePointColor = "#009933";
-							var onePointStrokeColor = "#009933";
-							var onePointHighlightFill = "#009933";
-							var onePointHighlightStroke = "#009933";
+							var oneFillColor = "#FFFFFF";
+							var oneStrokeColor = "#FFFFFF";
+							var onePointColor = "#FFFFFF";
+							var onePointStrokeColor = "#FFFFFF";
+							var onePointHighlightFill = "#FFFFFF";
+							var onePointHighlightStroke = "#FFFFFF";
 
 							$scope.lineChartOptionsUpwards = {
 								scaleOverride : true,
