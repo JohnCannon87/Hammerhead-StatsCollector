@@ -7,11 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -75,12 +79,22 @@ public class SonarDao extends AbstractWebDao {
 
         try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider)
                 .build()) {
+
+            HttpHost httpHost = new HttpHost(getConfig().getHost(), getConfig().getHostPort(), "http");
+            BasicScheme basicScheme = new BasicScheme();
+            BasicAuthCache authCache = new BasicAuthCache();
+            authCache.put(httpHost, basicScheme);
+
+            HttpClientContext context = HttpClientContext.create();
+            context.setCredentialsProvider(credsProvider);
+            context.setAuthCache(authCache);
+
             URIBuilder baseURIBuilder = setupBaseURI(ALL_METRICS_URL);
             baseURIBuilder.addParameters(getLatestStatsParameters());
             URI uri = baseURIBuilder.build();
             HttpGet httpGet = new HttpGet(uri);
 
-            try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+            try (CloseableHttpResponse response = httpclient.execute(httpGet, context)) {
                 HttpEntity httpEntity = response.getEntity();
                 resultString = EntityUtils.toString(httpEntity);
                 EntityUtils.consume(httpEntity);
@@ -122,12 +136,22 @@ public class SonarDao extends AbstractWebDao {
 
         try (CloseableHttpClient httpclient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider)
                 .build()) {
+
+            HttpHost httpHost = new HttpHost(getConfig().getHost(), getConfig().getHostPort(), "http");
+            BasicScheme basicScheme = new BasicScheme();
+            BasicAuthCache authCache = new BasicAuthCache();
+            authCache.put(httpHost, basicScheme);
+
+            HttpClientContext context = HttpClientContext.create();
+            context.setCredentialsProvider(credsProvider);
+            context.setAuthCache(authCache);
+
             URIBuilder baseURIBuilder = setupBaseURI(TIME_MACHINE_URL);
             baseURIBuilder.addParameters(getDateWindowParameters(interval, resourceKey));
             URI uri = baseURIBuilder.build();
             HttpGet httpGet = new HttpGet(uri);
 
-            try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
+            try (CloseableHttpResponse response = httpclient.execute(httpGet, context)) {
                 HttpEntity httpEntity = response.getEntity();
                 resultString = EntityUtils.toString(httpEntity);
                 EntityUtils.consume(httpEntity);
