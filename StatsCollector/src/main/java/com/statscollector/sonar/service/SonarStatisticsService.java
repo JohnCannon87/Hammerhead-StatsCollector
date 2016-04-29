@@ -41,6 +41,7 @@ import com.statscollector.sonar.dao.SonarDao;
 import com.statscollector.sonar.model.SonarMetric;
 import com.statscollector.sonar.model.SonarProject;
 import com.statscollector.sonar.model.SonarStatistics;
+import com.statscollector.sonar.model.SonarTargetsStatus;
 import com.statscollector.sonar.service.filter.FilterProjectNamePredicate;
 
 @Service
@@ -460,5 +461,24 @@ public class SonarStatisticsService {
         } catch(Exception e) {
             return new ConnectionTestResults<SonarProject>(connectionDetails.toString(), null, e.toString());
         }
+    }
+
+    public SonarTargetsStatus getTargetStatus(final String projectRegex) throws IOException, URISyntaxException {
+        SonarStatistics latestStatistics = getLatestStatistics(projectRegex);
+
+        BigDecimal fileComplexity = new BigDecimal(latestStatistics.getFileComplexity());
+        BigDecimal methodComplexity = new BigDecimal(latestStatistics.getMethodComplexity());
+        BigDecimal rulesCompliance = new BigDecimal(latestStatistics.getRulesCompliance());
+        BigDecimal testCoverage = new BigDecimal(latestStatistics.getTestCoverage());
+        BigDecimal fileComplexityTarget = new BigDecimal(sonarConfig.getFileComplexityTarget());
+        BigDecimal methodComplexityTarget = new BigDecimal(sonarConfig.getMethodComplexityTarget());
+        BigDecimal rulesComplianceTarget = new BigDecimal(sonarConfig.getRulesComplianceTarget());
+        BigDecimal testCoverageTarget = new BigDecimal(sonarConfig.getTestCoverageTarget());
+        boolean hitFileTarget = (fileComplexity.compareTo(fileComplexityTarget) <= 0);
+        boolean hitMethodTarget = (methodComplexity.compareTo(methodComplexityTarget) <= 0);
+        boolean hitTestTarget = (testCoverage.compareTo(testCoverageTarget) >= 0);
+        boolean hitRulesTarget = (rulesCompliance.compareTo(rulesComplianceTarget) >= 0);
+
+        return new SonarTargetsStatus(hitFileTarget, hitMethodTarget, hitTestTarget, hitRulesTarget);
     }
 }

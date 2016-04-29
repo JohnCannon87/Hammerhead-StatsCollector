@@ -144,6 +144,7 @@ function SetupChartOptions($scope) {
 }
 
 function UpdateGerritConfig(data, $scope, $location) {
+	$scope.gerritUrl = "http://"+data.host+":"+data.hostPort;
 	$scope.gerritHostname = data.host;
 	$scope.gerritHostPort = data.hostPort;
 	$scope.reviewersToIgnore = data.reviewersToIgnore;
@@ -175,6 +176,7 @@ function UpdateGerritConfig(data, $scope, $location) {
 }
 
 function UpdateSonarConfig(data, $scope, $location) {
+	$scope.sonarUrl = "http://"+data.host+":"+data.hostPort;
 	$scope.sonarHostname = data.host;
 	$scope.sonarHostPort = data.hostPort;
 	$scope.sonarUsername = data.username;
