@@ -12,6 +12,7 @@
 <%@include file="../common/configPages.jsp"%>
 </head>
 <body ng-controller="SonarConfigCtrl as vm">
+	<c:set var="imagePath" value="../../images"/>
 	<%@include file="../common/navbar.jsp"%>
 	<div class="container-fluid">
 		<div class="col-sm-12">

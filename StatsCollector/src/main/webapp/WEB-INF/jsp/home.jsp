@@ -13,6 +13,7 @@
 <%@include file="common/configPages.jsp"%>
 </head>
 <body ng-controller="StatsCtrl">
+	<c:set var="imagePath" value="images"/>
 	<%@include file="common/navbar.jsp"%>
 		<div ng-if="!showGerritData" class="col-sm-3 no-pad no-pad-right">
 			<div class="panel panel-default">
