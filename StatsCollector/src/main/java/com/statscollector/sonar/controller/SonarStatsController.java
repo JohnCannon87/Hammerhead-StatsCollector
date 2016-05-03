@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.statscollector.gerrit.model.ConnectionTestResults;
+import com.statscollector.sonar.model.SonarTargets;
 import com.statscollector.sonar.model.SonarTargetsStatus;
 import com.statscollector.sonar.service.SonarStatisticsService;
 
@@ -46,9 +48,15 @@ public class SonarStatsController {
     @RequestMapping(value = "/statistics/targetStatus/{projectRegex}/{type}")
     @ResponseBody
     public SonarTargetsStatus targetStatus(@PathVariable final String projectRegex,
-            @PathVariable final String type, final HttpServletResponse response) throws IOException,
+            @PathVariable final String type, @RequestParam(required = false) final String sonarMethodTarget,
+            @RequestParam(required = false) final String sonarFileTarget,
+            @RequestParam(required = false) final String sonarTestTarget,
+            @RequestParam(required = false) final String sonarRulesTarget, final HttpServletResponse response)
+            throws IOException,
             URISyntaxException {
-        return sonarStatisticsService.getTargetStatus(projectRegex);
+        SonarTargets sonarTargets = new SonarTargets(sonarMethodTarget, sonarFileTarget,
+                sonarRulesTarget, sonarTestTarget);
+        return sonarStatisticsService.getTargetStatus(projectRegex, sonarTargets);
     }
 
     @RequestMapping(value = "/statistics/{projectRegex}/{type}")

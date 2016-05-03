@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.log4j.Logger;
@@ -41,6 +42,7 @@ import com.statscollector.sonar.dao.SonarDao;
 import com.statscollector.sonar.model.SonarMetric;
 import com.statscollector.sonar.model.SonarProject;
 import com.statscollector.sonar.model.SonarStatistics;
+import com.statscollector.sonar.model.SonarTargets;
 import com.statscollector.sonar.model.SonarTargetsStatus;
 import com.statscollector.sonar.service.filter.FilterProjectNamePredicate;
 
@@ -477,22 +479,35 @@ public class SonarStatisticsService {
         }
     }
 
-    public SonarTargetsStatus getTargetStatus(final String projectRegex) throws IOException, URISyntaxException {
+    public SonarTargetsStatus getTargetStatus(final String projectRegex, final SonarTargets sonarTargets)
+            throws IOException, URISyntaxException {
         SonarStatistics latestStatistics = getLatestStatistics(projectRegex);
 
         BigDecimal fileComplexity = new BigDecimal(latestStatistics.getFileComplexity());
         BigDecimal methodComplexity = new BigDecimal(latestStatistics.getMethodComplexity());
         BigDecimal rulesCompliance = new BigDecimal(latestStatistics.getRulesCompliance());
         BigDecimal testCoverage = new BigDecimal(latestStatistics.getTestCoverage());
-        BigDecimal fileComplexityTarget = new BigDecimal(sonarConfig.getFileComplexityTarget());
-        BigDecimal methodComplexityTarget = new BigDecimal(sonarConfig.getMethodComplexityTarget());
-        BigDecimal rulesComplianceTarget = new BigDecimal(sonarConfig.getRulesComplianceTarget());
-        BigDecimal testCoverageTarget = new BigDecimal(sonarConfig.getTestCoverageTarget());
+        BigDecimal fileComplexityTarget = getTarget(sonarTargets.getSonarFileTarget(),
+                sonarConfig.getFileComplexityTarget());
+        BigDecimal methodComplexityTarget = getTarget(sonarTargets.getSonarMethodTarget(),
+                sonarConfig.getMethodComplexityTarget());
+        BigDecimal rulesComplianceTarget = getTarget(sonarTargets.getSonarRulesTarget(),
+                sonarConfig.getRulesComplianceTarget());
+        BigDecimal testCoverageTarget = getTarget(sonarTargets.getSonarTestTarget(),
+                sonarConfig.getTestCoverageTarget());
         boolean hitFileTarget = (fileComplexity.compareTo(fileComplexityTarget) <= 0);
         boolean hitMethodTarget = (methodComplexity.compareTo(methodComplexityTarget) <= 0);
         boolean hitTestTarget = (testCoverage.compareTo(testCoverageTarget) >= 0);
         boolean hitRulesTarget = (rulesCompliance.compareTo(rulesComplianceTarget) >= 0);
 
         return new SonarTargetsStatus(hitFileTarget, hitMethodTarget, hitTestTarget, hitRulesTarget);
+    }
+
+    private BigDecimal getTarget(final String urlTarget, final String configTarget) {
+        if(StringUtils.isEmpty(urlTarget)) {
+            return new BigDecimal(configTarget);
+        } else {
+            return new BigDecimal(urlTarget);
+        }
     }
 }
