@@ -350,10 +350,24 @@ public class SonarStatisticsService {
         List<Interval> intervals = new ArrayList<>();
         intervals.addAll(condensedMetrics.keySet());
         Collections.sort(intervals, (final Interval i1, final Interval i2) -> i1.getStart().compareTo(i2.getStart()));
-        Interval lastInterval = intervals.get(intervals.size() - 1);
-        Map<String, SonarMetric> map = condensedMetrics.get(lastInterval);
+        Map<String, SonarMetric> map = getMap(condensedMetrics, intervals, 1);
 
         return calculateSonarStatistics(map);
+    }
+
+    /**
+     * @param condensedMetrics
+     * @param intervals
+     * @return
+     */
+    private Map<String, SonarMetric> getMap(final Map<Interval, Map<String, SonarMetric>> condensedMetrics,
+            final List<Interval> intervals, final Integer offSet) {
+        Interval lastInterval = intervals.get(intervals.size() - offSet);
+        Map<String, SonarMetric> map = condensedMetrics.get(lastInterval);
+        if(map.isEmpty()) {
+            return getMap(condensedMetrics, intervals, offSet + 1);
+        }
+        return map;
     }
 
     /**
