@@ -11,12 +11,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.statscollector.application.config.AbstractWebConfig;
 
-@JsonPropertyOrder({ "projectName", "host", "hostPort", "username", "password", "projectRegex", "topicRegex",
+@JsonPropertyOrder({ "projectName", "host", "hostPort", "username", "password", "projectRegex", "projectFilterOutRegex",
+        "topicRegex",
         "threadSplitSize", "startDateOffset", "endDateOffset", "noPeerReviewTarget", "onePeerReviewTarget",
         "twoPeerReviewTarget", "collaborativeReviewTarget", "reviewersToIgnore", "showGerritHistory", "showGerritPie" })
 public class GerritConfig extends AbstractWebConfig {
 
-    private String projectRegex, topicRegex;
+    private String projectRegex, projectFilterOutRegex, topicRegex;
     private Integer threadSplitSize, startDateOffset, endDateOffset;
     private Float noPeerReviewTarget, onePeerReviewTarget, twoPeerReviewTarget, collaborativeReviewTarget;
     private String reviewersToIgnore;
@@ -35,6 +36,15 @@ public class GerritConfig extends AbstractWebConfig {
 
     public void setProjectRegex(final String projectRegex) {
         this.projectRegex = projectRegex;
+    }
+
+    @JsonProperty
+    public String getProjectFilterOutRegex() {
+        return projectFilterOutRegex;
+    }
+
+    public void setProjectFilterOutRegex(final String projectFilterOutRegex) {
+        this.projectFilterOutRegex = projectFilterOutRegex;
     }
 
     @JsonProperty(required = true)

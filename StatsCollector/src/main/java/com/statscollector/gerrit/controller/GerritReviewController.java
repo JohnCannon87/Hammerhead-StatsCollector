@@ -46,12 +46,30 @@ public class GerritReviewController {
         return statisticsService.testConnection();
     }
 
-    @RequestMapping(value = "/authors/{changeStatus}/{projectFilterString}/{startDateOffset}/{endDateOffset}", produces = "application/json")
+    @RequestMapping(value = "/authors/{changeStatus}/{projectFilterString}/{projectFilterOutString}/{startDateOffset}/{endDateOffset}", produces = "application/json")
     public GerritAuthorsAndReviewersList authorsList(@PathVariable final String changeStatus,
-            @PathVariable final String projectFilterString, @PathVariable final Integer startDateOffset,
+            @PathVariable final String projectFilterString, @PathVariable final String projectFilterOutString,
+            @PathVariable final Integer startDateOffset,
             @PathVariable final Integer endDateOffset) {
         try {
-            return getCommitAuthors(changeStatus, projectFilterString, calculateDateFromOffset(startDateOffset),
+            return getCommitAuthors(changeStatus, projectFilterString, projectFilterOutString,
+                    calculateDateFromOffset(startDateOffset),
+                    calculateDateFromOffset(endDateOffset));
+        } catch(Exception e) {
+            LOGGER.error("Error Producing Authors and Reviewers List", e);
+            return new GerritAuthorsAndReviewersList(new ArrayList<GerritUserCount>(),
+                    new ArrayList<GerritUserCount>());
+        }
+    }
+
+    @RequestMapping(value = "/authors/{changeStatus}/{projectFilterString}/{startDateOffset}/{endDateOffset}", produces = "application/json")
+    public GerritAuthorsAndReviewersList authorsList(@PathVariable final String changeStatus,
+            @PathVariable final String projectFilterString,
+            @PathVariable final Integer startDateOffset,
+            @PathVariable final Integer endDateOffset) {
+        try {
+            return getCommitAuthors(changeStatus, projectFilterString, "",
+                    calculateDateFromOffset(startDateOffset),
                     calculateDateFromOffset(endDateOffset));
         } catch(Exception e) {
             LOGGER.error("Error Producing Authors and Reviewers List", e);
@@ -62,10 +80,27 @@ public class GerritReviewController {
 
     @RequestMapping(value = "/{changeStatus}/{projectFilterString}/{startDateOffset}/{endDateOffset}", produces = "application/json")
     public GerritReviewStats statusReview(@PathVariable final String changeStatus,
-            @PathVariable final String projectFilterString, @PathVariable final Integer startDateOffset,
+            @PathVariable final String projectFilterString,
+            @PathVariable final Integer startDateOffset,
             @PathVariable final Integer endDateOffset) {
         try {
-            return getReviewStatistics(changeStatus, projectFilterString, calculateDateFromOffset(startDateOffset),
+            return getReviewStatistics(changeStatus, projectFilterString, "",
+                    calculateDateFromOffset(startDateOffset),
+                    calculateDateFromOffset(endDateOffset));
+        } catch(Exception e) {
+            LOGGER.error("Error Producing review List", e);
+            return GerritReviewStats.buildEmptyStatsObjectWithStatus(e.getMessage(), true);
+        }
+    }
+
+    @RequestMapping(value = "/{changeStatus}/{projectFilterString}/{projectFilterOutString}/{startDateOffset}/{endDateOffset}", produces = "application/json")
+    public GerritReviewStats statusReview(@PathVariable final String changeStatus,
+            @PathVariable final String projectFilterString, @PathVariable final String projectFilterOutString,
+            @PathVariable final Integer startDateOffset,
+            @PathVariable final Integer endDateOffset) {
+        try {
+            return getReviewStatistics(changeStatus, projectFilterString, projectFilterOutString,
+                    calculateDateFromOffset(startDateOffset),
                     calculateDateFromOffset(endDateOffset));
         } catch(Exception e) {
             LOGGER.error("Error Producing review List", e);
@@ -77,7 +112,7 @@ public class GerritReviewController {
     public GerritReviewStats mergedReview(@PathVariable final String changeStatus,
             @PathVariable final String projectFilterString) {
         try {
-            return getReviewStatistics(changeStatus, projectFilterString, null, null);
+            return getReviewStatistics(changeStatus, projectFilterString, null, null, null);
         } catch(Exception e) {
             return GerritReviewStats.buildEmptyStatsObjectWithStatus(e.getMessage(), true);
         }
@@ -88,7 +123,7 @@ public class GerritReviewController {
             @PathVariable final Integer startDateOffset, @PathVariable final Integer endDateOffset) throws IOException,
             URISyntaxException {
         try {
-            return getReviewStatistics(changeStatus, null, calculateDateFromOffset(startDateOffset),
+            return getReviewStatistics(changeStatus, null, null, calculateDateFromOffset(startDateOffset),
                     calculateDateFromOffset(endDateOffset));
         } catch(Exception e) {
             return GerritReviewStats.buildEmptyStatsObjectWithStatus(e.getMessage(), true);
@@ -99,13 +134,14 @@ public class GerritReviewController {
     public GerritReviewStats mergedReview(@PathVariable final String changeStatus) throws IOException,
             URISyntaxException {
         try {
-            return getReviewStatistics(changeStatus, null, null, null);
+            return getReviewStatistics(changeStatus, null, null, null, null);
         } catch(Exception e) {
             return GerritReviewStats.buildEmptyStatsObjectWithStatus(e.getMessage(), true);
         }
     }
 
     public GerritAuthorsAndReviewersList getCommitAuthors(final String changeStatus, String projectFilterString,
+            final String projectFilterOutString,
             DateTime startDate, DateTime endDate) throws IOException, URISyntaxException {
         if(null == changeStatus || changeStatus.isEmpty()) {
             throw new RuntimeException("Error change status cannot be null");
@@ -121,16 +157,21 @@ public class GerritReviewController {
             // time syncs between servers.
             endDate = new DateMidnight().plusYears(CURRENT_TIME_OFFSET).toDateTime();
         }
-        return statisticsService.getCommitAuthors(changeStatus, projectFilterString, startDate, endDate);
+        return statisticsService.getCommitAuthors(changeStatus, projectFilterString, projectFilterOutString, startDate,
+                endDate);
     }
 
     public GerritReviewStats getReviewStatistics(final String changeStatus, String projectFilterString,
+            String projectFilterOutString,
             DateTime startDate, DateTime endDate) throws IOException, URISyntaxException {
         if(null == changeStatus || changeStatus.isEmpty()) {
             throw new RuntimeException("Error change status cannot be null");
         }
         if(null == projectFilterString) {
             projectFilterString = ALL_REGEX;
+        }
+        if(null == projectFilterOutString) {
+            projectFilterOutString = "";
         }
         if(null == startDate) {
             startDate = new DateTime(0);
@@ -140,7 +181,8 @@ public class GerritReviewController {
             // time syncs between servers.
             endDate = new DateMidnight().plusYears(CURRENT_TIME_OFFSET).toDateTime();
         }
-        return statisticsService.getReviewStatistics(changeStatus, projectFilterString, startDate, endDate);
+        return statisticsService.getReviewStatistics(changeStatus, projectFilterString, projectFilterOutString,
+                startDate, endDate);
     }
 
     private DateTime calculateDateFromOffset(final Integer offset) {

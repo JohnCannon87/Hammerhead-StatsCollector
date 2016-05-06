@@ -158,16 +158,23 @@ function UpdateGerritConfig(data, $scope, $location) {
 	$scope.onePeerReviewTarget = data.onePeerReviewTarget;
 	$scope.twoPeerReviewTarget = data.twoPeerReviewTarget;
 	$scope.collaborativeReviewTarget = data.collaborativeReviewTarget;
-	$scope.configLoaded = true;
 	$scope.gerritProjectName = data.projectName;
 	$scope.gerritProjectRegex = data.projectRegex;
+	if(data.projectFilterOutRegex === undefined){
+		$scope.gerritProjectFilterOutRegex = "";		
+	}else{
+		$scope.gerritProjectFilterOutRegex = data.projectFilterOutRegex;		
+	}
 	$scope.showGerritHistory = data.showGerritHistory;
 	$scope.showGerritPie = data.showGerritPie;
+	$scope.configLoaded = true;
 
 	// Override from URL Param For multiple projects.
 	if (typeof $location !== "undefined") {
 		if (typeof $location.search().projectRegex !== "undefined") {
 			$scope.gerritProjectRegex = $location.search().projectRegex
+		}if (typeof $location.search().projectFilterOutRegex !== "undefined") {
+			$scope.gerritProjectFilterOutRegex = $location.search().projectFilterOutRegex
 		}
 		if (typeof $location.search().projectName !== "undefined") {
 			$scope.gerritProjectName = $location.search().projectName
@@ -224,7 +231,16 @@ function UpdateSonarConfig(data, $scope, $location) {
 
 function GetGerritAuthorAndReviewerStats($http, $scope) {
 	if ($scope.configLoaded == true) {
-		if ($scope.gerritProjectRegex !== undefined
+		if($scope.gerritProjectRegex !== undefined
+				&& $scope.gerritStartDateOffset !== undefined
+				&& $scope.gerritEndDateOffset !== undefined
+				&& $scope.gerritProjectFilterOutRegex !== undefined){
+			url = '/gerrit/review/authors/' + $scope.gerritStatus + '/'
+			+ $scope.gerritProjectRegex + '/'
+			+ $scope.gerritProjectFilterOutRegex + '/'
+			+ $scope.gerritStartDateOffset + '/'
+			+ $scope.gerritEndDateOffset;
+		} else if ($scope.gerritProjectRegex !== undefined
 				&& $scope.gerritStartDateOffset !== undefined
 				&& $scope.gerritEndDateOffset !== undefined) {
 			url = '/gerrit/review/authors/' + $scope.gerritStatus + '/'
@@ -251,7 +267,16 @@ function GetGerritAuthorAndReviewerStats($http, $scope) {
 
 function GetGerritStats($http, $scope) {
 	if ($scope.configLoaded) {
-		if ($scope.gerritProjectRegex !== undefined
+		if($scope.gerritProjectRegex !== undefined
+				&& $scope.gerritStartDateOffset !== undefined
+				&& $scope.gerritEndDateOffset !== undefined
+				&& $scope.gerritProjectFilterOutRegex !== undefined){
+			url = '/gerrit/review/' + $scope.gerritStatus + '/'
+			+ $scope.gerritProjectRegex + '/'
+			+ $scope.gerritProjectFilterOutRegex + '/'
+			+ $scope.gerritStartDateOffset + '/'
+			+ $scope.gerritEndDateOffset;
+		} else if ($scope.gerritProjectRegex !== undefined
 				&& $scope.gerritStartDateOffset !== undefined
 				&& $scope.gerritEndDateOffset !== undefined) {
 			url = '/gerrit/review/' + $scope.gerritStatus + '/'
@@ -299,9 +324,7 @@ function GetGerritStats($http, $scope) {
 							var changeCountHistory = response.data.changeCountHistory;
 							var days = [];
 							var noPeerReviewCount = [];
-							var onePeerReviewCount = [];
-							var twoPeerReviewCount = [];
-							var collaborativeDevelopmentCount = [];
+							var actualReviewCount = [];
 							var dates = Object.keys(changeCountHistory).sort();
 							var maxCount = 0;
 							for (d in dates) {
@@ -311,21 +334,11 @@ function GetGerritStats($http, $scope) {
 								if (maxCount < changeCountHistory[dates[d]].noPeerReviewCount) {
 									maxCount = changeCountHistory[dates[d]].noPeerReviewCount;
 								}
-								onePeerReviewCount
-										.push(changeCountHistory[dates[d]].onePeerReviewCount);
-								if (maxCount < changeCountHistory[dates[d]].onePeerReviewCount) {
-									maxCount = changeCountHistory[dates[d]].onePeerReviewCount;
+								totalActualReviewCount = changeCountHistory[dates[d]].onePeerReviewCount + changeCountHistory[dates[d]].twoPeerReviewCount + changeCountHistory[dates[d]].collaborativeDevelopmentCount;
+								if(maxCount < totalActualReviewCount){
+									maxCount = totalActualReviewCount;
 								}
-								twoPeerReviewCount
-										.push(changeCountHistory[dates[d]].twoPeerReviewCount);
-								if (maxCount < changeCountHistory[dates[d]].twoPeerReviewCount) {
-									maxCount = changeCountHistory[dates[d]].twoPeerReviewCount;
-								}
-								collaborativeDevelopmentCount
-										.push(changeCountHistory[dates[d]].collaborativeDevelopmentCount);
-								if (maxCount < changeCountHistory[dates[d]].collaborativeDevelopmentCount) {
-									maxCount = changeCountHistory[dates[d]].collaborativeDevelopmentCount;
-								}
+								actualReviewCount.push(totalActualReviewCount);
 							}
 
 							var noFillColor = "#CC0000";
@@ -341,11 +354,16 @@ function GetGerritStats($http, $scope) {
 							var onePointHighlightFill = "#FFFFFF";
 							var onePointHighlightStroke = "#FFFFFF";
 
+							var scaleWidth = 2;
+							if(maxCount > 20){
+								scaleWidth = 5;
+							}
+							
 							$scope.lineChartOptionsUpwards = {
 								scaleOverride : true,
 								scaleStartValue : 0,
-								scaleSteps : (maxCount / 2) + 1,
-								scaleStepWidth : 2,
+								scaleSteps : (maxCount / scaleWidth) + 1,
+								scaleStepWidth : scaleWidth,
 								scaleLabel : function(object) {
 									return "  " + object.value;
 								},
@@ -370,7 +388,7 @@ function GetGerritStats($http, $scope) {
 							var gerritHistoryChartData = {
 								datasets : [
 										{
-											label : "One Peer Review",
+											label : "Actual Review Count",
 											fillColor : oneFillColor,
 											strokeColor : oneStrokeColor,
 											pointColor : onePointColor,
@@ -390,7 +408,7 @@ function GetGerritStats($http, $scope) {
 							};
 
 							gerritHistoryChartData.labels = days;
-							gerritHistoryChartData.datasets[0].data = onePeerReviewCount;
+							gerritHistoryChartData.datasets[0].data = actualReviewCount;
 							gerritHistoryChartData.datasets[1].data = noPeerReviewCount;
 							$scope.gerritHistoryChartData = gerritHistoryChartData;
 

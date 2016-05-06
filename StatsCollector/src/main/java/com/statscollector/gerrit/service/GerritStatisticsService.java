@@ -24,6 +24,7 @@ import com.statscollector.gerrit.model.GerritReviewStats;
 import com.statscollector.gerrit.model.GerritReviewStatsResult;
 import com.statscollector.gerrit.model.GerritUserCount;
 import com.statscollector.gerrit.service.filter.FilterDateUpdatedPredicate;
+import com.statscollector.gerrit.service.filter.FilterOutProjectNamePredicate;
 import com.statscollector.gerrit.service.filter.FilterProjectNamePredicate;
 import com.statscollector.gerrit.service.filter.FilterTopicPredicate;
 import com.statscollector.gerrit.service.filter.GerritChangeFilter;
@@ -92,11 +93,15 @@ public class GerritStatisticsService {
      * @param endDate
      * @return
      */
-    private List<GerritChangeFilter> getFilters(final String projectFilterRegex, final DateTime startDate,
+    private List<GerritChangeFilter> getFilters(final String projectFilterRegex, final String projectFilterOutRegex,
+            final DateTime startDate,
             final DateTime endDate, final String topicNameRegex) {
         List<GerritChangeFilter> results = new ArrayList<GerritChangeFilter>();
         results.add(new FilterDateUpdatedPredicate(startDate, endDate));
         results.add(new FilterProjectNamePredicate(projectFilterRegex));
+        if(!projectFilterOutRegex.isEmpty()) {
+            results.add(new FilterOutProjectNamePredicate(projectFilterOutRegex));
+        }
         if(!topicNameRegex.isEmpty()) {
             results.add(new FilterTopicPredicate(topicNameRegex));
         }
@@ -212,9 +217,10 @@ public class GerritStatisticsService {
     }
 
     public GerritAuthorsAndReviewersList getCommitAuthors(final String changeStatus, final String projectFilterString,
+            final String projectFilterOutString,
             final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
 
-        List<GerritChangeFilter> filters = getFilters(projectFilterString, startDate, endDate,
+        List<GerritChangeFilter> filters = getFilters(projectFilterString, projectFilterOutString, startDate, endDate,
                 gerritConfig.getTopicRegex());
 
         GerritReviewStats reviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
@@ -222,9 +228,10 @@ public class GerritStatisticsService {
     }
 
     public GerritReviewStats getReviewStatistics(final String changeStatus, final String projectFilterString,
+            final String projectFilterOutString,
             final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
 
-        List<GerritChangeFilter> filters = getFilters(projectFilterString, startDate, endDate,
+        List<GerritChangeFilter> filters = getFilters(projectFilterString, projectFilterOutString, startDate, endDate,
                 gerritConfig.getTopicRegex());
 
         GerritReviewStats reviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
@@ -268,6 +275,7 @@ public class GerritStatisticsService {
         if(null != reviewStats) {
             Map<String, GerritUserCount> mapOfAuthorsAndCounts = gerritStatisticsHelper
                     .createHashMapOfAuthorsAndCounts(
+                            filterChanges(reviewStats.getNoPeerReviewList(), filters),
                             filterChanges(reviewStats.getOnePeerReviewList(), filters),
                             filterChanges(reviewStats.getTwoPlusPeerReviewList(), filters),
                             filterChanges(reviewStats.getCollabrativeDevelopmentList(), filters));
@@ -287,7 +295,15 @@ public class GerritStatisticsService {
     private void affixNoPeerStatus(final Map<String, GerritUserCount> mapOfReviewersAndCounts,
             final List<ChangeInfo> filterChanges) {
         for(ChangeInfo changeInfo : filterChanges) {
-            mapOfReviewersAndCounts.get(changeInfo.owner.username).setDidDoOwnReview(true);
+            try {
+                if(!mapOfReviewersAndCounts.containsKey(changeInfo.owner.username)) {
+                    mapOfReviewersAndCounts.put(changeInfo.owner.username, new GerritUserCount(changeInfo.owner));
+                }
+                mapOfReviewersAndCounts.get(changeInfo.owner.username).setDidDoOwnReview(true);
+                mapOfReviewersAndCounts.get(changeInfo.owner.username).incrementCount();
+            } catch(NullPointerException e) {
+                LOGGER.error("Could not process change: " + changeInfo.id, e);
+            }
         }
     }
 
