@@ -6,7 +6,7 @@
 			<div>
 				<ul class="nav navbar-nav">
 					<li><a href="/home" target="_self"><i class="fa fa-home"></i> Home</a></li>
-					<li ng-show="gerritUrl !== undefined"><a href={{gerritUrl}} target="_self"><img src="${imagePath}/gerritLogo.png" width="17" /> Gerrit</a></li>
+					<li ng-show="gerritUrl !== undefined && showGerritStats"><a href={{gerritUrl}} target="_self"><img src="${imagePath}/gerritLogo.png" width="17" /> Gerrit</a></li>
 					<li ng-show="sonarUrl !== undefined"><a href={{sonarUrl}} target="_self"><img src="${imagePath}/sonarLogo.png" width="17" /> Sonar</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">

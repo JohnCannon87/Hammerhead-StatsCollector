@@ -14,14 +14,15 @@ import com.statscollector.application.config.AbstractWebConfig;
 @JsonPropertyOrder({ "projectName", "host", "hostPort", "username", "password", "projectRegex", "projectFilterOutRegex",
         "topicRegex",
         "threadSplitSize", "startDateOffset", "endDateOffset", "noPeerReviewTarget", "onePeerReviewTarget",
-        "twoPeerReviewTarget", "collaborativeReviewTarget", "reviewersToIgnore", "showGerritHistory", "showGerritPie" })
+        "twoPeerReviewTarget", "collaborativeReviewTarget", "reviewersToIgnore", "showGerritHistory", "showGerritPie",
+        "showGerritStats" })
 public class GerritConfig extends AbstractWebConfig {
 
     private String projectRegex, projectFilterOutRegex, topicRegex;
     private Integer threadSplitSize, startDateOffset, endDateOffset;
     private Float noPeerReviewTarget, onePeerReviewTarget, twoPeerReviewTarget, collaborativeReviewTarget;
     private String reviewersToIgnore;
-    private boolean showGerritHistory, showGerritPie;
+    private boolean showGerritHistory, showGerritPie, showGerritStats;
 
     @JsonCreator
     public GerritConfig() {
@@ -141,6 +142,14 @@ public class GerritConfig extends AbstractWebConfig {
 
     public void setShowGerritPie(final boolean showGerritPie) {
         this.showGerritPie = showGerritPie;
+    }
+
+    public boolean isShowGerritStats() {
+        return showGerritStats;
+    }
+
+    public void setShowGerritStats(final boolean showGerritStats) {
+        this.showGerritStats = showGerritStats;
     }
 
     @Override

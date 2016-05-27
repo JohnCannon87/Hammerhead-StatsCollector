@@ -167,6 +167,7 @@ function UpdateGerritConfig(data, $scope, $location) {
 	}
 	$scope.showGerritHistory = data.showGerritHistory;
 	$scope.showGerritPie = data.showGerritPie;
+	$scope.showGerritStats = data.showGerritStats;
 	$scope.configLoaded = true;
 
 	// Override from URL Param For multiple projects.
@@ -476,7 +477,7 @@ function UpdateSonarStats(data, $scope) {
 		testCoverage.push(data[dates[d]].testCoverage);
 		testCoverageTarget.push($scope.testCoverageTarget);
 		rulesCompliance.push(data[dates[d]].rulesCompliance);
-		rulesComplianceTarget.push($scope.rulesComplianceTarget);
+		rulesComplianceTarget.push($scope.rulesComplianceTarget);		
 	}
 
 	var latestStatsKey = Object.keys(data).sort().reverse()[0];

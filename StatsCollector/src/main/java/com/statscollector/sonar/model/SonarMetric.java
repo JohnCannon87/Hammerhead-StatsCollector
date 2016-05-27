@@ -15,6 +15,8 @@ public class SonarMetric {
     public static final Object INFO_VIOLATIONS_KEY = "info_violations";
     public static final Object LINES_TO_COVER_KEY = "lines_to_cover";
     public static final Object UNCOVERED_LINES = "uncovered_lines";
+    public static final Object FUNCTION_COMPLEXITY_DISTRIBUTION = "function_complexity_distribution";
+    public static final Object FILE_COMPLEXITY_DISTRIBUTION = "file_complexity_distribution";
 
     @SerializedName("key")
     private String key;
@@ -22,15 +24,18 @@ public class SonarMetric {
     private String value;
     @SerializedName("frmt_val")
     private String formattedValue;
+    @SerializedName("data")
+    private String data;
 
     public SonarMetric() {
     };
 
-    public SonarMetric(final String key, final String value, final String formattedValue) {
+    public SonarMetric(final String key, final String value, final String formattedValue, final String data) {
         super();
         this.key = key;
         this.value = value;
         this.formattedValue = formattedValue;
+        this.data = data;
     }
 
     public String getKey() {
@@ -57,10 +62,19 @@ public class SonarMetric {
         this.formattedValue = formattedValue;
     }
 
+    public String getData() {
+        return data;
+    }
+
+    public void setData(final String data) {
+        this.data = data;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((data == null) ? 0 : data.hashCode());
         result = prime * result + ((formattedValue == null) ? 0 : formattedValue.hashCode());
         result = prime * result + ((key == null) ? 0 : key.hashCode());
         result = prime * result + ((value == null) ? 0 : value.hashCode());
@@ -79,6 +93,13 @@ public class SonarMetric {
             return false;
         }
         SonarMetric other = (SonarMetric) obj;
+        if(data == null) {
+            if(other.data != null) {
+                return false;
+            }
+        } else if(!data.equals(other.data)) {
+            return false;
+        }
         if(formattedValue == null) {
             if(other.formattedValue != null) {
                 return false;
@@ -105,7 +126,8 @@ public class SonarMetric {
 
     @Override
     public String toString() {
-        return "SonarMetric [key=" + key + ", value=" + value + ", formattedValue=" + formattedValue + "]";
+        return "SonarMetric [key=" + key + ", value=" + value + ", formattedValue=" + formattedValue + ", data=" + data
+                + "]";
     }
 
 }

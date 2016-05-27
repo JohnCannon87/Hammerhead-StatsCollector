@@ -46,7 +46,7 @@ public class SonarDao extends AbstractWebDao {
     private static final String ALL_METRICS_URL = "/api/resources";
     private static final BasicNameValuePair METRICS_PAIR = new BasicNameValuePair(
             "metrics",
-            "ncloc,complexity,files,functions,blocker_violations,critical_violations,major_violations,minor_violations,info_violations,lines_to_cover,uncovered_lines");
+            "ncloc,complexity,files,functions,blocker_violations,critical_violations,major_violations,minor_violations,info_violations,lines_to_cover,uncovered_lines,function_complexity_distribution,file_complexity_distribution");
     private static final String TIME_MACHINE_URL = "/api/timemachine";
     private static final String FROM_DATE_KEY = "fromDateTime";
     private static final String END_DATE_KEY = "toDateTime";

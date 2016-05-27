@@ -195,13 +195,29 @@ public class SonarStatisticsService {
 
     private SonarMetric condenseMetrics(final SonarMetric currentMetric, SonarMetric newMetric) {
         if(newMetric == null) {
-            newMetric = new SonarMetric(currentMetric.getKey(), "0", "0");
+            newMetric = new SonarMetric(currentMetric.getKey(), "0", "0", "0=0");
         }
         if(!currentMetric.getValue().isEmpty() && !newMetric.getValue().isEmpty()) {
-            BigDecimal currentValue = new BigDecimal(currentMetric.getValue());
-            BigDecimal newValue = new BigDecimal(newMetric.getValue());
-            BigDecimal updatedValue = currentValue.add(newValue);
-            return new SonarMetric(currentMetric.getKey(), updatedValue.toString(), null);
+            if(SonarMetric.FUNCTION_COMPLEXITY_DISTRIBUTION.equals(currentMetric.getKey())
+                    || SonarMetric.FILE_COMPLEXITY_DISTRIBUTION.equals(currentMetric.getKey())) {
+                Map<Integer, Integer> currentComplexityDistribution = calculateComplexityDistribution(
+                        currentMetric);
+                Map<Integer, Integer> newComplexityDistribution = calculateComplexityDistribution(
+                        newMetric);
+                Map<Integer, Integer> updatedComplexityDistribution = new HashMap<>();
+                for(Integer key : currentComplexityDistribution.keySet()) {
+                    Integer newValue = currentComplexityDistribution.get(key)
+                            + newComplexityDistribution.getOrDefault(key, 0);
+                    updatedComplexityDistribution.put(key, newValue);
+                }
+                return new SonarMetric(currentMetric.getKey(),
+                        rebuildComplexityDistribution(updatedComplexityDistribution), null, null);
+            } else {
+                BigDecimal currentValue = new BigDecimal(currentMetric.getValue());
+                BigDecimal newValue = new BigDecimal(newMetric.getValue());
+                BigDecimal updatedValue = currentValue.add(newValue);
+                return new SonarMetric(currentMetric.getKey(), updatedValue.toString(), null, null);
+            }
         }
         return null;
     }
@@ -296,7 +312,7 @@ public class SonarStatisticsService {
         List<Cell> cells = parsedResults.getCells();
         for(Cell cell : cells) {
             DateTime statsInstance = sonarTimeFormatter.parseDateTime(cell.getD());
-            List<Double> statsValues = cell.getV();
+            List<String> statsValues = cell.getV();
             if(statsValues.size() != metricNames.size()) {
                 LOGGER.error("Metrics Names And Values Arrays Do NOT Match In Size");
                 break;
@@ -307,7 +323,7 @@ public class SonarStatisticsService {
                 if(statsValues.get(i) != null) {
                     value = statsValues.get(i).toString();
                 }
-                SonarMetric metric = new SonarMetric(metricNames.get(i).getMetric(), value, value);
+                SonarMetric metric = new SonarMetric(metricNames.get(i).getMetric(), value, value, value);
                 statisticsMap.put(metric.getKey(), metric);
             }
             results.put(statsInstance, statisticsMap);
@@ -391,23 +407,73 @@ public class SonarStatisticsService {
         SonarMetric infoViolations = map.get(SonarMetric.INFO_VIOLATIONS_KEY);
         SonarMetric linesToCover = map.get(SonarMetric.LINES_TO_COVER_KEY);
         SonarMetric uncoveredLines = map.get(SonarMetric.UNCOVERED_LINES);
+        SonarMetric functionComplexityDistribution = map.get(SonarMetric.FUNCTION_COMPLEXITY_DISTRIBUTION);
+        SonarMetric fileComplexityDistribution = map.get(SonarMetric.FILE_COMPLEXITY_DISTRIBUTION);
 
         return calculateSonarStatistics(linesOfCode, complexity, numberOfFiles, numberOfMethods, blockerViolations,
-                criticalViolations, majorViolations, minorViolations, infoViolations, linesToCover, uncoveredLines);
+                criticalViolations, majorViolations, minorViolations, infoViolations, linesToCover, uncoveredLines,
+                functionComplexityDistribution, fileComplexityDistribution);
     }
 
     private SonarStatistics calculateSonarStatistics(final SonarMetric linesOfCode, final SonarMetric complexity,
             final SonarMetric numberOfFiles, final SonarMetric numberOfMethods, final SonarMetric blockerViolations,
             final SonarMetric criticalViolations, final SonarMetric majorViolations, final SonarMetric minorViolations,
-            final SonarMetric infoViolations, final SonarMetric linesToCover, final SonarMetric uncoveredLines) {
+            final SonarMetric infoViolations, final SonarMetric linesToCover, final SonarMetric uncoveredLines,
+            final SonarMetric rawFunctionComplexityDistribution, final SonarMetric rawFileComplexityDistribution) {
         String methodComplexity = calculateComplexity(complexity, numberOfMethods);
         String fileComplexity = calculateComplexity(complexity, numberOfFiles);
         String rulesCompliance = calculateCompliance(blockerViolations, criticalViolations, majorViolations,
                 minorViolations, infoViolations, linesOfCode);
         String testCoverage = calculateTestCoverage(uncoveredLines, linesToCover);
+        Map<Integer, Integer> functionComplexityDistribution = calculateComplexityDistribution(
+                rawFunctionComplexityDistribution);
+        Map<Integer, Integer> fileComplexityDistribution = calculateComplexityDistribution(
+                rawFileComplexityDistribution);
 
         return new SonarStatistics(methodComplexity, fileComplexity, rulesCompliance, testCoverage,
-                new BigDecimal(linesOfCode.getValue()).setScale(0).toString());
+                new BigDecimal(linesOfCode.getValue()).setScale(0).toString(), functionComplexityDistribution,
+                fileComplexityDistribution);
+    }
+
+    private Map<Integer, Integer> calculateComplexityDistribution(
+            final SonarMetric functionComplexityDistribution) {
+        Map<Integer, Integer> result = new HashMap<>();
+        String rawData = functionComplexityDistribution.getData();
+        translateRawComplexity(result, rawData);
+        rawData = functionComplexityDistribution.getValue();
+        translateRawComplexity(result, rawData);
+        return result;
+    }
+
+    /**
+     * @param result
+     * @param rawData
+     */
+    private void translateRawComplexity(final Map<Integer, Integer> result, final String rawData) {
+        if(!StringUtils.isEmpty(rawData)) {
+            String[] splitData = rawData.split(";");
+            for(String stringData : splitData) {
+                String[] data = stringData.split("=");
+                if(data.length == 2) {
+                    result.put(Integer.valueOf(data[0]), Integer.valueOf(data[1]));
+                }
+            }
+        }
+    }
+
+    private String rebuildComplexityDistribution(final Map<Integer, Integer> updatedFunctionComplexityDistribution) {
+        StringBuilder result = new StringBuilder();
+        Set<Integer> keySet = updatedFunctionComplexityDistribution.keySet();
+        for(Integer key : keySet) {
+            result.append(key);
+            result.append("=");
+            result.append(updatedFunctionComplexityDistribution.get(key));
+            result.append(";");
+        }
+        if(result.length() > 1) {
+            result.deleteCharAt(result.length() - 1);
+        }
+        return result.toString();
     }
 
     private String calculateCompliance(final SonarMetric blockerViolations, final SonarMetric criticalViolations,
