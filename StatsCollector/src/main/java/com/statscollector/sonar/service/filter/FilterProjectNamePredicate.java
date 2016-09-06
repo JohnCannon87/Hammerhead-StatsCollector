@@ -5,7 +5,7 @@ import java.util.List;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
-import com.statscollector.sonar.model.SonarProject;
+import com.statscollector.neo.sonar.model.SonarProject;
 
 public class FilterProjectNamePredicate implements Predicate<SonarProject>, SonarProjectFilter {
 

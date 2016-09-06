@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.statscollector.sonar.config.SonarConfig;
+import com.statscollector.neo.sonar.config.SonarConfig;
 
 /**
  * I manage the creation, saving and loading of a config file to/from a raw JSON file.

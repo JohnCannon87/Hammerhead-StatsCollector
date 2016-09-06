@@ -97,7 +97,7 @@ function SetupChartOptions($scope) {
 			ctx.restore();
 		}
 	});
-	
+
 	$scope.gerritChartOptions = {
 
 			// Sets the chart to be responsive
@@ -161,9 +161,9 @@ function UpdateGerritConfig(data, $scope, $location) {
 	$scope.gerritProjectName = data.projectName;
 	$scope.gerritProjectRegex = data.projectRegex;
 	if(data.projectFilterOutRegex === undefined){
-		$scope.gerritProjectFilterOutRegex = "";		
+		$scope.gerritProjectFilterOutRegex = "";
 	}else{
-		$scope.gerritProjectFilterOutRegex = data.projectFilterOutRegex;		
+		$scope.gerritProjectFilterOutRegex = data.projectFilterOutRegex;
 	}
 	$scope.showGerritHistory = data.showGerritHistory;
 	$scope.showGerritPie = data.showGerritPie;
@@ -359,7 +359,7 @@ function GetGerritStats($http, $scope) {
 							if(maxCount > 20){
 								scaleWidth = 5;
 							}
-							
+
 							$scope.lineChartOptionsUpwards = {
 								scaleOverride : true,
 								scaleStartValue : 0,
@@ -445,14 +445,14 @@ function GetGerritStats($http, $scope) {
 }
 
 function GetSonarStats($http, $scope){
-	$http.get('/sonar/stats/statistics/' + $scope.sonarProjectRegex + '/all').then(
+	$http.get('/sonar/stats/' + $scope.sonarProjectRegex + '/all').then(
 			function(response) {
 				UpdateSonarStats(response.data, $scope);
 			})
 }
 
 function UpdateSonarStats(data, $scope) {
-	var dates = Object.keys(data).sort();
+	var dates = Object.keys(data.sonarMetricPeriods).sort();
 	var months = [];
 	var fileComplexity = [];
 	var fileComplexityTarget = [];
@@ -464,29 +464,31 @@ function UpdateSonarStats(data, $scope) {
 	var rulesComplianceTarget = [];
 
 	$scope.showSonarData = true;
-	if(dates.length == 0){
+	if(dates.length === 0){
 		$scope.showSonarData = false;
 	}
-	
-	for (d in dates) {
-		months.push(moment(dates[d]).format('MMMM'));
-		fileComplexity.push(data[dates[d]].fileComplexity);
+
+
+
+	for (var index = (dates.length-12); index < dates.length; index++) {
+		var metricPeriod = data.sonarMetricPeriods[dates[index]];
+		months.push(metricPeriod.period.year + "-" + metricPeriod.period.monthValue);
+		fileComplexity.push(metricPeriod.derivedMetrics[0].value);
 		fileComplexityTarget.push($scope.fileComplexityTarget);
-		methodComplexity.push(data[dates[d]].methodComplexity);
+		methodComplexity.push(metricPeriod.derivedMetrics[1].value);
 		methodComplexityTarget.push($scope.methodComplexityTarget);
-		testCoverage.push(data[dates[d]].testCoverage);
+		testCoverage.push(metricPeriod.derivedMetrics[2].value);
 		testCoverageTarget.push($scope.testCoverageTarget);
-		rulesCompliance.push(data[dates[d]].rulesCompliance);
-		rulesComplianceTarget.push($scope.rulesComplianceTarget);		
+		rulesCompliance.push(metricPeriod.derivedMetrics[3].value);
+		rulesComplianceTarget.push($scope.rulesComplianceTarget);
 	}
 
-	var latestStatsKey = Object.keys(data).sort().reverse()[0];
-	var latestStats = data[latestStatsKey];
-	$scope.methodComplexity = latestStats.methodComplexity;
-	$scope.fileComplexity = latestStats.fileComplexity;
-	$scope.testCoverage = latestStats.testCoverage;
-	$scope.rulesCompliance = latestStats.rulesCompliance;
-	$scope.linesOfCode = latestStats.linesOfCode;
+	var latestStatsKey = Object.keys(data.sonarMetricPeriods).sort().reverse()[0];
+	var latestStats = data.sonarMetricPeriods[latestStatsKey];
+	$scope.methodComplexity = latestStats.derivedMetrics[1].rawValue;
+	$scope.fileComplexity = latestStats.derivedMetrics[0].rawValue;
+	$scope.testCoverage = latestStats.derivedMetrics[2].rawValue;
+	$scope.rulesCompliance = latestStats.derivedMetrics[3].rawValue;
 	$scope.lineChartOptionsUpwards = {
 		scaleLabel : function(object) {
 			return "  " + object.value;
@@ -651,14 +653,14 @@ function GetAvatarClass(avatarUrl) {
 
 function StatsCtrl($http, $scope, $rootScope, $location, $log, $q, $interval, Gerrit, Sonar){
 	//Timers
-	$interval(function(){
-		GetSonarStats($http, $scope);
-	}, 5000);
-	$interval(function(){
-		GetGerritAuthorAndReviewerStats($http, $scope);
-		GetGerritStats($http, $scope);
-	}, 5000);
-	
+	//$interval(function(){
+	//	GetSonarStats($http, $scope);
+	//}, 5000);
+	//$interval(function(){
+	//	GetGerritAuthorAndReviewerStats($http, $scope);
+	//	GetGerritStats($http, $scope);
+	//}, 5000);
+
 	//Initial Values
 	$scope.showGerritData = true;
 	$scope.showSonarData = true;
@@ -668,7 +670,7 @@ function StatsCtrl($http, $scope, $rootScope, $location, $log, $q, $interval, Ge
 		$scope.configLoaded = false;
 	}
 	SetupChartOptions($scope);
-	
+
 	//Functions
 	$scope.GetAvatarClass = GetAvatarClass;
 	$scope.getNoPeerReviewRowClass = function(percentage) {
@@ -698,20 +700,20 @@ function StatsCtrl($http, $scope, $rootScope, $location, $log, $q, $interval, Ge
 	};
 	$scope.getRulesComplianceClass = function(value) {
 		return GetReviewRowClassTarget(value, $scope.rulesComplianceTarget);
-	};		
+	};
 	$scope.GetSonarStatsClass = function(){
 		return GetSonarStatsClass($scope);
 	};
 	$scope.GetGerritStatsClass = function() {
 		return GetGerritStatsClass($scope);
 	};
-	
+
 	//Watches
 	$scope.$watch('configLoaded', function() {
 		GetGerritStats($http, $scope);
 		GetGerritAuthorAndReviewerStats($http, $scope);
 	}, true);
-	
+
 	//Initial Calls
 	Gerrit.configInfo().then(function(response) {
 		UpdateGerritConfig(response.data, $scope, $location);

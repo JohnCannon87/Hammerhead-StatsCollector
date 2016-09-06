@@ -23,3 +23,4 @@ StatsCollector/.settings/org.eclipse.jdt.core.prefs
 StatsCollector/.classpath
 StatsCollector/run.log
 dist/GerritStatistics.json
+.settings/org.eclipse.buildship.core.prefs

@@ -2,23 +2,28 @@ apply from: 'versions.gradle'
 
 dependencies {
 	compile group:'org.apache.tomcat.embed', name:'tomcat-embed-jasper', version:tomcatEmbeddedVersion
-
+	compile group:'org.projectlombok', name:'lombok', version:lombokVersion
 	compile(group:'org.springframework.boot', name:'spring-boot-starter-web', version:springBootVersion)
+	compile(group:'org.springframework.data', name:'spring-data-jpa', version:springDataVersion)
+	compile(group:'org.hibernate', name:'hibernate-entitymanager', version:hibernateVersion)
+	compile(group:'org.hibernate', name:'hibernate-java8', version:hibernateVersion)
     providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 	compile(group:'com.google.code.gson', name:'gson', version:gsonVersion)
 	compile(group:'org.apache.httpcomponents', name:'httpclient', version:httpClientVersion)
 	compile group:'joda-time', name:'joda-time', version:jodatimeVersion
 	compile group:'com.google.guava', name:'guava', version:guavaVersion
 	compile group:'org.apache.logging.log4j', name:'log4j-core', version:log4jVersion
-	compile group:'commons-configuration', name:'commons-configuration', version:commonsConfigVersion	
+	compile group:'commons-configuration', name:'commons-configuration', version:commonsConfigVersion
 	compile group:'javax.servlet', name:'jstl', version:jstlVersion
 	compile group:'commons-io', name:'commons-io', version:commonsIoVersion
 	compile group:'commons-beanutils', name:'commons-beanutils', version:beanUtils
 	compile group:'com.google.gerrit', name:'gerrit-extension-api', version:gerritExtentionsVersion
 	compile group:'org.jacoco', name:'jacoco-maven-plugin', version:jacocoVersion
 	compile group:'com.fasterxml.jackson.module', name:'jackson-module-jsonSchema', version:jsonSchemaVersion
-	
-	
+	compile group:'org.postgresql', name:'postgresql', version:postgresVersion
+	compile group:'org.aspectj', name:'aspectjweaver', version:aspectjWeaverVersion
+
+
 	/* Test Compile dependencies */
 	testCompile group:'junit', name:'junit', version:junitVersion
 	testCompile group:'org.mockito', name:'mockito-core', version:mockitoVersion

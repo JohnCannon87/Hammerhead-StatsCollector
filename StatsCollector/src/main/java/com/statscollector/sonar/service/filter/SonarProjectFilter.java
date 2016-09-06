@@ -2,7 +2,8 @@ package com.statscollector.sonar.service.filter;
 
 import java.util.List;
 
-import com.statscollector.sonar.model.SonarProject;
+import com.statscollector.neo.sonar.model.SonarProject;
+
 
 public interface SonarProjectFilter {
 
