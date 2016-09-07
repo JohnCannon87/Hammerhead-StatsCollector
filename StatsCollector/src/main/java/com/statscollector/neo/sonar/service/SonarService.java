@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.gson.JsonSyntaxException;
 import com.statscollector.gerrit.model.ConnectionTestResults;
 import com.statscollector.neo.sonar.config.SonarConfig;
 import com.statscollector.neo.sonar.dao.SonarProjectRepository;
@@ -58,9 +59,13 @@ public class SonarService {
     public void refreshAllStatistics() {
         List<SonarProject> sonarProjects = buildListOfSonarProjects();
         for(SonarProject sonarProject : sonarProjects) {
-            RawSonarMetrics rawSonarMetrics = sonarHttpClient
-                    .getProjectValuesFromStartOfTimeToNow(sonarProject.getKey());
-            sonarMetricService.convertRawSonarValues(rawSonarMetrics, sonarProject);
+            try {
+                RawSonarMetrics rawSonarMetrics = sonarHttpClient
+                        .getProjectValuesFromStartOfTimeToNow(sonarProject.getKey());
+                sonarMetricService.convertRawSonarValues(rawSonarMetrics, sonarProject);
+            } catch(JsonSyntaxException e) {
+                LOGGER.error("Error thrown getting sonar data for project: " + sonarProject, e);
+            }
         }
         sonarProjectRepository.save(sonarProjects);
     }

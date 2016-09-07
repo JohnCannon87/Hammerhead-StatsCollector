@@ -468,9 +468,12 @@ function UpdateSonarStats(data, $scope) {
 		$scope.showSonarData = false;
 	}
 
+	var startingIndex = (dates.length-12);
+	if(startingIndex < 0){
+		startingIndex = 0;
+	}
 
-
-	for (var index = (dates.length-12); index < dates.length; index++) {
+	for (var index = startingIndex; index < dates.length; index++) {
 		var metricPeriod = data.sonarMetricPeriods[dates[index]];
 		months.push(metricPeriod.period.year + "-" + metricPeriod.period.monthValue);
 		fileComplexity.push(metricPeriod.derivedMetrics[0].value);

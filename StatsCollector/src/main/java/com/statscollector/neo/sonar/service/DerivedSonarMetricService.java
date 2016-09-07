@@ -26,6 +26,7 @@ public class DerivedSonarMetricService {
     private static final String RULES_COMPLIANCE_KEY = "rules_compliance";
     private static final String RULES_COMPLIANCE_NAME = "Rules Coverage";
     private static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
+    private static final BigDecimal ZERO = new BigDecimal(0);;
 
     /**
      * Calculate the average file complexity based on the passed in metrics.
@@ -75,8 +76,13 @@ public class DerivedSonarMetricService {
         BigDecimal linesToCoverValue = new BigDecimal(linesToCover.getRawValue());
         BigDecimal uncoveredLinesValue = new BigDecimal(uncoveredLines.getRawValue());
         BigDecimal linesCoveredValue = linesToCoverValue.subtract(uncoveredLinesValue);
-        BigDecimal linesCoveredDecimal = linesCoveredValue.setScale(4)
-                .divide(linesToCoverValue.setScale(4), RoundingMode.HALF_UP).setScale(4);
+        BigDecimal linesCoveredDecimal;
+        if(linesToCoverValue.equals(ZERO) || linesCoveredValue.equals(ZERO)) {
+            linesCoveredDecimal = ZERO;
+        } else {
+            linesCoveredDecimal = linesCoveredValue.setScale(4)
+                    .divide(linesToCoverValue.setScale(4), RoundingMode.HALF_UP).setScale(4);
+        }
         BigDecimal linesCoveredPercentage = linesCoveredDecimal.multiply(ONE_HUNDRED).setScale(2);
         return SonarMetric.builder().key(TEST_COVERAGE_KEY).name(TEST_COVERAGE_NAME)
                 .value(linesCoveredPercentage).rawValue(linesCoveredPercentage.toString()).build();
