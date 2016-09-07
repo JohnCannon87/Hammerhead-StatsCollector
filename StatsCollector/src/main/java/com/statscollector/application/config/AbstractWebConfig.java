@@ -1,5 +1,6 @@
 package com.statscollector.application.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -37,9 +38,16 @@ public class AbstractWebConfig implements WebConfig {
         this.username = username;
     }
 
-    @JsonProperty(required = true)
+    /**
+     * Returns null to stop the value being returned when being exported as JSON.
+     */
     public String getPassword() {
-        return password;
+        return null;
+    }
+
+    @JsonIgnore
+    public String getActualPassword() {
+        return this.password;
     }
 
     public void setPassword(final String password) {

@@ -31,7 +31,7 @@ public abstract class AbstractAuthenticationHelper {
                 WebConfig config = getConfig();
                 credsProvider = new BasicCredentialsProvider();
                 credsProvider.setCredentials(AuthScope.ANY,
-                        new UsernamePasswordCredentials(config.getUsername(), config.getPassword()));
+                        new UsernamePasswordCredentials(config.getUsername(), config.getActualPassword()));
                 credsProviderCreated = true;
             }
         } catch(IllegalArgumentException e) {
@@ -54,7 +54,7 @@ public abstract class AbstractAuthenticationHelper {
             } else if(null == credentials.getPassword()) {
                 return true;
             } else {
-                boolean passwordSame = credentials.getPassword().equals(config.getPassword());
+                boolean passwordSame = credentials.getPassword().equals(config.getActualPassword());
                 boolean usernameSame = credentials.getUserPrincipal().getName().equals(config.getUsername());
                 return !passwordSame || !usernameSame;
             }

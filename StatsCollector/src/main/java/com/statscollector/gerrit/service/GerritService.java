@@ -49,17 +49,17 @@ public class GerritService {
         Credentials credentials = authenticationHelper.credentialsProvider().getCredentials(AuthScope.ANY);
         connectionDetails.append("Attempting Connection With Username: "
                 + credentials.getUserPrincipal().getName() + " and Password: "
-                + credentials.getPassword());
+                + "Hidden :(");
         String connectionResult = "";
         try {
             connectionResult = gerritDao.testConnection(authenticationHelper.credentialsProvider());
             JsonElement resultJson = jsonParser.parse(connectionResult);
             List<ChangeInfo> result = translateToChanges(resultJson);
-            return new ConnectionTestResults<ChangeInfo>(connectionDetails.toString(), result, null);
+            return new ConnectionTestResults<>(connectionDetails.toString(), result, null);
         } catch(JsonSyntaxException e) {
-            return new ConnectionTestResults<ChangeInfo>(connectionDetails.toString(), null, connectionResult);
+            return new ConnectionTestResults<>(connectionDetails.toString(), null, connectionResult);
         } catch(Exception e) {
-            return new ConnectionTestResults<ChangeInfo>(connectionDetails.toString(), null, e.toString());
+            return new ConnectionTestResults<>(connectionDetails.toString(), null, e.toString());
         }
     }
 
@@ -73,7 +73,7 @@ public class GerritService {
     }
 
     private List<ChangeInfo> translateToChanges(final JsonElement rawJsonElement) {
-        List<ChangeInfo> results = new ArrayList<ChangeInfo>();
+        List<ChangeInfo> results = new ArrayList<>();
         if(rawJsonElement.isJsonArray()) {
             JsonArray rawJsonArray = rawJsonElement.getAsJsonArray();
             for(JsonElement jsonElement : rawJsonArray) {

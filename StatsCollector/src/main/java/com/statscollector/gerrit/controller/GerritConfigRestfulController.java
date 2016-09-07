@@ -3,6 +3,7 @@ package com.statscollector.gerrit.controller;
 import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,9 +67,15 @@ public class GerritConfigRestfulController {
     @ResponseBody
     public GerritConfig changeConfig(@RequestBody final GerritConfig newGerritConfig)
             throws ConfigurationException, JsonGenerationException, JsonMappingException, IOException {
+        String password;
+        if(StringUtils.isEmpty(newGerritConfig.getActualPassword())) {
+            password = gerritConfig.getActualPassword();
+        } else {
+            password = newGerritConfig.getActualPassword();
+        }
         gerritConfig.replaceWith(newGerritConfig);
         gerritConfig.setUsername(newGerritConfig.getUsername());
-        gerritConfig.setPassword(newGerritConfig.getPassword());
+        gerritConfig.setPassword(password);
         gerritJsonConfigService.saveConfigFile(gerritConfig);
         return gerritConfig;
     }

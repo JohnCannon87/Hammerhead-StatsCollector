@@ -3,6 +3,7 @@ package com.statscollector.neo.sonar.controller;
 import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,9 +66,15 @@ public class SonarConfigRestfulController {
     @ResponseBody
     public SonarConfig changeConfig(@RequestBody final SonarConfig newSonarConfig)
             throws ConfigurationException, JsonGenerationException, JsonMappingException, IOException {
+        String password;
+        if(StringUtils.isEmpty(newSonarConfig.getActualPassword())) {
+            password = sonarConfig.getActualPassword();
+        } else {
+            password = newSonarConfig.getActualPassword();
+        }
         sonarConfig.replaceWith(newSonarConfig);
         sonarConfig.setUsername(newSonarConfig.getUsername());
-        sonarConfig.setPassword(newSonarConfig.getPassword());
+        sonarConfig.setPassword(password);
         sonarJsonConfigService.saveConfigFile(sonarConfig);
         return sonarConfig;
     }
