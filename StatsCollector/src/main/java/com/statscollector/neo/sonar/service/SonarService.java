@@ -1,10 +1,9 @@
 package com.statscollector.neo.sonar.service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,7 @@ import com.statscollector.neo.sonar.dao.SonarProjectRepository;
 import com.statscollector.neo.sonar.external.SonarHttpClient;
 import com.statscollector.neo.sonar.model.RawSonarMetrics;
 import com.statscollector.neo.sonar.model.RawSonarProject;
+import com.statscollector.neo.sonar.model.SonarMetric;
 import com.statscollector.neo.sonar.model.SonarMetricPeriod;
 import com.statscollector.neo.sonar.model.SonarProject;
 import com.statscollector.neo.sonar.model.SonarTargets;
@@ -45,6 +45,9 @@ public class SonarService {
 
     @Autowired
     private SonarProjectRepository sonarProjectRepository;
+
+    @Autowired
+    private DerivedSonarMetricService derivedSonarMetricService;
 
     public ConnectionTestResults testConnection() {
         List<RawSonarProject> projectNames = sonarHttpClient.getProjectNames();
@@ -139,29 +142,46 @@ public class SonarService {
         return new ArrayList<>(sonarProjects.values());
     }
 
-    public SonarTargetsStatus getTargetStatus(final String projectRegex, final SonarTargets sonarTargets)
-            throws IOException, URISyntaxException {
-        // getSquashedSonarMetricsForAllProjectsWhoseNamesMatchFilter
-        //
-        // BigDecimal fileComplexity = new BigDecimal(latestStatistics.getFileComplexity());
-        // BigDecimal methodComplexity = new BigDecimal(latestStatistics.getMethodComplexity());
-        // BigDecimal rulesCompliance = new BigDecimal(latestStatistics.getRulesCompliance());
-        // BigDecimal testCoverage = new BigDecimal(latestStatistics.getTestCoverage());
-        // BigDecimal fileComplexityTarget = getTarget(sonarTargets.getSonarFileTarget(),
-        // sonarConfig.getFileComplexityTarget());
-        // BigDecimal methodComplexityTarget = getTarget(sonarTargets.getSonarMethodTarget(),
-        // sonarConfig.getMethodComplexityTarget());
-        // BigDecimal rulesComplianceTarget = getTarget(sonarTargets.getSonarRulesTarget(),
-        // sonarConfig.getRulesComplianceTarget());
-        // BigDecimal testCoverageTarget = getTarget(sonarTargets.getSonarTestTarget(),
-        // sonarConfig.getTestCoverageTarget());
-        // boolean hitFileTarget = (fileComplexity.compareTo(fileComplexityTarget) <= 0);
-        // boolean hitMethodTarget = (methodComplexity.compareTo(methodComplexityTarget) <= 0);
-        // boolean hitTestTarget = (testCoverage.compareTo(testCoverageTarget) >= 0);
-        // boolean hitRulesTarget = (rulesCompliance.compareTo(rulesComplianceTarget) >= 0);
-        //
-        // return new SonarTargetsStatus(hitFileTarget, hitMethodTarget, hitTestTarget, hitRulesTarget);
-        return null;
+    /**
+     * Gets the squashed and derived metrics for the given project regex and then returns if they meet the standard
+     * metric targets passed in.
+     *
+     * @param projectRegex
+     * @param sonarTargets
+     * @return
+     */
+    public SonarTargetsStatus getTargetStatus(final String projectRegex, final SonarTargets sonarTargets) {
+        SonarProject sonarProject = getSquashedAndDerivedSonarMetricsForAllProjectsWhoseNamesMatchFilter(projectRegex);
+        ArrayList<YearMonth> keyList = new ArrayList<>(sonarProject.getSonarMetricPeriods().keySet());
+        Collections.sort(keyList);
+        SonarMetricPeriod latestMetric = sonarProject.getSonarMetricPeriods().get(keyList.get(keyList.size() - 1));
+        if(latestMetric != null) {
+            Map<String, SonarMetric> metricsMap = derivedSonarMetricService
+                    .convertListToMap(latestMetric.getDerivedMetrics());
+            BigDecimal fileComplexity = new BigDecimal(
+                    metricsMap.get(DerivedSonarMetricService.AVERAGE_FILE_COMPLEXITY_KEY).getRawValue());
+            BigDecimal methodComplexity = new BigDecimal(
+                    metricsMap.get(DerivedSonarMetricService.AVERAGE_METHOD_COMPLEXITY_KEY).getRawValue());
+            BigDecimal rulesCompliance = new BigDecimal(
+                    metricsMap.get(DerivedSonarMetricService.RULES_COMPLIANCE_KEY).getRawValue());
+            BigDecimal testCoverage = new BigDecimal(
+                    metricsMap.get(DerivedSonarMetricService.TEST_COVERAGE_KEY).getRawValue());
+            BigDecimal fileComplexityTarget = getTarget(sonarTargets.getSonarFileTarget(),
+                    sonarConfig.getFileComplexityTarget());
+            BigDecimal methodComplexityTarget = getTarget(sonarTargets.getSonarMethodTarget(),
+                    sonarConfig.getMethodComplexityTarget());
+            BigDecimal rulesComplianceTarget = getTarget(sonarTargets.getSonarRulesTarget(),
+                    sonarConfig.getRulesComplianceTarget());
+            BigDecimal testCoverageTarget = getTarget(sonarTargets.getSonarTestTarget(),
+                    sonarConfig.getTestCoverageTarget());
+            boolean hitFileTarget = fileComplexity.compareTo(fileComplexityTarget) <= 0;
+            boolean hitMethodTarget = methodComplexity.compareTo(methodComplexityTarget) <= 0;
+            boolean hitTestTarget = testCoverage.compareTo(testCoverageTarget) >= 0;
+            boolean hitRulesTarget = rulesCompliance.compareTo(rulesComplianceTarget) >= 0;
+
+            return new SonarTargetsStatus(hitFileTarget, hitMethodTarget, hitTestTarget, hitRulesTarget);
+        }
+        return new SonarTargetsStatus(false, false, false, false);
     }
 
     private BigDecimal getTarget(final String urlTarget, final String configTarget) {

@@ -2,6 +2,8 @@ package com.statscollector.neo.sonar.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +19,24 @@ public class DerivedSonarMetricService {
     @Autowired
     private SonarConfig sonarConfig;
 
+    public static final String RULES_COMPLIANCE_KEY = "rules_compliance";
+    public static final String AVERAGE_METHOD_COMPLEXITY_KEY = "average_method_complexity";
+    public static final String AVERAGE_FILE_COMPLEXITY_KEY = "average_file_complexity";
+    public static final String TEST_COVERAGE_KEY = "test_coverage";
     private static final String AVERAGE_METHOD_COMPLEXITY_NAME = "Average Method Complexity";
-    private static final String AVERAGE_METHOD_COMPLEXITY_KEY = "average_method_complexity";
     private static final String AVERAGE_FILE_COMPLEXITY_NAME = "Average File Complexity";
-    private static final String AVERAGE_FILE_COMPLEXITY_KEY = "average_file_complexity";
-    private static final String TEST_COVERAGE_KEY = "test_coverage";
     private static final String TEST_COVERAGE_NAME = "Test Coverage";
-    private static final String RULES_COMPLIANCE_KEY = "rules_compliance";
     private static final String RULES_COMPLIANCE_NAME = "Rules Coverage";
     private static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
-    private static final BigDecimal ZERO = new BigDecimal(0);;
+    private static final BigDecimal ZERO = new BigDecimal(0);
+
+    public Map<String, SonarMetric> convertListToMap(final List<SonarMetric> sonarMetrics) {
+        Map<String, SonarMetric> result = new HashMap<>();
+        for(SonarMetric sonarMetric : sonarMetrics) {
+            result.put(sonarMetric.getKey(), sonarMetric);
+        }
+        return result;
+    }
 
     /**
      * Calculate the average file complexity based on the passed in metrics.

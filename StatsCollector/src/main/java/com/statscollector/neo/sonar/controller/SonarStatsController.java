@@ -48,7 +48,7 @@ public class SonarStatsController {
     }
 
     @CrossOrigin
-    @RequestMapping(value = "/targetStatus/{projectRegex}")
+    @RequestMapping(value = "/targetStatus/{projectRegex}/all")
     @ResponseBody
     public SonarTargetsStatus targetStatus(@PathVariable final String projectRegex,
             @RequestParam(required = false) final String sonarMethodTarget,
