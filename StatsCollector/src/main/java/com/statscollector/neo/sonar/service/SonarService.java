@@ -112,7 +112,7 @@ public class SonarService {
         List<SonarProject> result = new ArrayList<>();
         List<SonarProject> allSonarProjects = sonarProjectRepository.findAll();
         for(SonarProject sonarProject : allSonarProjects) {
-            if(sonarProject.getName().matches(regexFilter)) {
+            if(sonarProject.getKey().matches(regexFilter)) {
                 result.add(sonarProject);
             }
         }
