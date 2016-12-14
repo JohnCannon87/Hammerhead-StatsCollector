@@ -1,123 +1,237 @@
-
 <!DOCTYPE HTML>
-
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
-<html ng-app="app">
+<html ng-app="statsCollectorApp">
 <head>
-<%@include file="common/allPages.jsp"%>
-<%@include file="common/gerrit.jsp"%>
-<%@include file="common/sonar.jsp"%>
-<%@include file="common/charting.jsp"%>
-<%@include file="common/configPages.jsp"%>
+<link rel="stylesheet" href="/style/fireworks.css">
+<script src="/javascript/external/soundmanager2-nodebug-jsmin.js"></script>
+<script src="/javascript/external/fireworks.js"></script>
+<%@include file="common/header.jspf"%>
+<script src="/javascript/controller/statsCollector-statsDisplayController.js"></script>
 </head>
-<body ng-controller="StatsCtrl">
-	<c:set var="imagePath" value="images"/>
-	<%@include file="common/navbar.jsp"%>
-		<div ng-if="showGerritStats">
-			<div ng-if="!showGerritData" class="col-sm-3 no-pad no-pad-right">
-				<div class="panel panel-default">
-					<h1>	
-						<div>
-							<p class="text-center"><i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom text-center"></i></p>
-						</div>
-						<div>
-							<p class="text-center">Loading Gerrit Statistics...</p>
-						</div>
-					</h1>
-				</div>		
-			</div>
-			<div class="col-sm-3 no-pad no-pad-right no-pad-bottom" ng-if="showGerritData">				
-					<div class="panel panel-default">
-						<div ng-show="showGerritHistory"><canvas tc-chartjs chart-type="Line" chart-data="gerritHistoryChartData" chart-options="lineChartOptionsUpwards" id="fileComplexityChart"></canvas></div>
-						<div ng-show="showGerritPie"><canvas tc-chartjs-pie chart-data="gerritChartData" chart-options="gerritChartOptions"></canvas></div>
-					</div>
-					<ul class="list-group">
-						<li ng-show="noPeerReviewers > 0" ng-click="isNoPeerCollapsed = !isNoPeerCollapsed" ng-class="getNoPeerReviewRowClass(noPeerPercentage)"
-							class="list-group-item"><span class="legendBox img-circle" style="background-color:#CC0000"></span>No Peer Reviewers: <span class="badge">{{noPeerReviewers}}</span></li>
-							<div collapse="!isNoPeerCollapsed" class="hideOverflow">
-								<div ng-repeat="review in noPeerReviews">
-									<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.subject}}</a>							
-								</div>
-							</div>
-						<li ng-show="onePeerReviewers > 0" ng-click="isOnePeerCollapsed = !isOnePeerCollapsed" ng-class="getOnePeerReviewRowClass(onePeerPercentage, twoPeerPercentage, collaborativePercentage)"
-							class="list-group-item"><span class="legendBox img-circle" style="background-color:#009933"></span>One Peer Reviewer: <span class="badge">{{onePeerReviewers}}</span></li>
-							<div collapse="!isOnePeerCollapsed" class="hideOverflow">
-								<div ng-repeat="review in onePeerReviews">
-									<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.subject}}</a>							
-								</div>
-							</div>
-						<li ng-show="twoPeerReviewers > 0" ng-click="isTwoPeerCollapsed = !isTwoPeerCollapsed" ng-class="getTwoPeerReviewRowClass(twoPeerPercentage, collaborativePercentage)"
-							class="list-group-item"><span class="legendBox img-circle" style="background-color:#0099FF"></span>Two Peer Reviewers: <span
-							class="badge">{{twoPeerReviewers}}</span></li>
-							<div collapse="!isTwoPeerCollapsed" class="hideOverflow">
-								<div ng-repeat="review in twoPeerReviews">
-									<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.subject}}</a>							
-								</div>
-							</div>
-						<li ng-show="collabrativeDevelopments > 0" ng-click="isCollabrativeDevelopmentCollapsed = !isCollabrativeDevelopmentCollapsed" 
-							ng-class="getCollabrativeDevelopmentRowClass(collaborativePercentage)"
-							class="list-group-item"><span class="legendBox img-circle" style="background-color:#6600FF"></span>Collaborative Development: <span
-							class="badge">{{collabrativeDevelopments}}</span></li>
-							<div collapse="!isCollabrativeDevelopmentCollapsed" class="hideOverflow">
-								<div ng-repeat="review in collabrativeDevelopment">
-									<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank">{{review.subject}}</a>							
-								</div>
-							</div>
-							<li class="list-group-item">Total Reviews: <span class="badge">{{totalReviews}}</span></li>					
-					</ul>
-					<div class="row no-gutter">
-						<div class="col-sm-6 no-pad-right">
-							<ul class="list-group">
-								<h4 class="list-group-item active">Authors</h4>
-								<li ng-repeat="author in authors" class="list-group-item"><span class="hideOverflow"><img ng-class="GetAvatarClass(author.user.avatars[0].url)" src="{{author.user.avatars[0].url}} "  width="25" height="25"/> {{author.user.name}}: <span class="badge">{{author.count}}</span></span></li>
-							</ul>
-						</div>				
-						<div class="col-sm-6 no-pad">
-							<ul class="list-group">
-								<h4 class="list-group-item active">Reviewers</h4>
-								<li ng-class="{'list-group-item-warning-dim': reviewer.didDoOwnReview == true}" ng-repeat="reviewer in reviewers" class="list-group-item"><span class="hideOverflow"><img ng-class="GetAvatarClass(reviewer.user.avatars[0].url)" src="{{reviewer.user.avatars[0].url}}" width="25" height="25"/> {{reviewer.user.name}}: <span class="badge">{{reviewer.count}}</span></span></li>
-							</ul>
-						</div>
-					</div>
-			</div>
+<body ng-controller="StatsDisplayCtrl as vm">
+<%@include file="common/navbar.jspf"%>
+	<div id="fireworks-template">
+	 <div id="fw" class="firework"></div>
+	 <div id="fp" class="fireworkParticle"><img src="image/particles.gif" alt="" /></div>
+	</div>
+
+	<div id="fireContainer"></div>
+	<div>
+		<div ng-show="!vm.reviewStats" class="col-sm-3 well min-pad">
+			<h1>
+				<div>
+					<p class="text-center"><i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom text-center"></i></p>
+				</div>
+				<div>
+					<p class="text-center">Loading Gerrit Statistics...</p>
+				</div>
+			</h1>
 		</div>
-		<div ng-if="!showGerritStats" class="col-sm-1"></div>
-		<div ng-if="!showSonarData" class="col-sm-9 no-pad no-pad-right">
-			<div class="panel panel-default">
-				<h1>	
-					<div>
-						<p class="text-center"><i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom text-center"></i></p>
+		<div ng-show="vm.reviewStats" class="col-sm-3 well min-pad">
+			<div class="gerritActitvity">
+				<canvas id="gerritActivity" class="chart chart-line"
+				  chart-dataset-override="vm.gerritActivityDatasetOverride"
+				  chart-data="vm.gerritActivityChartData"
+				  chart-series="vm.gerritActivityChartSeries"
+				  chart-labels="vm.gerritActivityChartLabels"
+				  chart-options="vm.gerritActivityChartOptions"
+				  chart-colors="vm.gerritActivityChartColors">
+				</canvas>
+			</div>
+			<div class="col-sm-2"></div>
+			<div class="col-sm-8 gerritStatus">
+				<canvas id="gerritPie" class="chart chart-pie"
+				  chart-data="vm.gerritPieChartData"
+				  chart-labels="vm.gerritPieChartLabels"
+				  chart-options="vm.gerritPieChartOptions"
+				  chart-colors="vm.gerritPieChartColors">
+				</canvas>
+			</div>
+			<div class="col-sm-2"></div>
+			<div class="col-sm-12 no-pad">
+				<ul class="list-group">
+					<li ng-repeat="reviewType in vm.reviewStats" ng-show="reviewType.count > 0" ng-click="reviewType.isCollapsed = !reviewType.isCollapsed" class="list-group-item">
+						<span class="legendBox img-circle" style="background-color:#CC0000"></span>{{reviewType.type}}: <span class="badge">{{reviewType.count}}</span>
+						<div ng-show="reviewType.isCollapsed" class="">
+							<div ng-repeat="review in reviewType.list">
+								<a href="http://{{gerritHostname}}:{{gerritHostPort}}/#/c/{{review._number}}/" class="btn btn-success btn-block margin-both-05" target="_blank" data-toggle="tooltip" title="{{review.subject}}">{{review.subject | limitTo : 50}}{{review.subject.length > 50 ? '...' : ''}}</a>
+							</div>
+						</div>
+					</li>
+				</ul>
+				<div class="row no-gutter">
+					<div class="col-sm-6 no-pad-right">
+						<ul class="list-group">
+							<h4 class="list-group-item active">Authors</h4>
+							<li ng-repeat="author in vm.gerritReviewStats.authorsCountList" class="list-group-item"><span class="hideOverflow"><img ng-class="vm.getAvatarClass(author.user.avatars[0].url)" src="{{author.user.avatars[0].url}} "  width="25" height="25"/> {{author.user.name}}: <span class="badge">{{author.count}}</span></span></li>
+						</ul>
 					</div>
-					<div>
-						<p class="text-center">Loading Sonar Statistics...</p>
-					</div>
-				</h1>
-			</div>		
-		</div>
-		<div class="col-sm-9 no-pad no-pad-right" ng-if="showSonarData">
-				<div class="col-sm-6 no-pad no-pad-right">					
-					<div class="panel panel-default">		
-						<div class="list-group-item" ng-class="getFileComplexityClass(fileComplexity)"><i class="fa fa-arrow-down text-right" aria-hidden="true"></i> File Complexity = {{fileComplexity}}</div>
-						<canvas tc-chartjs chart-type="LineAlt" chart-data="fileComplexityChartData" chart-options="lineChartOptionsUpwards" id="fileComplexityChart"></canvas>
-					</div>
-					<div class="panel panel-default">
-						<div class="list-group-item" ng-class="getTestCoverageClass(testCoverage)"><i class="fa fa-arrow-up" aria-hidden="true"></i> Test Coverage = {{testCoverage}}%</div>
-						<canvas tc-chartjs chart-type="LineAlt" chart-data="testCoverageChartData" chart-options="lineChartOptionsDownwards" id="testCoverageChart"></canvas>
+					<div class="col-sm-6 no-pad-left">
+						<ul class="list-group">
+							<h4 class="list-group-item active">Reviewers</h4>
+							<li ng-repeat="reviewer in vm.gerritReviewStats.reviewersCountList" ng-class="{'list-group-item-warning-dim': reviewer.didDoOwnReview == true}" class="list-group-item"><span class="hideOverflow"><img ng-class="vm.getAvatarClass(reviewer.user.avatars[0].url)" src="{{reviewer.user.avatars[0].url}}" width="25" height="25"/> {{reviewer.user.name}}: <span class="badge">{{reviewer.count}}</span></span></li>
+						</ul>
 					</div>
 				</div>
-				<div class="col-sm-6 no-pad no-pad-right">			
-					<div class="panel panel-default">	
-						<div class="list-group-item" ng-class="getMethodComplexityClass(methodComplexity)"><i class="fa fa-arrow-down" aria-hidden="true"></i> Method Complexity = {{methodComplexity}}</div>		
-						<canvas tc-chartjs chart-type="LineAlt" chart-data="methodComplexityChartData" chart-options="lineChartOptionsUpwards" id="methodComplexityChart"></canvas>
-					</div>
-					<div class="panel panel-default">	
-						<div class="list-group-item" ng-class="getRulesComplianceClass(rulesCompliance)"><i class="fa fa-arrow-up" aria-hidden="true"></i> Rules Compliance = {{rulesCompliance}}%</div>		
-						<canvas tc-chartjs chart-type="LineAlt" chart-data="rulesComplianceChartData" chart-options="lineChartOptionsDownwards" id="rulesComplianceChart"></canvas>
-					</div>
-				</div>
+			</div>
 		</div>
-	<%@include file="common/footer.jspf"%>
+		<div ng-show="!vm.sonarStats" class="col-sm-9 well min-pad">
+			<h1>
+				<div>
+					<p class="text-center"><i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom text-center"></i></p>
+				</div>
+				<div>
+					<p class="text-center">Loading Sonar Statistics...</p>
+				</div>
+			</h1>
+		</div>
+		<div ng-show="vm.sonarStats" class="col-sm-9 well min-pad">
+			<div class="col-sm-12">
+				<div class="col-sm-6 well min-pad">
+					<div class="input-group">
+						<span ng-show="vm.sonarChart1.trendDirection && vm.sonarChart1.trendDirection !== 'none'" class="input-group-btn">
+						    <button type="button" class="btn {{vm.sonarChart1.targetStatusClass}}" ng-click="vm.showOff(vm.sonarChart1)">
+		               			<i ng-show="vm.sonarChart1.trendDirection === 'down'" class="fa fa-arrow-down" aria-hidden="true"></i>
+		               			<i ng-show="vm.sonarChart1.trendDirection === 'up'" class="fa fa-arrow-up" aria-hidden="true"></i>
+		               			<span>{{vm.sonarChart1.latestScore}}</span>
+				            </button>
+			            </span>
+						<ui-select ng-model="vm.selectedMetric1">
+							<ui-select-match placeholder="Select or search a person in the list...">{{$select.selected.name}}</ui-select-match>
+							<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
+								<div ng-bind-html="item.name | highlight: $select.search"></div>
+								<small ng-show="!item.raw">Calculated</small>
+							</ui-select-choices>
+						</ui-select>
+						<span class="input-group-btn">
+						  <button ng-disabled="vm.selectedMetric1 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.selectedMetric1)" class="btn btn-info">
+			               	<i class="fa fa-pencil" aria-hidden="true"></i>
+			                 </button>
+			            </span>
+		            </div>
+					<br/>
+					<canvas id="sonarChart1" class="chart-base"
+					chart-type="vm.sonarChart1.type"
+					chart-series ="vm.sonarChart1.series"
+					chart-data="vm.sonarChart1.data"
+					chart-labels="vm.sonarChart1.labels"
+					chart-options="vm.sonarChartOptions"
+					chart-colors="vm.sonarChart1.colors"
+					chart-dataset-override="vm.sonarChart1.datasetOverride">
+					</canvas>
+				</div>
+				<div class="col-sm-6 well min-pad">
+					<div class="input-group">
+						<span ng-show="vm.sonarChart2.trendDirection && vm.sonarChart2.trendDirection !== 'none'" class="input-group-btn">
+						    <button type="button" class="btn {{vm.sonarChart2.targetStatusClass}}" ng-click="vm.showOff(vm.sonarChart2)">
+		               			<i ng-show="vm.sonarChart2.trendDirection === 'down'" class="fa fa-arrow-down" aria-hidden="true"></i>
+		               			<i ng-show="vm.sonarChart2.trendDirection === 'up'" class="fa fa-arrow-up" aria-hidden="true"></i>
+		               			<span>{{vm.sonarChart2.latestScore}}</span>
+				            </button>
+			            </span>
+						<ui-select ng-model="vm.selectedMetric2">
+							<ui-select-match placeholder="Select or search a person in the list...">{{$select.selected.name}}</ui-select-match>
+							<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
+								<div ng-bind-html="item.name | highlight: $select.search"></div>
+								<small ng-show="!item.raw">Calculated</small>
+							</ui-select-choices>
+						</ui-select>
+						<span class="input-group-btn">
+						  <button ng-disabled="vm.selectedMetric2 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.selectedMetric2)" class="btn btn-info">
+			               	<i class="fa fa-pencil" aria-hidden="true"></i>
+			                 </button>
+			            </span>
+		            </div>
+					<br/>
+					<canvas id="sonarChart2" class="chart-base"
+					chart-type="vm.sonarChart2.type"
+					chart-series ="vm.sonarChart2.series"
+					chart-data="vm.sonarChart2.data"
+					chart-labels="vm.sonarChart2.labels"
+					chart-options="vm.sonarChartOptions"
+					chart-colors="vm.sonarChart2.colors"
+					chart-dataset-override="vm.sonarChart2.datasetOverride">
+					</canvas>
+				</div>
+			</div>
+			<div class="col-sm-12">
+				<div class="col-sm-6 well min-pad">
+					<div class="input-group">
+						<span ng-show="vm.sonarChart3.trendDirection && vm.sonarChart3.trendDirection !== 'none'" class="input-group-btn">
+						    <button type="button" class="btn {{vm.sonarChart3.targetStatusClass}}" ng-click="vm.showOff(vm.sonarChart3)">
+		               			<i ng-show="vm.sonarChart3.trendDirection === 'down'" class="fa fa-arrow-down" aria-hidden="true"></i>
+		               			<i ng-show="vm.sonarChart3.trendDirection === 'up'" class="fa fa-arrow-up" aria-hidden="true"></i>
+		               			<span>{{vm.sonarChart3.latestScore}}</span>
+				            </button>
+			            </span>
+						<ui-select ng-model="vm.selectedMetric3">
+							<ui-select-match placeholder="Select or search a person in the list...">{{$select.selected.name}}</ui-select-match>
+							<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
+								<div ng-bind-html="item.name | highlight: $select.search"></div>
+								<small ng-show="!item.raw">Calculated</small>
+							</ui-select-choices>
+						</ui-select>
+						<span class="input-group-btn">
+						  <button ng-disabled="vm.selectedMetric3 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.selectedMetric3)" class="btn btn-info">
+			               	<i class="fa fa-pencil" aria-hidden="true"></i>
+			                 </button>
+			            </span>
+		            </div>
+					<br/>
+					<canvas id="sonarChart3" class="chart-base"
+					chart-type="vm.sonarChart3.type"
+					chart-series ="vm.sonarChart3.series"
+					chart-data="vm.sonarChart3.data"
+					chart-labels="vm.sonarChart3.labels"
+					chart-options="vm.sonarChartOptions"
+					chart-colors="vm.sonarChart3.colors"
+					chart-dataset-override="vm.sonarChart3.datasetOverride">
+					</canvas>
+				</div>
+				<div class="col-sm-6 well min-pad">
+					<div class="input-group">
+						<span ng-show="vm.sonarChart4.trendDirection && vm.sonarChart4.trendDirection !== 'none'" class="input-group-btn">
+						    <button type="button" class="btn {{vm.sonarChart4.targetStatusClass}}" ng-click="vm.showOff(vm.sonarChart4)">
+		               			<i ng-show="vm.sonarChart4.trendDirection === 'down'" class="fa fa-arrow-down" aria-hidden="true"></i>
+		               			<i ng-show="vm.sonarChart4.trendDirection === 'up'" class="fa fa-arrow-up" aria-hidden="true"></i>
+		               			<span>{{vm.sonarChart4.latestScore}}</span>
+				            </button>
+			            </span>
+						<ui-select ng-model="vm.selectedMetric4">
+							<ui-select-match placeholder="Select or search a person in the list...">{{$select.selected.name}}</ui-select-match>
+							<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
+								<div ng-bind-html="item.name | highlight: $select.search"></div>
+								<small ng-show="!item.raw">Calculated</small>
+							</ui-select-choices>
+						</ui-select>
+						<span class="input-group-btn">
+						  <button ng-disabled="vm.selectedMetric4 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.selectedMetric4)" class="btn btn-info">
+			               	<i class="fa fa-pencil" aria-hidden="true"></i>
+			                 </button>
+			            </span>
+		            </div>
+					<br/>
+					<canvas id="sonarChart4" class="chart-base"
+					chart-type="vm.sonarChart4.type"
+					chart-series ="vm.sonarChart4.series"
+					chart-data="vm.sonarChart4.data"
+					chart-labels="vm.sonarChart4.labels"
+					chart-options="vm.sonarChartOptions"
+					chart-colors="vm.sonarChart4.colors"
+					chart-dataset-override="vm.sonarChart4.datasetOverride">
+					</canvas>
+				</div>
+			</div>
+			<div class="col-sm-10">
+				<span class="text center">Sonar Review Length:  {{vm.sonarDistanceValue}} Months</span>
+				<slider ng-model="vm.sonarDistanceValue" tooltip_position="bottom" min="6" max="vm.sonarMaxDistance" step="1" value="vm.sonarDistanceValue"></slider>
+			</div>
+			<div class="col-sm-2">
+				<button class="btn btn-primary" ng-click="vm.redraw()"><i class="fa fa-retweet" aria-hidden="true"></i> Redraw Graphs</button>
+			</div>
+		</div>
+	</div>
+<%@include file="common/footer.jspf"%>
 </body>
 </html>

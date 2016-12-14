@@ -26,13 +26,22 @@ import com.statscollector.neo.sonar.model.RawSonarProject;
 import com.statscollector.neo.sonar.model.SonarMetric;
 import com.statscollector.neo.sonar.model.SonarMetricPeriod;
 import com.statscollector.neo.sonar.model.SonarProject;
-import com.statscollector.neo.sonar.model.SonarTargets;
 import com.statscollector.neo.sonar.model.SonarTargetsStatus;
+import com.statscollector.targets.dao.SonarDisplayParametersRepository;
+import com.statscollector.targets.model.SonarDisplayParameters;
+import com.statscollector.targets.model.SonarTargetSettings;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class SonarService {
 
     private static final Logger LOGGER = Logger.getLogger(SonarService.class);
+
+    private static final String TREND_UP = "up";
+
+    private static final String TREND_DOWN = "down";
 
     @Autowired
     private SonarConfig sonarConfig;
@@ -48,6 +57,9 @@ public class SonarService {
 
     @Autowired
     private DerivedSonarMetricService derivedSonarMetricService;
+
+    @Autowired
+    private SonarDisplayParametersRepository sonarDisplayParametersRepository;
 
     public ConnectionTestResults testConnection() {
         List<RawSonarProject> projectNames = sonarHttpClient.getProjectNames();
@@ -80,9 +92,9 @@ public class SonarService {
      * @return
      */
     public SonarProject getSquashedSonarMetricsForAllProjectsWhoseNamesMatchFilter(
-            final String regexFilter) {
-        List<SonarProject> allProjects = getAllSonarProjectsWhoseNamesMatchFilter(regexFilter);
-        return sonarMetricService.squashProjectMetrics(allProjects);
+            final List<SonarProject> allProjects) {
+        SonarProject result = sonarMetricService.squashProjectMetrics(allProjects);
+        return result;
     }
 
     /**
@@ -94,11 +106,18 @@ public class SonarService {
      */
     public SonarProject getSquashedAndDerivedSonarMetricsForAllProjectsWhoseNamesMatchFilter(
             final String regexFilter) {
-        SonarProject sonarProject = getSquashedSonarMetricsForAllProjectsWhoseNamesMatchFilter(regexFilter);
+        List<SonarProject> projects = getAllSonarProjectsWhoseNamesMatchFilter(regexFilter);
+        SonarProject sonarProject = getSquashedSonarMetricsForAllProjectsWhoseNamesMatchFilter(projects);
         for(Entry<YearMonth, SonarMetricPeriod> entry : sonarProject.getSonarMetricPeriods().entrySet()) {
             SonarMetricPeriod value = entry.getValue();
             value.setDerivedMetrics(sonarMetricService.deriveMetrics(value));
         }
+        StringBuilder builder = new StringBuilder();
+        for(SonarProject squishedProject : projects) {
+            builder.append(squishedProject.getName() + ",");
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        sonarProject.setProjectsSquished(builder.toString());
         return sonarProject;
     }
 
@@ -146,42 +165,79 @@ public class SonarService {
      * Gets the squashed and derived metrics for the given project regex and then returns if they meet the standard
      * metric targets passed in.
      *
-     * @param projectRegex
+     * @param projectName
      * @param sonarTargets
      * @return
      */
-    public SonarTargetsStatus getTargetStatus(final String projectRegex, final SonarTargets sonarTargets) {
-        SonarProject sonarProject = getSquashedAndDerivedSonarMetricsForAllProjectsWhoseNamesMatchFilter(projectRegex);
+    public SonarTargetsStatus getTargetStatus(final String projectName) {
+        SonarDisplayParameters projectParameters = sonarDisplayParametersRepository.findByProjectName(projectName);
+        SonarProject sonarProject = getSquashedAndDerivedSonarMetricsForAllProjectsWhoseNamesMatchFilter(
+                projectParameters.getSonarRegex());
         ArrayList<YearMonth> keyList = new ArrayList<>(sonarProject.getSonarMetricPeriods().keySet());
         Collections.sort(keyList);
         SonarMetricPeriod latestMetric = sonarProject.getSonarMetricPeriods().get(keyList.get(keyList.size() - 1));
         if(latestMetric != null) {
-            Map<String, SonarMetric> metricsMap = derivedSonarMetricService
+            Map<String, SonarMetric> derivedMetricsMap = derivedSonarMetricService
                     .convertListToMap(latestMetric.getDerivedMetrics());
-            BigDecimal fileComplexity = new BigDecimal(
-                    metricsMap.get(DerivedSonarMetricService.AVERAGE_FILE_COMPLEXITY_KEY).getRawValue());
-            BigDecimal methodComplexity = new BigDecimal(
-                    metricsMap.get(DerivedSonarMetricService.AVERAGE_METHOD_COMPLEXITY_KEY).getRawValue());
-            BigDecimal rulesCompliance = new BigDecimal(
-                    metricsMap.get(DerivedSonarMetricService.RULES_COMPLIANCE_KEY).getRawValue());
-            BigDecimal testCoverage = new BigDecimal(
-                    metricsMap.get(DerivedSonarMetricService.TEST_COVERAGE_KEY).getRawValue());
-            BigDecimal fileComplexityTarget = getTarget(sonarTargets.getSonarFileTarget(),
-                    sonarConfig.getFileComplexityTarget());
-            BigDecimal methodComplexityTarget = getTarget(sonarTargets.getSonarMethodTarget(),
-                    sonarConfig.getMethodComplexityTarget());
-            BigDecimal rulesComplianceTarget = getTarget(sonarTargets.getSonarRulesTarget(),
-                    sonarConfig.getRulesComplianceTarget());
-            BigDecimal testCoverageTarget = getTarget(sonarTargets.getSonarTestTarget(),
-                    sonarConfig.getTestCoverageTarget());
-            boolean hitFileTarget = fileComplexity.compareTo(fileComplexityTarget) <= 0;
-            boolean hitMethodTarget = methodComplexity.compareTo(methodComplexityTarget) <= 0;
-            boolean hitTestTarget = testCoverage.compareTo(testCoverageTarget) >= 0;
-            boolean hitRulesTarget = rulesCompliance.compareTo(rulesComplianceTarget) >= 0;
+            Map<String, SonarMetric> metricsMap = derivedSonarMetricService
+                    .convertListToMap(latestMetric.getSonarMetrics());
 
-            return new SonarTargetsStatus(hitFileTarget, hitMethodTarget, hitTestTarget, hitRulesTarget);
+            Boolean metric1TargetMet = doesMetricMeetTarget(projectParameters, derivedMetricsMap, metricsMap,
+                    projectParameters.getDefaultMetric1());
+            Boolean metric2TargetMet = doesMetricMeetTarget(projectParameters, derivedMetricsMap, metricsMap,
+                    projectParameters.getDefaultMetric2());
+            Boolean metric3TargetMet = doesMetricMeetTarget(projectParameters, derivedMetricsMap, metricsMap,
+                    projectParameters.getDefaultMetric3());
+            Boolean metric4TargetMet = doesMetricMeetTarget(projectParameters, derivedMetricsMap, metricsMap,
+                    projectParameters.getDefaultMetric4());
+
+            return new SonarTargetsStatus(metric1TargetMet, metric2TargetMet, metric3TargetMet, metric4TargetMet);
         }
         return new SonarTargetsStatus(false, false, false, false);
+    }
+
+    /**
+     * @param projectParameters
+     * @param derivedMetricsMap
+     * @param metricsMap
+     * @param metricName
+     */
+    private Boolean doesMetricMeetTarget(final SonarDisplayParameters projectParameters,
+            final Map<String, SonarMetric> derivedMetricsMap, final Map<String, SonarMetric> metricsMap,
+            final String metricName) {
+        Boolean targetMet;
+        String metricNameAsKey = metricNameAsKey(metricName);
+        SonarTargetSettings sonarTargetSettings = projectParameters.getSonarTargetParam()
+                .get(metricNameAsKey);
+
+        SonarMetric sonarMetric = derivedMetricsMap.get(metricNameAsKey);
+        if(null == sonarMetric) {
+            sonarMetric = metricsMap.get(metricNameAsKey);
+        }
+        if(null == sonarMetric) {
+            targetMet = false;
+        } else {
+            String trendDirection = sonarTargetSettings.getTrendDirection();
+            BigDecimal value = new BigDecimal(sonarMetric.getRawValue());
+            BigDecimal target = new BigDecimal(sonarTargetSettings.getTarget());
+            if(TREND_UP.equals(trendDirection)) {
+                targetMet = value.compareTo(target) >= 0;
+            } else if(TREND_DOWN.equals(trendDirection)) {
+                targetMet = value.compareTo(target) <= 0;
+            } else {
+                // No Way Of Knowing
+                targetMet = false;
+            }
+        }
+        return targetMet;
+    }
+
+    private String metricNameAsKey(final String metricName) {
+        if(StringUtils.isNotEmpty(metricName)) {
+            return metricName.toLowerCase().replace(" ", "_");
+        } else {
+            return "";
+        }
     }
 
     private BigDecimal getTarget(final String urlTarget, final String configTarget) {

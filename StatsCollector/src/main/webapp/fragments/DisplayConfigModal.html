@@ -1,0 +1,59 @@
+<div class="modal-header text-center">
+  <h3>{{modalOptions.headerText}}</h3>
+</div>
+<div class="modal-body">
+	<uib-tabset active="activePill" type="pills" justified="true">
+			<form>
+				<div class="form-group">
+					<label for="projectName">Project Name</label>
+					<input type="text" class="form-control" id="target" ng-model="modalOptions.displayParameters.gerritDisplayParameters.projectName">
+				</div>
+				<div class="form-group">
+					<label for="gerritRegex">Gerrit Project Regex</label>
+					<input type="text" class="form-control" id="gerritRegex" ng-model="modalOptions.displayParameters.gerritDisplayParameters.gerritRegex">
+				</div>
+				<div class="form-group">
+					<label for="gerritFilterOutRegex">Gerrit Project Filter Out Regex</label>
+					<input type="text" class="form-control" id="gerritFilterOutRegex" ng-model="modalOptions.displayParameters.gerritDisplayParameters.gerritFilterOutRegex">
+				</div>
+				<div class="form-group">
+					<label for="topicRegex">Gerrit Topic Regex</label>
+					<input type="text" class="form-control" id="topicRegex" ng-model="modalOptions.displayParameters.gerritDisplayParameters.topicRegex">
+				</div>
+				<div class="form-group">
+					<label for="sonarRegex">Sonar Project Regex</label>
+					<input type="text" class="form-control" id="sonarRegex" ng-model="modalOptions.displayParameters.sonarDisplayParameters.sonarRegex">
+				</div>
+				<div class="form-group">
+					<label for="sonarHistoryLength">Default Sonar History Length</label>
+					<input type="number" class="form-control" id="sonarHistoryLength" ng-model="modalOptions.displayParameters.sonarDisplayParameters.sonarHistoryLength">
+				</div>
+				<div class="form-group">
+					<label for="sonarMetric1">Default Metric Top Left <small>(Copied from selected, to modify use drop down on main page)</small></label>
+					<input type="text" ng-disabled="true" class="form-control" id="sonarMetric1" ng-model="modalOptions.displayParameters.sonarDisplayParameters.defaultMetric1">
+				</div>
+				<div class="form-group">
+					<label for="sonarMetric2">Default Metric Top Right <small>(Copied from selected, to modify use drop down on main page)</small></label>
+					<input type="text" ng-disabled="true" class="form-control" id="sonarMetric2" ng-model="modalOptions.displayParameters.sonarDisplayParameters.defaultMetric2">
+				</div>
+				<div class="form-group">
+					<label for="sonarMetric3">Default Metric Bottom Left <small>(Copied from selected, to modify use drop down on main page)</small></label>
+					<input type="text" ng-disabled="true" class="form-control" id="sonarMetric3" ng-model="modalOptions.displayParameters.sonarDisplayParameters.defaultMetric3">
+				</div>
+				<div class="form-group">
+					<label for="sonarMetric4">Default Metric Bottom Right <small>(Copied from selected, to modify use drop down on main page)</small></label>
+					<input type="text" ng-disabled="true" class="form-control" id="sonarMetric4" ng-model="modalOptions.displayParameters.sonarDisplayParameters.defaultMetric4">
+				</div>
+				<div class="form-group">
+					<label for="squished">Squished Projects</label>
+					<textArea type="text" ng-disabled="true" class="form-control textAreaVerticalOnly" id="squished" ng-model="modalOptions.squishedProjects"></textArea>
+				</div>
+			</form>
+		</uib-tab>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary btn-block"
+          data-ng-click="modalOptions.close()"><i class="fa fa-times" aria-hidden="true"></i> {{modalOptions.closeButtonText}}</button>
+  <button type="button" class="btn btn-success btn-block"
+          data-ng-click="modalOptions.ok()"><i class="fa fa-save" aria-hidden="true"></i> {{modalOptions.saveButtonText}}</button>
+</div>

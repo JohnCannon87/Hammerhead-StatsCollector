@@ -96,7 +96,7 @@ public class GerritStatisticsService {
     private List<GerritChangeFilter> getFilters(final String projectFilterRegex, final String projectFilterOutRegex,
             final DateTime startDate,
             final DateTime endDate, final String topicNameRegex) {
-        List<GerritChangeFilter> results = new ArrayList<GerritChangeFilter>();
+        List<GerritChangeFilter> results = new ArrayList<>();
         results.add(new FilterDateUpdatedPredicate(startDate, endDate));
         results.add(new FilterProjectNamePredicate(projectFilterRegex));
         if(!projectFilterOutRegex.isEmpty()) {
@@ -221,7 +221,7 @@ public class GerritStatisticsService {
             final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
 
         List<GerritChangeFilter> filters = getFilters(projectFilterString, projectFilterOutString, startDate, endDate,
-                gerritConfig.getTopicRegex());
+                ".*");
 
         GerritReviewStats reviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
         return buildAuthorsListObject(filters, reviewStats);
@@ -232,7 +232,7 @@ public class GerritStatisticsService {
             final DateTime startDate, final DateTime endDate) throws IOException, URISyntaxException {
 
         List<GerritChangeFilter> filters = getFilters(projectFilterString, projectFilterOutString, startDate, endDate,
-                gerritConfig.getTopicRegex());
+                ".*");
 
         GerritReviewStats reviewStats = gerritStatisticsHelper.getAllReviewStats().get(changeStatus);
         reviewStats = buildReviewStatsObject(filters, reviewStats);

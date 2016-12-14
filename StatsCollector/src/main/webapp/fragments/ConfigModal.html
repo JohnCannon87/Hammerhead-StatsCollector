@@ -1,0 +1,28 @@
+<div class="modal-header text-center">
+  <h3>{{modalOptions.headerText}}</h3>
+</div>
+<div class="modal-body">
+	<uib-tabset active="activePill" type="pills" justified="true">
+		<uib-tab index="0" heading="Config">
+		<br/>
+			<div class="well">
+				<form ng-submit="modalOptions.saveConfig(modalOptions.config)" name="modalOptions.form" novalidate>
+				    <formly-form model="modalOptions.config" fields="modalOptions.schema" options="modalOptions.options" form="modalOptions.form">
+				      <button type="submit" class="btn btn-success btn-block submit-button" ng-disabled="modalOptions.form.$invalid"><span class="fa fa-save"></span>  Save Changes</button>
+				    </formly-form>
+			  	</form>
+		  	</div>
+	  	</uib-tab>
+	  	<uib-tab index="1" heading="Test">
+	  		<button class="btn btn-info btn-block" ng-click="modalOptions.refreshMetrics(modalOptions)"><i class="fa fa-refresh" aria-hidden="true"></i>  Refresh Metrics</button>
+	  		<button class="btn btn-primary btn-block" ng-click="modalOptions.testConnection(modalOptions)"><i class="fa fa-server" aria-hidden="true"></i>  Test Connection (Save Changes First)</button>
+	  		<label for="comment">Test Result:</label>
+					<textarea ng-model="modalOptions.connectionResult" class="form-control" rows="40" id="comment"></textarea>
+	  	</uib-tab>
+	</uib-tabset>
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary btn-block"
+          data-ng-click="modalOptions.close()"><i class="fa fa-times" aria-hidden="true"></i> {{modalOptions.closeButtonText}}</button>
+</div>

@@ -1,0 +1,25 @@
+<div class="modal-header text-center">
+  <h3>{{modalOptions.headerText}}</h3>
+</div>
+<div class="modal-body">
+	<form>
+		<div class="form-group">
+			<label for="target">Target <small>(Ignored for Distribution Chart Types)</small></label>
+			<input type="number" class="form-control" id="target" ng-model="modalOptions.sonarMetricParameters.target">
+		</div>
+		<div class="form-group">
+			<label for="trendDirection">Trend Direction <small>(Can be up, down or none, other values will be ignored)</small></label>
+			<input type="text" class="form-control" id="trendDirection" ng-model="modalOptions.sonarMetricParameters.trendDirection">
+		</div>
+		<div class="form-group">
+			<label for="chartType">Chart Type <small>(Chart types can be found <a href="http://www.chartjs.org/docs/">here</a>, also the custom type distribution can be used for distribution based metrics)</small></label>
+			<input type="text" class="form-control" id="chartType" ng-model="modalOptions.sonarMetricParameters.chartType">
+		</div>
+	</form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary btn-block"
+          data-ng-click="modalOptions.close()"><i class="fa fa-times" aria-hidden="true"></i> {{modalOptions.closeButtonText}}</button>
+  <button type="button" class="btn btn-success btn-block"
+          data-ng-click="modalOptions.ok()"><i class="fa fa-save" aria-hidden="true"></i> {{modalOptions.saveButtonText}}</button>
+</div>

@@ -39,6 +39,7 @@ public class SonarProject {
     @Column(unique = true)
     private String key;
     private String name;
+    private String projectsSquished;
     @OneToMany(cascade = { CascadeType.ALL, CascadeType.REMOVE }, orphanRemoval = true)
     @JoinColumn(nullable = true)
     @MapKey(name = "period")

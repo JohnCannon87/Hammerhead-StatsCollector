@@ -1,0 +1,24 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<script src="/javascript/controller/statsCollector-navbarController.js"></script>
+<div ng-controller="NavbarCtrl as nav">
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<span class="sr-only">Toggle navigation</span>
+				<a class="navbar-brand" href="https://github.com/JohnCannon87/StatsCollector"><i class="fa fa-github"></i> {{vm.projectName}} Statistics Collector</a>
+			</div>
+			<div>
+				<ul class="nav navbar-nav">
+					<li ng-show="nav.gerritUrl !== undefined"><a href=http://{{nav.gerritUrl}} target="_blank"><img src="../../images/gerritLogo.png" width="17" /> Gerrit</a></li>
+					<li ng-show="nav.sonarUrl !== undefined"><a href=http://{{nav.sonarUrl}} target="_blank"><img src="../../images/sonarLogo.png" width="17" /> Sonar</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li><button class="btn navbar-btn btn-primary" ng-disabled="!vm.sonarStats" ng-click="vm.showDisplayConfig()"><i class="fa fa-cogs"></i> Display Config</button></li>
+					<li><button class="btn navbar-btn btn-primary" ng-click="nav.showGerritConfig()"><i class="fa fa-cogs"></i> Gerrit Config</button></li>
+					<li><button class="btn navbar-btn btn-primary" ng-click="nav.showSonarConfig()"><i class="fa fa-cogs"></i> Sonar Config</button></li>
+				</ul>
+			</div>
+		</div>
+		<div uib-alert dismiss-on-timeout="{{alert.timeout}}" type="{{alert.type}}" class="alert alert-{{alert.type}}" ng-repeat="alert in nav.alerts" close="nav.closeAlert(alert)"> {{alert.msg}}</div>
+	</nav>
+</div>

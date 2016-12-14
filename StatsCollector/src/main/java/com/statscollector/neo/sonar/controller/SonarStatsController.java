@@ -6,21 +6,21 @@ import java.net.URISyntaxException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.statscollector.gerrit.model.ConnectionTestResults;
 import com.statscollector.neo.sonar.model.SonarProject;
-import com.statscollector.neo.sonar.model.SonarTargets;
 import com.statscollector.neo.sonar.model.SonarTargetsStatus;
 import com.statscollector.neo.sonar.service.SonarService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/sonar/stats")
 public class SonarStatsController {
@@ -28,15 +28,13 @@ public class SonarStatsController {
     @Autowired
     private SonarService sonarService;
 
-    final static Logger LOGGER = Logger.getLogger(SonarStatsController.class);
-
     @RequestMapping(value = "/refreshCache")
     public boolean refreshCache() {
-        LOGGER.info("Manual Cache Refresh Triggered");
+        log.info("Manual Cache Refresh Triggered");
         try {
             sonarService.refreshAllStatistics();
         } catch(Exception e) {
-            LOGGER.error("Error thrown", e);
+            log.error("Error thrown", e);
             return false;
         }
         return true;
@@ -48,31 +46,27 @@ public class SonarStatsController {
     }
 
     @CrossOrigin
-    @RequestMapping(value = "/targetStatus/{projectRegex}/all")
+    @RequestMapping(value = "/targetStatus/{projectName}/all")
     @ResponseBody
-    public SonarTargetsStatus targetStatus(@PathVariable final String projectRegex,
-            @RequestParam(required = false) final String sonarMethodTarget,
-            @RequestParam(required = false) final String sonarFileTarget,
-            @RequestParam(required = false) final String sonarTestTarget,
-            @RequestParam(required = false) final String sonarRulesTarget, final HttpServletResponse response)
+    public SonarTargetsStatus targetStatus(@PathVariable final String projectName, final HttpServletResponse response)
             throws IOException,
             URISyntaxException {
-        SonarTargets sonarTargets = new SonarTargets(sonarMethodTarget, sonarFileTarget,
-                sonarRulesTarget, sonarTestTarget);
-        return sonarService.getTargetStatus(projectRegex, sonarTargets);
+        return sonarService.getTargetStatus(projectName);
     }
 
     @RequestMapping(value = "/{projectRegex}/all")
     public SonarProject allStatistics(@PathVariable final String projectRegex) throws IOException,
             URISyntaxException {
-        LOGGER.info("Getting All Sonar Statistics");
+        log.info("Getting All Sonar Statistics");
         String searchRegex;
         if(StringUtils.isEmpty(projectRegex)) {
             searchRegex = ".*";
         } else {
             searchRegex = projectRegex;
         }
-        return sonarService.getSquashedAndDerivedSonarMetricsForAllProjectsWhoseNamesMatchFilter(searchRegex);
+        SonarProject result = sonarService
+                .getSquashedAndDerivedSonarMetricsForAllProjectsWhoseNamesMatchFilter(searchRegex);
+        return result;
     }
 
 }

@@ -22,6 +22,7 @@ dependencies {
 	compile group:'com.fasterxml.jackson.module', name:'jackson-module-jsonSchema', version:jsonSchemaVersion
 	compile group:'org.postgresql', name:'postgresql', version:postgresVersion
 	compile group:'org.aspectj', name:'aspectjweaver', version:aspectjWeaverVersion
+	compile group:'org.springframework.boot', name:'spring-boot-starter-actuator', version:springBootActuatorVersion
 
 
 	/* Test Compile dependencies */
