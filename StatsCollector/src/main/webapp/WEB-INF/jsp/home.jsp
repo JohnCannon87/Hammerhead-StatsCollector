@@ -3,9 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <html ng-app="statsCollectorApp">
 <head>
-<link rel="stylesheet" href="/style/fireworks.css">
-<script src="/javascript/external/soundmanager2-nodebug-jsmin.js"></script>
-<script src="/javascript/external/fireworks.js"></script>
 <%@include file="common/header.jspf"%>
 <script src="/javascript/controller/statsCollector-statsDisplayController.js"></script>
 </head>

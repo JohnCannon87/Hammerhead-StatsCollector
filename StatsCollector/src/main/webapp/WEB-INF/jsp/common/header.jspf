@@ -23,7 +23,9 @@
 <meta name="msapplication-TileImage" content="/images/favicon/mstile-144x144.png">
 <meta name="msapplication-config" content="/images/favicon/browserconfig.xml">
 <meta name="theme-color" content="#ffffff">
-
+<link rel="stylesheet" href="/style/fireworks.css">
+<script src="/javascript/external/soundmanager2-nodebug-jsmin.js"></script>
+<script src="/javascript/external/fireworks.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.9/angular.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.9/angular-sanitize.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.3.0/ui-bootstrap-tpls.min.js"></script>
@@ -51,3 +53,13 @@
 <link rel="stylesheet" href="/css/external/font-awesome/css/font-awesome.min.css">
 
 <link rel="stylesheet" href="/css/app.css">
+<script src="/javascript/external/snowstorm.js"></script>
+<script>
+	snowStorm.flakesMaxActive = 96;
+	snowStorm.useTwinkleEffect = true;
+	snowStorm.followMouse = false;
+	snowStorm.freezeOnBlur = true;
+	if(moment().format("MM") !== "12"){
+		snowStorm.stop();
+	}
+</script>
