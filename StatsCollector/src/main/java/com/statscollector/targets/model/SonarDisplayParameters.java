@@ -33,5 +33,7 @@ public class SonarDisplayParameters {
     private String defaultMetric2;
     private String defaultMetric3;
     private String defaultMetric4;
-
+    private String defaultExtraMetric1;
+    private String defaultExtraMetric2;
+    private String defaultExtraMetric3;
 }

@@ -24,6 +24,8 @@
 
 		//Do Things
 		initialSetup();
+		setupWatches();
+		setupProjectName();
 		setupCustomChartType();
 		setupGerritChartSettings();
 		setupSonarChartSettings();
@@ -31,47 +33,9 @@
 		vm.sonarChart2 = {};
 		vm.sonarChart3 = {};
 		vm.sonarChart4 = {};
-
-		//Watches
-		$scope.$watch(function (){
-			return vm.selectedMetric1;
-		},
-		function (newValue){
-			updateSonarChart(newValue, vm.sonarChart1);
-		});
-
-		$scope.$watch(function (){
-			return vm.parameters;
-		},
-		function (){
-			updateSonarChart(vm.selectedMetric1, vm.sonarChart1);
-			updateSonarChart(vm.selectedMetric2, vm.sonarChart2);
-			updateSonarChart(vm.selectedMetric3, vm.sonarChart3);
-			updateSonarChart(vm.selectedMetric4, vm.sonarChart4);
-		});
-
-		$scope.$watch(function (){
-			return vm.selectedMetric2;
-		},
-		function (newValue){
-			updateSonarChart(newValue, vm.sonarChart2);
-		});
-
-
-		$scope.$watch(function (){
-			return vm.selectedMetric3;
-		},
-		function (newValue){
-			updateSonarChart(newValue, vm.sonarChart3);
-		});
-
-
-		$scope.$watch(function (){
-			return vm.selectedMetric4;
-		},
-		function (newValue){
-			updateSonarChart(newValue, vm.sonarChart4);
-		});
+		vm.extraChart1 = {};
+		vm.extraChart2 = {};
+		vm.extraChart3 = {};
 
 		//Kick Off Timers, this should be done last out of the "Do Things" section so that all setup is completed beforehand.
 		$interval(getGerritStats, 120000);//Every 2 Minutes
@@ -86,10 +50,83 @@
 			$rootScope.$broadcast('notify-occured', { notify: { statusText: msg}, timeout: timeout, type: type});
 		}
 
-		function initialSetup(){
-			getParameters();
-			getGerritConfig();
-			getSonarConfig();
+		function setupWatches(){
+			//Watches
+			$scope.$watch(function (){
+				return vm.selectedProject;
+			},
+			function(newValue, oldValue){
+				var sameParam = false;
+				if(newValue !== undefined && oldValue !== undefined){
+					sameParam = newValue.gerritDisplayParameters.projectName === oldValue.gerritDisplayParameters.projectName;
+				}
+				if(!sameParam && newValue !== oldValue && vm.selectedProject !== undefined){
+					vm.sonarStats = undefined;
+					vm.reviewStats = undefined;
+					vm.projectName = vm.selectedProject.gerritDisplayParameters.projectName;
+				}
+			});
+			$scope.$watch(function (){
+				return vm.projectName;
+			},
+			function (){
+				setupProjectName();
+				getParameters();
+			});
+			$scope.$watch(function (){
+				return vm.extraMetric1;
+			},
+			function (newValue){
+				updateSonarChart(newValue, vm.extraChart1);
+			});
+			$scope.$watch(function (){
+				return vm.extraMetric2;
+			},
+			function (newValue){
+				updateSonarChart(newValue, vm.extraChart2);
+			});
+			$scope.$watch(function (){
+				return vm.extraMetric3;
+			},
+			function (newValue){
+				updateSonarChart(newValue, vm.extraChart3);
+			});
+
+			$scope.$watch(function (){
+				return vm.selectedMetric1;
+			},
+			function (newValue){
+				updateSonarChart(newValue, vm.sonarChart1);
+			});
+
+			$scope.$watch(function (){
+				return vm.parameters;
+			},
+			function (){
+				updateSonarChart(vm.selectedMetric1, vm.sonarChart1);
+				updateSonarChart(vm.selectedMetric2, vm.sonarChart2);
+				updateSonarChart(vm.selectedMetric3, vm.sonarChart3);
+				updateSonarChart(vm.selectedMetric4, vm.sonarChart4);
+			});
+
+			$scope.$watch(function (){
+				return vm.selectedMetric2;
+			},
+			function (newValue){
+				updateSonarChart(newValue, vm.sonarChart2);
+			});
+			$scope.$watch(function (){
+				return vm.selectedMetric3;
+			},
+			function (newValue){
+				updateSonarChart(newValue, vm.sonarChart3);
+			});
+			$scope.$watch(function (){
+				return vm.selectedMetric4;
+			},
+			function (newValue){
+				updateSonarChart(newValue, vm.sonarChart4);
+			});
 			$scope.$watchCollection(function (){
 				return [vm.parameters, vm.gerritConfig];
 			},
@@ -108,11 +145,19 @@
 			});
 		}
 
+		function initialSetup(){
+			getGerritConfig();
+			getSonarConfig();
+		}
+
 		function redraw(){
 			updateSonarChart(vm.selectedMetric1, vm.sonarChart1);
 			updateSonarChart(vm.selectedMetric2, vm.sonarChart2);
 			updateSonarChart(vm.selectedMetric3, vm.sonarChart3);
 			updateSonarChart(vm.selectedMetric4, vm.sonarChart4);
+			updateSonarChart(vm.extraMetric1, vm.extraChart1);
+			updateSonarChart(vm.extraMetric2, vm.extraChart2);
+			updateSonarChart(vm.extraMetric3, vm.extraChart3);
 		}
 
 		function showDisplayConfig(){
@@ -134,6 +179,15 @@
 			modalOptions.displayParameters.sonarDisplayParameters.defaultMetric2 = vm.selectedMetric2.name;
 			modalOptions.displayParameters.sonarDisplayParameters.defaultMetric3 = vm.selectedMetric3.name;
 			modalOptions.displayParameters.sonarDisplayParameters.defaultMetric4 = vm.selectedMetric4.name;
+			if(vm.extraMetric1 !== undefined){
+				modalOptions.displayParameters.sonarDisplayParameters.defaultExtraMetric1 = vm.extraMetric1.name;
+			}
+			if(vm.extraMetric2 !== undefined){
+				modalOptions.displayParameters.sonarDisplayParameters.defaultExtraMetric2 = vm.extraMetric2.name;
+			}
+			if(vm.extraMetric3 !== undefined){
+				modalOptions.displayParameters.sonarDisplayParameters.defaultExtraMetric3 = vm.extraMetric3.name;
+			}
 
 			ModalPopupService.showModal(modalDefaults, modalOptions).then(function(response){
 				if(response){
@@ -209,13 +263,20 @@
 			return '';
 		}
 
-		function getParameters(){
-			var projectName = $location.path();
-			if(projectName === undefined || projectName === ''){
-				vm.projectName = 'Default';
+		function setupProjectName(){
+			if(vm.projectName === undefined){
+				var projectName = $location.path();
+				if(projectName === undefined || projectName === ''){
+					vm.projectName = 'Default';
+				}else{
+					vm.projectName = projectName.substring(1);
+				}
 			}else{
-				vm.projectName = projectName.substring(1);
+				$location.path('/'+vm.projectName);
 			}
+		}
+
+		function getParameters(){
 			DisplayParametersService.getParams(vm.projectName).then(function(response){
 				if(response.data === undefined){
 					notify('No Project Data Found For Name: '+vm.projectName+' please set some up using the config items on the navbar.', 10000, 'danger');
@@ -230,20 +291,29 @@
 		}
 
 		function processParametersResponse(responseData){
-			vm.gerritStatsRequest = {
-					gerritProjectRegex : responseData.gerritDisplayParameters.gerritRegex,
-					gerritTopicRegex : responseData.gerritDisplayParameters.topicRegex,
-					gerritProjectFilterOutRegex: responseData.gerritDisplayParameters.gerritFilterOutRegex,
-					gerritStatus: 'merged',
-					gerritStartDateOffset: '-30',
-					gerritEndDateOffset: '0'
-				};
-				vm.sonarStatsRequest = {
-					sonarProjectRegex : responseData.sonarDisplayParameters.sonarRegex
-				};
-				vm.parameters = responseData;
-				vm.sonarMaxDistance = 100;
-				vm.sonarDistanceValue = vm.parameters.sonarDisplayParameters.sonarHistoryLength;
+			vm.projectList = responseData;
+			for (let project of vm.projectList) {
+				if(vm.projectName === project.gerritDisplayParameters.projectName){
+					vm.selectedProject = project;
+				}
+				if(vm.selectedProject !== undefined && vm.selectedProject.gerritDisplayParameters.projectName === project.gerritDisplayParameters.projectName){
+					vm.gerritStatsRequest = {
+							gerritProjectRegex : project.gerritDisplayParameters.gerritRegex,
+							gerritTopicRegex : project.gerritDisplayParameters.topicRegex,
+							gerritProjectFilterOutRegex: project.gerritDisplayParameters.gerritFilterOutRegex,
+							gerritStatus: 'merged',
+							gerritStartDateOffset: '-30',
+							gerritEndDateOffset: '0'
+						};
+					vm.sonarStatsRequest = {
+						sonarProjectRegex : project.sonarDisplayParameters.sonarRegex
+					};
+					vm.sonarMaxDistance = 100;
+					vm.sonarDistanceValue = project.sonarDisplayParameters.sonarHistoryLength;
+					vm.parameters = project;
+					break;
+				}
+			}
 		}
 
 		function editSonarMetricParameters(sonarMetric){
@@ -450,6 +520,9 @@
 				vm.selectedMetric2 = findMetricCalled(vm.listOfAvailableMetrics, vm.parameters.sonarDisplayParameters.defaultMetric2);
 				vm.selectedMetric3 = findMetricCalled(vm.listOfAvailableMetrics, vm.parameters.sonarDisplayParameters.defaultMetric3);
 				vm.selectedMetric4 = findMetricCalled(vm.listOfAvailableMetrics, vm.parameters.sonarDisplayParameters.defaultMetric4);
+				vm.extraMetric1 = findMetricCalled(vm.listOfAvailableMetrics, vm.parameters.sonarDisplayParameters.defaultExtraMetric1);
+				vm.extraMetric2 = findMetricCalled(vm.listOfAvailableMetrics, vm.parameters.sonarDisplayParameters.defaultExtraMetric2);
+				vm.extraMetric3 = findMetricCalled(vm.listOfAvailableMetrics, vm.parameters.sonarDisplayParameters.defaultExtraMetric3);
 			}
 		}
 

@@ -1,5 +1,10 @@
 package com.statscollector.targets.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +27,21 @@ public class ParametersController {
 
     @Autowired
     private SonarDisplayParametersRepository sonarDisplayParametersRepository;
+
+    @RequestMapping(value = "/parameters/list", method = RequestMethod.GET)
+    @ResponseBody
+    public List<DisplayParameters> parametersList() {
+        Map<String, GerritDisplayParameters> gerritParameters = new HashMap<>();
+        sonarDisplayParametersRepository.findAll();
+        for(GerritDisplayParameters parameter : gerritDisplayParametersRepository.findAll()) {
+            gerritParameters.put(parameter.getProjectName(), parameter);
+        }
+        List<DisplayParameters> parameters = new ArrayList<>();
+        for(SonarDisplayParameters parameter : sonarDisplayParametersRepository.findAll()) {
+            parameters.add(new DisplayParameters(gerritParameters.get(parameter.getProjectName()), parameter));
+        }
+        return parameters;
+    }
 
     @RequestMapping(value = "/parameters/{projectName}", method = RequestMethod.GET)
     @ResponseBody

@@ -3,6 +3,10 @@ body {
   padding-top: 60px;
   padding-bottom: 70px;
 }
+div.ui-select-container{
+	margin-top:6px;
+	margin-bottom:6px;
+}
 .alert{
 	margin-top: 5px;
 	margin-bottom: 0px;

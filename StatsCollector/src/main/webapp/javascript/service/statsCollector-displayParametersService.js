@@ -14,8 +14,8 @@
             	saveParams: saveParams
             };
 
-            function getParams(projectName){
-            	return $http.get('/parameters/'+projectName);
+            function getParams(){
+            	return $http.get('/parameters/list');
             }
 
             function saveParams(parameters){

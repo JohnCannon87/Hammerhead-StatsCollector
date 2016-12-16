@@ -13,6 +13,17 @@
 					<li ng-show="nav.sonarUrl !== undefined"><a href=http://{{nav.sonarUrl}} target="_blank"><img src="../../images/sonarLogo.png" width="17" /> Sonar</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
+					<li>
+						<div>
+							<label for="projectList">Project:</label>
+							<ui-select style="display:inline-block; vertical-align:middle"  ng-model="vm.selectedProject">
+								<ui-select-match placeholder="Select or search a project in the list...">{{$select.selected.gerritDisplayParameters.projectName}}</ui-select-match>
+								<ui-select-choices repeat="item in vm.projectList | orderBy: 'gerritDisplayParameters.projectName'">
+									<div ng-bind-html="item.gerritDisplayParameters.projectName | highlight: $select.search""></div>
+								</ui-select-choices>
+							</ui-select>
+						</div>
+					</li>
 					<li><button class="btn navbar-btn btn-primary" ng-disabled="!vm.sonarStats" ng-click="vm.showDisplayConfig()"><i class="fa fa-cogs"></i> Display Config</button></li>
 					<li><button class="btn navbar-btn btn-primary" ng-click="nav.showGerritConfig()"><i class="fa fa-cogs"></i> Gerrit Config</button></li>
 					<li><button class="btn navbar-btn btn-primary" ng-click="nav.showSonarConfig()"><i class="fa fa-cogs"></i> Sonar Config</button></li>

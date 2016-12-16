@@ -9,6 +9,10 @@
 					<input type="text" class="form-control" id="target" ng-model="modalOptions.displayParameters.gerritDisplayParameters.projectName">
 				</div>
 				<div class="form-group">
+					<label for="gerritEnabled">Show Gerrit Stats</label>
+					<input type="checkbox" class="form-control" id="gerritEnabled" ng-model="modalOptions.displayParameters.gerritDisplayParameters.show">
+				</div>
+				<div class="form-group">
 					<label for="gerritRegex">Gerrit Project Regex</label>
 					<input type="text" class="form-control" id="gerritRegex" ng-model="modalOptions.displayParameters.gerritDisplayParameters.gerritRegex">
 				</div>
@@ -43,6 +47,18 @@
 				<div class="form-group">
 					<label for="sonarMetric4">Default Metric Bottom Right <small>(Copied from selected, to modify use drop down on main page)</small></label>
 					<input type="text" ng-disabled="true" class="form-control" id="sonarMetric4" ng-model="modalOptions.displayParameters.sonarDisplayParameters.defaultMetric4">
+				</div>
+				<div class="form-group">
+					<label for="sonarMetric5">Extra Metric 1 <small>(Copied from selected, to modify use drop down on main page)</small></label>
+					<input type="text" ng-disabled="true" class="form-control" id="sonarMetric5" ng-model="modalOptions.displayParameters.sonarDisplayParameters.defaultExtraMetric1">
+				</div>
+				<div class="form-group">
+					<label for="sonarMetric6">Extra Metric 2 <small>(Copied from selected, to modify use drop down on main page)</small></label>
+					<input type="text" ng-disabled="true" class="form-control" id="sonarMetric6" ng-model="modalOptions.displayParameters.sonarDisplayParameters.defaultExtraMetric2">
+				</div>
+				<div class="form-group">
+					<label for="sonarMetric7">Extra Metric 3 <small>(Copied from selected, to modify use drop down on main page)</small></label>
+					<input type="text" ng-disabled="true" class="form-control" id="sonarMetric7" ng-model="modalOptions.displayParameters.sonarDisplayParameters.defaultExtraMetric3">
 				</div>
 				<div class="form-group">
 					<label for="squished">Squished Projects</label>

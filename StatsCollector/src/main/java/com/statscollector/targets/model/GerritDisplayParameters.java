@@ -24,5 +24,6 @@ public class GerritDisplayParameters {
     private String gerritRegex;
     private String gerritFilterOutRegex;
     private String topicRegex;
+    private Boolean show;
 
 }

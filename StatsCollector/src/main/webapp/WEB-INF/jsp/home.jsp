@@ -25,7 +25,118 @@
 				</div>
 			</h1>
 		</div>
-		<div ng-show="vm.reviewStats" class="col-sm-3 well min-pad">
+		<div ng-show="!vm.parameters.gerritDisplayParameters.show && !vm.sonarStats" class="col-sm-3 well min-pad">
+			<h1>
+				<div>
+					<p class="text-center"><i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom text-center"></i></p>
+				</div>
+				<div>
+					<p class="text-center">Loading Sonar Statistics...</p>
+				</div>
+			</h1>
+		</div>
+		<div ng-show="!vm.parameters.gerritDisplayParameters.show && vm.sonarStats" class="col-sm-3">
+			<div class="col-sm-12 well min-pad">
+				<div class="input-group">
+					<span ng-show="vm.extraChart1.trendDirection && vm.extraChart1.trendDirection !== 'none'" class="input-group-btn">
+						<button type="button" class="btn {{vm.extraChart1.targetStatusClass}}" ng-click="vm.showOff(vm.extraChart1)">
+							<i ng-show="vm.extraChart1.trendDirection === 'down'" class="fa fa-arrow-down" aria-hidden="true"></i>
+							<i ng-show="vm.extraChart1.trendDirection === 'up'" class="fa fa-arrow-up" aria-hidden="true"></i>
+							<span>{{vm.extraChart1.latestScore}}</span>
+						</button>
+					</span>
+					<ui-select ng-model="vm.extraMetric1">
+						<ui-select-match placeholder="Select or search a metric in the list...">{{$select.selected.name}}</ui-select-match>
+						<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
+							<div ng-bind-html="item.name | highlight: $select.search"></div>
+							<small ng-show="!item.raw">Calculated</small>
+						</ui-select-choices>
+					</ui-select>
+					<span class="input-group-btn">
+						<button ng-disabled="vm.selectedMetric1 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.selectedMetric1)" class="btn btn-info">
+							<i class="fa fa-pencil" aria-hidden="true"></i>
+						</button>
+					</span>
+				</div>
+				<br/>
+				<canvas id="extraChart1" class="chart-base"
+				chart-type="vm.extraChart1.type"
+				chart-series ="vm.extraChart1.series"
+				chart-data="vm.extraChart1.data"
+				chart-labels="vm.extraChart1.labels"
+				chart-options="vm.sonarChartOptions"
+				chart-colors="vm.extraChart1.colors"
+				chart-dataset-override="vm.extraChart1.datasetOverride">
+				</canvas>
+			</div>
+			<div class="col-sm-12 well min-pad">
+				<div class="input-group">
+					<span ng-show="vm.extraChart2.trendDirection && vm.extraChart2.trendDirection !== 'none'" class="input-group-btn">
+						<button type="button" class="btn {{vm.extraChart2.targetStatusClass}}" ng-click="vm.showOff(vm.extraChart2)">
+							<i ng-show="vm.extraChart2.trendDirection === 'down'" class="fa fa-arrow-down" aria-hidden="true"></i>
+							<i ng-show="vm.extraChart2.trendDirection === 'up'" class="fa fa-arrow-up" aria-hidden="true"></i>
+							<span>{{vm.extraChart2.latestScore}}</span>
+						</button>
+					</span>
+					<ui-select ng-model="vm.extraMetric2">
+						<ui-select-match placeholder="Select or search a metric in the list...">{{$select.selected.name}}</ui-select-match>
+						<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
+							<div ng-bind-html="item.name | highlight: $select.search"></div>
+							<small ng-show="!item.raw">Calculated</small>
+						</ui-select-choices>
+					</ui-select>
+					<span class="input-group-btn">
+						<button ng-disabled="vm.selectedMetric1 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.selectedMetric1)" class="btn btn-info">
+							<i class="fa fa-pencil" aria-hidden="true"></i>
+						</button>
+					</span>
+				</div>
+				<br/>
+				<canvas id="extraChart2" class="chart-base"
+				chart-type="vm.extraChart2.type"
+				chart-series ="vm.extraChart2.series"
+				chart-data="vm.extraChart2.data"
+				chart-labels="vm.extraChart2.labels"
+				chart-options="vm.sonarChartOptions"
+				chart-colors="vm.extraChart2.colors"
+				chart-dataset-override="vm.extraChart2.datasetOverride">
+				</canvas>
+			</div>
+			<div class="col-sm-12 well min-pad">
+				<div class="input-group">
+					<span ng-show="vm.extraChart3.trendDirection && vm.extraChart3.trendDirection !== 'none'" class="input-group-btn">
+						<button type="button" class="btn {{vm.extraChart3.targetStatusClass}}" ng-click="vm.showOff(vm.extraChart3)">
+							<i ng-show="vm.extraChart3.trendDirection === 'down'" class="fa fa-arrow-down" aria-hidden="true"></i>
+							<i ng-show="vm.extraChart3.trendDirection === 'up'" class="fa fa-arrow-up" aria-hidden="true"></i>
+							<span>{{vm.extraChart3.latestScore}}</span>
+						</button>
+					</span>
+					<ui-select ng-model="vm.extraMetric3">
+						<ui-select-match placeholder="Select or search a metric in the list...">{{$select.selected.name}}</ui-select-match>
+						<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
+							<div ng-bind-html="item.name | highlight: $select.search"></div>
+							<small ng-show="!item.raw">Calculated</small>
+						</ui-select-choices>
+					</ui-select>
+					<span class="input-group-btn">
+						<button ng-disabled="vm.selectedMetric1 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.selectedMetric1)" class="btn btn-info">
+							<i class="fa fa-pencil" aria-hidden="true"></i>
+						</button>
+					</span>
+				</div>
+				<br/>
+				<canvas id="extraChart3" class="chart-base"
+				chart-type="vm.extraChart3.type"
+				chart-series ="vm.extraChart3.series"
+				chart-data="vm.extraChart3.data"
+				chart-labels="vm.extraChart3.labels"
+				chart-options="vm.sonarChartOptions"
+				chart-colors="vm.extraChart3.colors"
+				chart-dataset-override="vm.extraChart3.datasetOverride">
+				</canvas>
+			</div>
+		</div>
+		<div ng-show="vm.parameters.gerritDisplayParameters.show && vm.reviewStats" class="col-sm-3 well min-pad">
 			<div class="gerritActitvity">
 				<canvas id="gerritActivity" class="chart chart-line"
 				  chart-dataset-override="vm.gerritActivityDatasetOverride"
@@ -95,7 +206,7 @@
 				            </button>
 			            </span>
 						<ui-select ng-model="vm.selectedMetric1">
-							<ui-select-match placeholder="Select or search a person in the list...">{{$select.selected.name}}</ui-select-match>
+							<ui-select-match placeholder="Select or search a metric in the list...">{{$select.selected.name}}</ui-select-match>
 							<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
 								<div ng-bind-html="item.name | highlight: $select.search"></div>
 								<small ng-show="!item.raw">Calculated</small>
@@ -128,7 +239,7 @@
 				            </button>
 			            </span>
 						<ui-select ng-model="vm.selectedMetric2">
-							<ui-select-match placeholder="Select or search a person in the list...">{{$select.selected.name}}</ui-select-match>
+							<ui-select-match placeholder="Select or search a metric in the list...">{{$select.selected.name}}</ui-select-match>
 							<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
 								<div ng-bind-html="item.name | highlight: $select.search"></div>
 								<small ng-show="!item.raw">Calculated</small>
@@ -163,7 +274,7 @@
 				            </button>
 			            </span>
 						<ui-select ng-model="vm.selectedMetric3">
-							<ui-select-match placeholder="Select or search a person in the list...">{{$select.selected.name}}</ui-select-match>
+							<ui-select-match placeholder="Select or search a metric in the list...">{{$select.selected.name}}</ui-select-match>
 							<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
 								<div ng-bind-html="item.name | highlight: $select.search"></div>
 								<small ng-show="!item.raw">Calculated</small>
@@ -196,7 +307,7 @@
 				            </button>
 			            </span>
 						<ui-select ng-model="vm.selectedMetric4">
-							<ui-select-match placeholder="Select or search a person in the list...">{{$select.selected.name}}</ui-select-match>
+							<ui-select-match placeholder="Select or search a metric in the list...">{{$select.selected.name}}</ui-select-match>
 							<ui-select-choices repeat="item in vm.listOfAvailableMetrics | filter: {name: $select.search} | orderBy: 'name'">
 								<div ng-bind-html="item.name | highlight: $select.search"></div>
 								<small ng-show="!item.raw">Calculated</small>
