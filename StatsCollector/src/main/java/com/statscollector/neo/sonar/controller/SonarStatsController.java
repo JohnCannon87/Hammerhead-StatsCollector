@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.statscollector.gerrit.model.ConnectionTestResults;
@@ -46,8 +45,7 @@ public class SonarStatsController {
     }
 
     @CrossOrigin
-    @RequestMapping(value = "/targetStatus/{projectName}/all")
-    @ResponseBody
+    @RequestMapping(value = "/targetStatus/{projectName}")
     public SonarTargetsStatus targetStatus(@PathVariable final String projectName, final HttpServletResponse response)
             throws IOException,
             URISyntaxException {

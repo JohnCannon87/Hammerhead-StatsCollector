@@ -206,13 +206,12 @@ public class SonarService {
             final Map<String, SonarMetric> derivedMetricsMap, final Map<String, SonarMetric> metricsMap,
             final String metricName) {
         Boolean targetMet;
-        String metricNameAsKey = metricNameAsKey(metricName);
         SonarTargetSettings sonarTargetSettings = projectParameters.getSonarTargetParam()
-                .get(metricNameAsKey);
+                .get(metricName);
 
-        SonarMetric sonarMetric = derivedMetricsMap.get(metricNameAsKey);
+        SonarMetric sonarMetric = derivedMetricsMap.get(metricNameAsKey(metricName));
         if(null == sonarMetric) {
-            sonarMetric = metricsMap.get(metricNameAsKey);
+            sonarMetric = metricsMap.get(metricName);
         }
         if(null == sonarMetric) {
             targetMet = false;
