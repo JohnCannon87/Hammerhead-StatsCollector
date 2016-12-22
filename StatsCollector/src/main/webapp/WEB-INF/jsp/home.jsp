@@ -53,7 +53,7 @@
 						</ui-select-choices>
 					</ui-select>
 					<span class="input-group-btn">
-						<button ng-disabled="vm.selectedMetric1 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.selectedMetric1)" class="btn btn-info">
+						<button ng-disabled="vm.extraMetric1 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.extraMetric1)" class="btn btn-info">
 							<i class="fa fa-pencil" aria-hidden="true"></i>
 						</button>
 					</span>
@@ -86,7 +86,7 @@
 						</ui-select-choices>
 					</ui-select>
 					<span class="input-group-btn">
-						<button ng-disabled="vm.selectedMetric1 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.selectedMetric1)" class="btn btn-info">
+						<button ng-disabled="vm.extraMetric2 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.extraMetric2)" class="btn btn-info">
 							<i class="fa fa-pencil" aria-hidden="true"></i>
 						</button>
 					</span>
@@ -119,7 +119,7 @@
 						</ui-select-choices>
 					</ui-select>
 					<span class="input-group-btn">
-						<button ng-disabled="vm.selectedMetric1 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.selectedMetric1)" class="btn btn-info">
+						<button ng-disabled="vm.extraMetric3 === undefined" type="button" ng-click="vm.editSonarMetricParameters(vm.extraMetric3)" class="btn btn-info">
 							<i class="fa fa-pencil" aria-hidden="true"></i>
 						</button>
 					</span>
